@@ -12,3 +12,5 @@ libraryDependencies ++= Seq(
   cache,
   ws
 )
+
+net.virtualvoid.sbt.graph.Plugin.graphSettings

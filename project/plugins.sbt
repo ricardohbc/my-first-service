@@ -1,18 +1,18 @@
-resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
+scalacOptions ++= Seq("-deprecation", "-language:_", "-unchecked")
 
-// The Play plugin
+// Comment to get more information during initialization
+logLevel := Level.Warn
+
+// The Typesafe repository
+resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+
+// Use the Play sbt plugin for Play projects
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.9")
 
-// web plugins
+addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.6.0")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0")
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.7.5")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.0.0")
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.6.0")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-jshint" % "1.0.1")
-
-addSbtPlugin("com.typesafe.sbt" % "sbt-rjs" % "1.0.1")
-
-addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.0.0")
-
-addSbtPlugin("com.typesafe.sbt" % "sbt-mocha" % "1.0.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.0")

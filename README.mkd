@@ -44,4 +44,5 @@ Navigate to the root project directory and call sbt
    When you are on sbt console, call **eclipse**
 
 All project dependencies will be download and the configuration files will be created
- 
+
+

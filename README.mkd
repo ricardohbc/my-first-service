@@ -45,4 +45,3 @@ Navigate to the root project directory and call sbt
 
 All project dependencies will be download and the configuration files will be created
  
- 

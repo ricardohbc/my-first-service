@@ -2,12 +2,10 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+# Index page
+GET     /hbc-microservice-template                           controllers.Application.index
+
 # Admin
-GET     /admin/ping                controllers.Admin.ping
-GET     /admin/jvmstats            controllers.Admin.jvmstats
+GET     /hbc-microservice-template/admin/ping                controllers.Admin.ping
+GET     /hbc-microservice-template/admin/jvmstats            controllers.Admin.jvmstat
 
-# Home page
-GET     /                           controllers.Application.index
-
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)

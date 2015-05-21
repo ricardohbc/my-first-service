@@ -1,0 +1,48 @@
+HBC Microservice Template
+=================================
+
+This Scala Play app template aims to be used the base template used by the developer community at HBC Digital.
+
+Feel free to run the steps below in order to bootstrap your brand new microservice.
+
+**To be Added as we migrate off of activator**
+
+- step 1
+- step 2
+- step 3
+- step etc
+
+#Features supported
+
+- Docker image (TBD)
+ 
+- Vagrant (TBD) 
+
+- Logging
+
+Based on embed Play logging support
+
+- Metrics
+
+Based on [metrics](https://github.com/saksdirect/metrics) project (to be updated to Scala metric jar), provides Counters, Gauges and Metrics
+
+- Health check page (TBD)
+ - Ping
+ - JVM stats
+ - Build version
+
+- HTTP fail over and timeout handling (TBD)
+
+- IDE support
+
+Navigate to the root project directory and call sbt
+
+ - Intellij
+   When you are on sbt console, call **gen-ide**
+  
+ - Eclipse
+   When you are on sbt console, call **eclipse**
+
+All project dependencies will be download and the configuration files will be created
+ 
+ 

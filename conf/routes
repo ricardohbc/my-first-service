@@ -2,6 +2,10 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+# Admin
+GET     /admin/ping                controllers.Admin.ping
+GET     /admin/jvmstats            controllers.Admin.jvmstats
+
 # Home page
 GET     /                           controllers.Application.index
 

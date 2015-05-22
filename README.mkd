@@ -14,17 +14,36 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 
 #Features supported
 
-- Docker image (TBD)
- 
-- Vagrant (TBD) 
+- Docker image (TBD - Still needs to be tested)
+  - Readme, Dockerfile, and scripts can be found under docker directory
+
+- Vagrant
+  - Vagrantfile is in root of project
+  - Puppet provisioning is in puppet directory
+  - To get started:
+    - Install [Homebrew](http://brew.sh/)
+    - Install Ruby (**Macs already have Ruby installed**) -
+      - https://www.ruby-lang.org/en/downloads/
+    - If you encounter permission issues, install RVM -
+      https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=install+rvm+mac
+    - Verify **Ruby 2.2.1** is set
+    - Install [Vagrant](http://www.vagrantup.com/downloads)
+    - Install Vagrant Puppet-Install plugin
+      - vagrant plugin install vagrant-puppet-install
+    - Install Vagrant Librarian-Puppet plugin (version 0.9.0)
+      - vagrant plugin install vagrant-librarian-puppet --plugin-version 0.9.0
 
 - Logging
+  - Based on embedded Play logging support (Logback)
+  - [logging](https://www.playframework.com/documentation/2.3.x/SettingsLogger)
+  - Change logging settings by modifying file conf/logger.xml
+  - Logs are at logs/hbc-microservice-template.log
 
-Based on embed Play logging support
-
-- Metrics
-
-Based on [metrics](https://github.com/saksdirect/metrics) project (to be updated to Scala metric jar), provides Counters, Gauges and Metrics
+- Metrics (TBD - Still needs to be thoroughly tested)
+  - Based on [metrics](https://github.com/saksdirect/metrics) project 
+  - Turned into a scala trait, StatsDClient, and associated classes
+  - Embedded with the template
+  - Provides Counters, Gauges and Metrics
 
 - Health check page
     Health check pages are under the endpoint path **/admin/[???]**
@@ -102,4 +121,11 @@ Navigate to the root project directory and call sbt
 
 All project dependencies will be download and the configuration files will be created
 
-
+####Links to More information
+- Vagrant
+  - http://docs.vagrantup.com/v2/getting-started/index.html
+- Puppet
+  - http://docs.puppetlabs.com/puppet/
+  - https://puppetlabs.com/download-learning-vm
+- Librarian puppet
+  - https://github.com/rodjek/librarian-puppet/blob/master/README.md

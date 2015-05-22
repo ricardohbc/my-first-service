@@ -5,6 +5,11 @@
 # Index page
 GET     /hbc-microservice-template                           controllers.Application.index
 
+# Change log level
+PUT     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevel(level: String)
+# Change log level convenience method
+GET     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevel(level: String)
+
 # Admin
 GET     /hbc-microservice-template/admin/ping                controllers.Admin.ping
 GET     /hbc-microservice-template/admin/jvmstats            controllers.Admin.jvmstats

@@ -7,5 +7,5 @@ GET     /hbc-microservice-template                           controllers.Applica
 
 # Admin
 GET     /hbc-microservice-template/admin/ping                controllers.Admin.ping
-GET     /hbc-microservice-template/admin/jvmstats            controllers.Admin.jvmstat
+GET     /hbc-microservice-template/admin/jvmstats            controllers.Admin.jvmstats
 

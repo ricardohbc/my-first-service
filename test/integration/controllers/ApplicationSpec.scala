@@ -25,7 +25,7 @@ with BeforeAndAfterAll {
     }
 
     "render the index page" in {
-      val index = route(FakeRequest(GET, "/microservice-template")).get
+      val index = route(FakeRequest(GET, "/hbc-microservice-template")).get
 
       status(index) shouldBe OK
       contentType(index).get == "application/json" shouldBe true

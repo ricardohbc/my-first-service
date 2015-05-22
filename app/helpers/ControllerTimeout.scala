@@ -1,12 +1,10 @@
 package helpers
 
-import com.typesafe.config.ConfigFactory
 import scala.concurrent._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
 
-trait ControllerTimeout {
-  lazy val config = ConfigFactory.load()
+trait ControllerTimeout extends ConfigHelper {
   var actionTimeout = config getInt "controllers.timeout" millis
 
   def timeout[T](errorHandler: => T)(body: => T) : Future[T] = {

@@ -1,27 +1,39 @@
 package integration.controllers
 
-import org.junit.runner.RunWith
-import org.specs2.mutable.Specification
-import org.specs2.runner.JUnitRunner
-import play.api.test.WithBrowser
+import play.api.test.Helpers._
+import play.api.test._
+import play.api.Play
+import org.scalatest.{Matchers, BeforeAndAfterAll, WordSpec}
+import play.api.test.FakeApplication
+import scala.Some
 
-@RunWith(classOf[JUnitRunner])
-class AdminSpec extends Specification {
+class AdminSpec extends WordSpec
+with Matchers
+with BeforeAndAfterAll {
+
+  override def beforeAll() = {
+    Play.start(FakeApplication(withGlobal = Some(new controllers.Global)))
+  }
+
+  override def afterAll() = {
+    Play.stop()
+  }
 
   "Admin controller" should {
 
-    "show **pong** when /admin/ping endpoint is called" in new WithBrowser {
+    "show **pong** when /hbc-microservice-template/admin/ping endpoint is called" in {
 
-      browser.goTo("http://localhost:" + port + "/admin/ping")
+      val ping = route(FakeRequest(GET, "/hbc-microservice-template/admin/ping")).get
 
-      browser.pageSource must contain("pong")
+      status(ping) shouldBe OK
+      contentAsString(ping).contains("pong") shouldBe true
     }
 
-    "show **JVM Stats** when /admin/jvmstats endpoint is called" in new WithBrowser {
-      println("bla")
-      browser.goTo("http://localhost:" + port + "/admin/jvmstats")
+    "show **JVM Stats** when /hbc-microservice-template/admin/jvmstats endpoint is called" in {
+      val jvmstats = route(FakeRequest(GET, "/hbc-microservice-template/admin/jvmstats")).get
 
-      browser.pageSource must contain("jvm_num_cpus")
+      status(jvmstats) shouldBe OK
+      contentAsString(jvmstats).contains("jvm_num_cpus") shouldBe true
     }
   }
 }

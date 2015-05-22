@@ -26,10 +26,67 @@ Based on embed Play logging support
 
 Based on [metrics](https://github.com/saksdirect/metrics) project (to be updated to Scala metric jar), provides Counters, Gauges and Metrics
 
-- Health check page (TBD)
+- Health check page
+    Health check pages are under the endpoint path **/admin/[???]**
+
+    These are the supported endpoint:
+
  - Ping
+    When called the endpoit **/admin/ping** the response should **pong**
+    
  - JVM stats
- - Build version
+    When called the endpoint **/admin/jvmstats** the response should be a JSON payload with the JVM stats as showed below:
+    
+    ```sh
+{
+  "jvm_num_cpus" : 4.0,
+  "jvm_current_mem_Code Cache_max" : 50331648,
+  "jvm_post_gc_PS Old Gen_max" : 7.1565312E+8,
+  "jvm_post_gc_PS Eden Space_used" : 0.0,
+  "jvm_fd_limit" : 10240.0,
+  "jvm_current_mem_PS Survivor Space_used" : 45259984,
+  "jvm_thread_count" : 40.0,
+  "jvm_post_gc_PS Perm Gen_used" : 106023416,
+  "jvm_classes_total_unloaded" : 14152.0,
+  "jvm_current_mem_PS Eden Space_max" : 239599616,
+  "jvm_current_mem_PS Old Gen_max" : 7.1565312E+8,
+  "jvm_nonheap_max" : 5.8720256E+8,
+  "jvm_buffer_direct_count" : 19.0,
+  "jvm_buffer_mapped_used" : 0.0,
+  "jvm_buffer_direct_max" : 627712.0,
+  "jvm_current_mem_PS Old Gen_used" : 197647536,
+  "jvm_classes_current_loaded" : 22564.0,
+  "jvm_start_time" : 1432235806864,
+  "jvm_current_mem_Code Cache_used" : 1.839776E+7,
+  "jvm_buffer_mapped_count" : 0.0,
+  "jvm_post_gc_PS Survivor Space_max" : 45613056,
+  "jvm_buffer_direct_used" : 627712.0,
+  "jvm_thread_peak_count" : 42.0,
+  "jvm_current_mem_used" : 527369496,
+  "jvm_post_gc_PS Eden Space_max" : 239599616,
+  "jvm_post_gc_used" : 276579328,
+  "jvm_current_mem_PS Perm Gen_used" : 134804432,
+  "jvm_uptime" : 70355031,
+  "jvm_heap_committed" : 495976448,
+  "jvm_compilation_time_msec" : 96308.0,
+  "jvm_current_mem_PS Eden Space_used" : 131259784,
+  "jvm_classes_total_loaded" : 36716.0,
+  "jvm_current_mem_PS Survivor Space_max" : 45613056,
+  "jvm_buffer_mapped_max" : 0.0,
+  "jvm_thread_daemon_count" : 9.0,
+  "jvm_heap_max" : 954728448,
+  "jvm_post_gc_PS Old Gen_used" : 125295928,
+  "jvm_fd_count" : 354.0,
+  "jvm_post_gc_PS Perm Gen_max" : 536870912,
+  "jvm_heap_used" : 374167304,
+  "jvm_post_gc_PS Survivor Space_used" : 45259984,
+  "jvm_nonheap_used" : 153191056,
+  "jvm_current_mem_PS Perm Gen_max" : 536870912,
+  "jvm_nonheap_committed" : 238354432
+}
+    ```
+ 
+ - Build version (TBD)
 
 - HTTP fail over and timeout handling (TBD)
 

@@ -38,6 +38,8 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
   - [logging](https://www.playframework.com/documentation/2.3.x/SettingsLogger)
   - Change logging settings by modifying file conf/logger.xml
   - Logs are at logs/hbc-microservice-template.log
+  - You can change the log level at runtime by hitting the endpoint:
+    - /hbc-microservice-template/logLevel/DEBUG (possible values = ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)
 
 - Metrics (TBD - Still needs to be thoroughly tested)
   - Based on [metrics](https://github.com/saksdirect/metrics) project 

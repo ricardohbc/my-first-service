@@ -2,6 +2,7 @@ package controllers
 
 import akka.actor.ActorSystem
 import com.s5a.metrics.{MetricNamespace, MetricName}
+import metrics.StatsDClient
 import play.api._
 import play.api.mvc._
 
@@ -10,7 +11,10 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class ApplicationLike (val recorder: RecorderLike) extends Controller with RecorderTrait {
+object Application extends Controller
+with StatsDClient {
+
+  override val context = ActorSystem("hbc-microservice-template")
 
   def index = Action.async ({
     request =>
@@ -25,6 +29,3 @@ class ApplicationLike (val recorder: RecorderLike) extends Controller with Recor
   })
 
 }
-
-object Application extends ApplicationLike (
-  MetricRecorder(ActorSystem("hbc-microservice-template"), MetricNamespace.SERVICE_CORE))

@@ -60,7 +60,7 @@ trait Gauger{
 trait RecorderLike extends Timer with Counter with Gauger
 
 //Used by other classes to mix in recorder functionality
-trait RecorderTrait extends RecorderLike {
+trait RecorderTrait extends RecorderLike with StatsDClient {
   def recorder: RecorderLike
   def time(tag: String, ms: Long) = recorder.time(tag, ms)
   def time [A](tag:String)(f: => A):A = recorder.time(tag){f}
@@ -104,5 +104,3 @@ class NullMetricRecorder() extends RecorderLike {
   def increment(tag: String){/*Do Nothing*/}
   def gauge(tag: String, num: Long){/*Do Nothing*/}
 }
-
-

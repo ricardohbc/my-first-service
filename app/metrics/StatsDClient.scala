@@ -31,14 +31,13 @@ import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 import java.util.Random
 import akka.actor._
-import com.typesafe.config.ConfigFactory
 import play.Logger
+import helpers.ConfigHelper
 
-trait StatsDClient {
+trait StatsDClient extends ConfigHelper {
 
   implicit val system: ActorSystem
 
-  val config = ConfigFactory.load()
   val host = config.getString("statsd.server")
   val port = config.getInt("statsd.port")
   val server = config.getString("statsd.metric-host")

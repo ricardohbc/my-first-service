@@ -36,8 +36,7 @@ import play.Logger
 
 trait StatsDClient {
 
-  //might need implicit
-  val context: ActorContext
+  implicit val system: ActorSystem
 
   val config = ConfigFactory.load()
   val host = config.getString("statsd.server")
@@ -51,7 +50,7 @@ trait StatsDClient {
 
   private val rand = new Random()
 
-  private val actorRef = context.actorOf(Props(new StatsDActor(host, port, multiMetrics, packetBufferSize, prefix)))
+  private lazy val actorRef = system.actorOf(Props(new StatsDActor(host, port, multiMetrics, packetBufferSize, prefix)))
 
   /**
    * Sends timing stats in milliseconds to StatsD
@@ -116,6 +115,7 @@ trait StatsDClient {
    */
   private def send(key: String, value: String, metric: String, sampleRate: Double): Boolean = {
     if (sampleRate >= 1 || rand.nextDouble <= sampleRate) {
+
       actorRef ! SendStat(StatsDProtocol.stat(key, value, metric, sampleRate))
       true
     }
@@ -123,7 +123,6 @@ trait StatsDClient {
       false
     }
   }
-
 }
 
 object StatsDProtocol {

@@ -1,7 +1,7 @@
 package controllers
 
 import akka.actor.ActorSystem
-import com.s5a.metrics.MetricNamespace
+import metrics.StatsDClient
 import play.api._
 
 import play.api.mvc._
@@ -13,7 +13,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import java.lang.management._
 import scala.collection.mutable
 
-class AdminLike (val recorder: RecorderLike) extends Controller with RecorderTrait {
+object Admin extends Controller
+with StatsDClient {
+
+  override val system = ActorSystem("hbc-microservice-template")
 
   def ping = Action.async ({
     request =>
@@ -111,6 +114,3 @@ class AdminLike (val recorder: RecorderLike) extends Controller with RecorderTra
     Json.toJson(out.toMap)
   }
 }
-
-object Admin extends AdminLike (
-  MetricRecorder(ActorSystem("Admin"), MetricNamespace.SERVICE_CORE))

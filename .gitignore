@@ -15,3 +15,6 @@ dist
 /.settings
 /.tmp
 /.librarian
+.DS_Store
+*.sublime-*
+.ensime*

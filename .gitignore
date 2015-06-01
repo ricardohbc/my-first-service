@@ -18,3 +18,6 @@ dist
 .DS_Store
 *.sublime-*
 .ensime*
+.vagrant
+puppet/.tmp
+puppet/modules/*

@@ -1,4 +1,4 @@
-include 'scala'
+include 'sbtubuntu'
 
 class { 'nodejs':
     version => 'latest',

@@ -1,19 +1,18 @@
 include 'sbtubuntu'
 
+class { 'java':
+  package => 'openjdk-7-jdk'
+}
+
 class { 'nodejs':
-    version => 'latest',
+  version => 'latest'
 }
 
-class {'::mongodb::server':
-  auth => true,
-}
+include '::mongodb::server'
 
-mongodb::db {'shared_state_inventory':
-  user          => 'shared_state_inventory',
-  password_hash => 'shared_state_inventory_123',
+class {'graphite':
+  gr_apache_24 => true
 }
-
-class {'graphite':}
 
 class {'statsd':
   backends     => ['./backends/graphite'],

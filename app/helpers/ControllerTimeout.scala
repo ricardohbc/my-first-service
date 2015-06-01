@@ -3,6 +3,7 @@ package helpers
 import scala.concurrent._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 trait ControllerTimeout extends ConfigHelper {
   var actionTimeout = config getInt "controllers.timeout" millis

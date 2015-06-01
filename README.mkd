@@ -5,12 +5,30 @@ This Scala Play app template aims to be used the base template used by the devel
 
 Feel free to run the steps below in order to bootstrap your brand new microservice.
 
-**To be Added as we migrate off of activator**
+#Steps to start a new Microservice
 
-- step 1
-- step 2
-- step 3
-- step etc
+- Clone this project:
+
+      ```sh
+      git clone https://github.com/saksdirect/hbc-microservice-template.git
+      ```
+- Run the setup.sh script inside this repo (Works in Mac OSX only at the moment):
+
+      ```sh
+      cd hbc-microservice-template
+      ./setup.sh
+      ```
+- Give this microservice a name. The script will perform a search & replace to change all "hbc-microservice-template" to the name you have provided. NOTE: the name should conform to our current naming scheme (lowercase words, separated by dashes):
+
+      ```sh
+      Please enter service name:
+      lookahead-service
+      ```
+- Finally, change out of the current directory, as it has been renamed.
+
+      ```sh
+      cd ..
+      ```
 
 #Features supported
 

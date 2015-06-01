@@ -16,6 +16,6 @@ git init
 
 echo "Done! Enjoy your new micro service"
 
-echo "Removing setup.sh since you don't need it anymore"
+echo "Removing setup.sh and README.mkd since you don't need it anymore"
 rm -f setup.sh
-
+rm -f README.mkd

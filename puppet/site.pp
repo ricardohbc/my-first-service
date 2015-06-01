@@ -1,21 +1,12 @@
 include 'sbtubuntu'
+include 'docker'
 
 class { 'java':
-  package => 'openjdk-7-jdk'
+    package => 'openjdk-7-jdk'
 }
 
-class { 'nodejs':
-  version => 'latest'
+docker::run { 'graphite':
+    image   => 'hopsoft/graphite-statsd',
+      ports => ["80:80", "2003:2003", "8125:8125/udp"]
 }
 
-include '::mongodb::server'
-
-class {'graphite':
-  gr_apache_24 => true
-}
-
-class {'statsd':
-  backends     => ['./backends/graphite'],
-  graphiteHost => 'localhost',
-  require      => Class['nodejs']
-}

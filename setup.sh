@@ -20,10 +20,16 @@ find ./ -type f -exec sed -i '' -E "s/hbc-microservice-template/$SERVICE_NAME/g"
 cd ..
 mv hbc-microservice-template $SERVICE_NAME
 cd $SERVICE_NAME
+
+echo "Removing setup.sh and README.mkd since you don't need it anymore"
+rm -f setup.sh
+rm -f README.mkd
+
+echo "Renaming README-template.mkd to README.mkd"
+mv README-template.mkd README.mkd
+
 git init
 
 echo "Done! Enjoy your new micro service"
 
-echo "Removing setup.sh since you don't need it anymore"
-rm -f setup.sh
-rm -f README.mkd
+

@@ -1,10 +1,18 @@
-echo "Please enter service name: "
-read SERVICE_NAME
+read -p "Please enter service name: " SERVICE_NAME
 
 if [ -z "$SERVICE_NAME" ]
 then
-	echo "Please enter a valid service name!"
-	exit;
+        echo "Please enter a valid service name!"
+        exit;
+elif ! [[ "$SERVICE_NAME" =~ ^[a-z]+-service$ ]]
+then
+        echo "Service name does not conform to current naming scheme! Please check README.mkd for correct scheme!"
+        read -p "Are you sure you want to continue? [y/n]: " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[^Yy]$ ]]
+        then
+                exit;
+        fi
 fi
 
 rm -rf .git
@@ -16,6 +24,6 @@ git init
 
 echo "Done! Enjoy your new micro service"
 
-echo "Removing setup.sh and README.mkd since you don't need it anymore"
+echo "Removing setup.sh since you don't need it anymore"
 rm -f setup.sh
 rm -f README.mkd

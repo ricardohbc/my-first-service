@@ -5,7 +5,7 @@ This Scala Play app template aims to be used the base template used by the devel
 
 Feel free to run the steps below in order to bootstrap your brand new microservice.
 
-#Steps to start a new Microservice
+#Steps to create a new Microservice
 
 - Clone this project:
 
@@ -18,7 +18,7 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
       cd hbc-microservice-template
       ./setup.sh
       ```
-- Give this microservice a name. The script will perform a search & replace to change all "hbc-microservice-template" to the name you have provided. NOTE: the name should conform to our current naming scheme (lowercase words, separated by dashes):
+- Give this microservice a name. The script will perform a search & replace to change all "hbc-microservice-template" to the name you have provided (please conform to the naming scheme described below):
 
       ```sh
       Please enter service name:
@@ -29,6 +29,16 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
       ```sh
       cd ..
       ```
+#Microservice Naming Scheme
+- Only use lower case letters.
+- All words should be combined together, with no spaces.
+- Name should be short, and clearly describes what the service is used for.
+- All microservices should have a suffix of "-service", so we can easily search for and distinguish all microservices in github.
+- Examples of good service names:
+      - findinstore-serivce
+      - storepickup-service
+      - endeca-service
+      - lookahead-service
 
 #Features supported
 

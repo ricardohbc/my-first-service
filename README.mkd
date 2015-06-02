@@ -31,12 +31,12 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
       ```
 #Microservice Naming Scheme
 - Only use lower case letters.
-- If needed, seperate words with dashes.
+- All words should be combined together, with no spaces.
 - Name should be short, and clearly describes what the service is used for.
-- All microservices should have a suffix of "-service" (so we can easily search for all microservices in github)
+- All microservices should have a suffix of "-service", so we can easily search for and distinguish all microservices in github.
 - Examples of good service names:
       - findinstore-serivce
-      - store-pickup-service
+      - storepickup-service
       - endeca-service
       - lookahead-service
 

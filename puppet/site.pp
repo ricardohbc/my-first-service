@@ -1,22 +1,12 @@
 include 'sbtubuntu'
+include 'docker'
 
-class { 'nodejs':
-    version => 'latest',
+class { 'java':
+    package => 'openjdk-7-jdk'
 }
 
-class {'::mongodb::server':
-  auth => true,
+docker::run { 'graphite':
+    image   => 'hopsoft/graphite-statsd',
+      ports => ["80:80", "2003:2003", "8125:8125/udp"]
 }
 
-mongodb::db {'shared_state_inventory':
-  user          => 'shared_state_inventory',
-  password_hash => 'shared_state_inventory_123',
-}
-
-class {'graphite':}
-
-class {'statsd':
-  backends     => ['./backends/graphite'],
-  graphiteHost => 'localhost',
-  require      => Class['nodejs']
-}

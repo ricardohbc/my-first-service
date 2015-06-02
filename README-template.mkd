@@ -1,0 +1,20 @@
+# hbc-microservice-template
+
+[description of what this service does]
+
+# Routes
+
+[list all routes that this service supports]
+
+| Method | Route | Class | Description
+| ------ | ----- | ----- | -----------
+| GET | /hbc-microservice-template | controllers.Application.index | Index Page
+| PUT | /hbc-microservice-template/logLevel/$level | controllers.Application.index | Change Log Level
+| GET | /hbc-microservice-template/logLevel/$level | controllers.Application.index | Change Log Level (Convenient Method)
+| GET | /hbc-microservice-template/admin/ping | controllers.Admin.ping | Ping Service
+| GET | /hbc-microservice-template/admin/jvmstats | controllers.Admin.jvmstats | Display current JVM Stats
+
+
+# Architecture
+
+[describe how this service interacts with other external systems]

@@ -10,7 +10,7 @@ fi
 echo "Copying hbc-microservice-template ZIP to current directory..."
 cp ../hbc-microservice-template/target/universal/hbc-microservice-template-0.1.zip .
 
-tag=hbcdigital/simulators:toggle-0.1
+tag=hbcdigital/simulators:hbc-microservice-template-0.1
 
 echo "Building hbc-microservice-template Docker Container.."
 sudo docker build -t ${tag} .

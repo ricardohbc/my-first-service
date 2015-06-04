@@ -1,35 +1,42 @@
 HBC Microservice Template
 =================================
 
-This Scala Play app template aims to be used the base template used by the developer community at HBC Digital.
+This Scala Play app template aims to be used as the base template used by the developer community at HBC Digital.
 
 Feel free to run the steps below in order to bootstrap your brand new microservice.
 
-#Steps to create a new Microservice
+[Steps to Create a New Microservice](#steps-to-create-a-new-microservice)  
+[Microservice Naming Scheme](#microservice-naming-scheme)  
+[Features Supported](#features-supported)  
+[Additional Information](#additional-information)  
 
+## Steps to Create a New Microservice
 - Clone this project:
-
+      
       ```sh
       git clone https://github.com/saksdirect/hbc-microservice-template.git
       ```
-- Run the setup.sh script inside this repo (Works in Mac OSX only at the moment):
-
+- Run the 'setup.sh' script inside this repo (works in Mac OSX only at the moment):
+      
       ```sh
       cd hbc-microservice-template
       ./setup.sh
       ```
-- Give this microservice a name. The script will perform a search & replace to change all "hbc-microservice-template" to the name you have provided (please conform to the naming scheme described below):
+
+- Give the new microservice a name. The script will perform a search & replace to change all "hbc-microservice-template" string instances to the name you have provided (please conform to the naming scheme described below):
 
       ```sh
       Please enter service name:
       lookahead-service
       ```
+
 - Finally, change out of the current directory, as it has been renamed.
 
       ```sh
       cd ..
       ```
-#Microservice Naming Scheme
+
+## Microservice Naming Scheme  
 - Only use lower case letters.
 - All words should be combined together, with no spaces.
 - Name should be short, and clearly describes what the service is used for.
@@ -40,7 +47,8 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
       - endeca-service
       - lookahead-service
 
-#Features supported
+## Features supported  
+[Get Started with Vagrant/Docker](https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#first-time-setup)
 
 - Docker image (TBD - Still needs to be tested)
   - Readme, Dockerfile, and scripts can be found under docker directory
@@ -48,28 +56,12 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 - Vagrant
   - Vagrantfile is in root of project
   - Puppet provisioning is in puppet directory
-  - To get started:
-    - Install [Homebrew](https://github.com/saksdirect/HBCPlatformDocs/tree/master/gettingStarted/backendDevWorkstation#install-homebrew)
-    - Install Ruby (**Macs already have Ruby installed**) -
-      - https://github.com/saksdirect/HBCPlatformDocs/tree/master/gettingStarted/backendDevWorkstation#ruby-setup
-    - If you encounter permission issues, install RVM -
-      https://github.com/saksdirect/HBCPlatformDocs/tree/master/gettingStarted/backendDevWorkstation#ruby-setup
-      - Verify **Ruby 2.2.1** is set
-    - Install [Vagrant](https://github.com/saksdirect/HBCPlatformDocs/tree/master/gettingStarted/backendDevWorkstation#vagrant-setup)
-    - Install Vagrant Puppet-Install plugin  
-      ```sh
-      vagrant plugin install vagrant-puppet-install
-      ```
-    - Install Vagrant Librarian-Puppet plugin (version 0.9.0)  
-      ```sh
-      vagrant plugin install vagrant-librarian-puppet --plugin-version 0.9.0
-      ```
-      
+
 - Logging
   - Based on embedded Play logging support (Logback)
-  - [logging](https://www.playframework.com/documentation/2.3.x/SettingsLogger)
-  - Change logging settings by modifying file conf/logger.xml
-  - Logs are at logs/hbc-microservice-template.log
+  - [Logging](https://www.playframework.com/documentation/2.3.x/SettingsLogger)
+  - Change logging settings by modifying file 'conf/logger.xml'
+  - Logs are at 'logs/hbc-microservice-template.log'
   - You can change the log level at runtime by hitting the endpoint:
     - /hbc-microservice-template/logLevel/DEBUG (possible values = ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)
 
@@ -139,7 +131,7 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 }
     ```
  
- - Build version (TBD)
+- Build version (TBD)
 
 - HTTP fail over and timeout handling (TBD)
 
@@ -148,18 +140,12 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 Navigate to the root project directory and call sbt
 
  - Intellij
-   When you are on sbt console, call **gen-ide**
+   When you are on sbt console, call **gen-idea**
   
  - Eclipse
    When you are on sbt console, call **eclipse**
 
-All project dependencies will be download and the configuration files will be created
+All project dependencies will be downloaded and the configuration files will be created
 
-####Links to More information
-- Vagrant
-  - http://docs.vagrantup.com/v2/getting-started/index.html
-- Puppet
-  - http://docs.puppetlabs.com/puppet/
-  - https://puppetlabs.com/download-learning-vm
-- Librarian puppet
-  - https://github.com/rodjek/librarian-puppet/blob/master/README.md
+## Additional Information  
+Resource: https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#additional-information

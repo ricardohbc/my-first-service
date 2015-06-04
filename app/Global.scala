@@ -5,6 +5,6 @@ import scala.concurrent.Future
 
 object Global extends GlobalSettings {
 
-  override def doFilter(next: EssentialAction): EssentialAction =
-    Filters(super.doFilter(next), GlobalFilter)
+  // override def doFilter(next: EssentialAction): EssentialAction =
+  //   Filters(super.doFilter(next), GlobalFilter)
 }

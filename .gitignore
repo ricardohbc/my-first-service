@@ -21,3 +21,4 @@ dist
 .vagrant
 puppet/.tmp
 puppet/modules/*
+projectFilesBackUp

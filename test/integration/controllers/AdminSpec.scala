@@ -12,7 +12,7 @@ with Matchers
 with BeforeAndAfterAll {
 
   override def beforeAll() = {
-    Play.start(FakeApplication(withGlobal = Some(new controllers.Global)))
+    Play.start(FakeApplication())
   }
 
   override def afterAll() = {

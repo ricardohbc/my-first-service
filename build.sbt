@@ -1,5 +1,7 @@
 import play.PlayScala
 
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
+
 name := """hbc-microservice-template"""
 
 version := "0.1"

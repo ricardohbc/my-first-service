@@ -5,12 +5,15 @@ import play.api.mvc._
 import scala.concurrent.Future
 import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import metrics.StatsDClient
+import metrics.StatsDClient._
 
 // common logging and metrics for all requests
-object GlobalFilter extends Filter with StatsDClient {
+object GlobalFilter extends Filter {
 
-	override val system = Akka.system // use play's akka system 
+//ROUTE_CONTROLLER : controllers.Application
+//ROUTE_ACTION_METHOD : index
+//ROUTE_VERB : GET
+
 
 	def apply(nextFilter: RequestHeader => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
 		val startTime = System.currentTimeMillis
@@ -23,7 +26,7 @@ object GlobalFilter extends Filter with StatsDClient {
 			val respTime = (endTime - startTime).toInt
 			val tag = requestHeader.tags.getOrElse("trackingtag", "carp not tag")
 			timing(routeTag, respTime)
-			Logger.debug(s"req $routeTag took $respTime. $tagInfo")
+			Logger.debug(s"FILTERED: $routeTag took $respTime. $tagInfo")
 			result
 		}
 	}

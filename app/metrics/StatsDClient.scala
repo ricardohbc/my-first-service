@@ -33,6 +33,8 @@ import java.util.Random
 import akka.actor._
 import play.Logger
 import helpers.ConfigHelper
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
 
 trait StatsDClient extends ConfigHelper {
 
@@ -236,4 +238,8 @@ private class StatsDActor(host: String,
       }
     }
   }
+}
+
+object StatsDClient extends StatsDClient {
+  override val system = Akka.system 
 }

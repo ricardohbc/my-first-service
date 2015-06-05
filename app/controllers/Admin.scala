@@ -6,6 +6,8 @@ import play.api._
 
 import play.api.mvc._
 import play.api.libs.json._
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,7 +18,7 @@ import scala.collection.mutable
 object Admin extends Controller
 with StatsDClient {
 
-  override val system = ActorSystem("hbc-microservice-template")
+  override val system = Akka.system
 
   def ping = Action.async ({
     request =>

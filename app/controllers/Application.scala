@@ -4,6 +4,8 @@ import akka.actor.ActorSystem
 import metrics.StatsDClient
 import play.api._
 import play.api.mvc._
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
 
 import helpers.{ControllerPayload, ControllerTimeout}
 import scala.util.Try
@@ -15,7 +17,7 @@ with StatsDClient
 with ControllerTimeout
 with ControllerPayload {
 
-  override val system = ActorSystem("hbc-microservice-template")
+  override val system = Akka.system
 
   def index = Action.async ({
     request =>

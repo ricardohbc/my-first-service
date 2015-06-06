@@ -27,6 +27,7 @@ then
 elif [[ $(git tag -l $VERSION_TAG | wc -l) -ne 0 ]]
 then
         read -p "The tag $VERSION_TAG already exists. Continue? [y/n]" -n 1 -r
+        echo
         if [[ $REPLY =~ ^[^Yy]$ ]]
         then
                 exit;

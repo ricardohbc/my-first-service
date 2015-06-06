@@ -131,9 +131,25 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 }
     ```
  
-- Build version (TBD)
+- Template patching/versioning
+  - Version stored in conf/application.conf
+  - Version property is template-version
+  - Corresponding Git head commit hash is stored in property: template-commit-hash
+  - To create patch and update version:
+    - Run ./create_patch.sh
+    - Follow instructions to set version and included commits
+    - conf/application.conf will automatically be updated
+    - New tag and conf/application.conf will be pushed to master
+    - To apply patch:
+      - https://github.com/saksdirect/How-to-Start/blob/master/git/creating-patches.mkd#how-to-apply-the-patch 
+  - You can also manually change the version and/or head commit in conf/application.conf yourself
 
-- HTTP fail over and timeout handling (TBD)
+- HTTP fail over (TBD)
+
+- Timeout handling
+  - Controller timeout handled by mixing in helpers/ControllerTimeout trait
+  - Wrap your async controller body like:
+    - timeout(errorHandler: => T) {BODY}
 
 - IDE support
 

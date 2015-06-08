@@ -19,11 +19,11 @@ object ServiceFilters {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
 		  val startTime = System.currentTimeMillis
 		  next(req).map { result =>
+        val endTime = System.currentTimeMillis
+        val respTime = (endTime - startTime).toInt
         val reqTag = requestTag(req)
-		    val endTime = System.currentTimeMillis
-		    val respTime = (endTime - startTime).toInt
         Logger.info(s"timer: $reqTag took $respTime")
-		    timing(reqTag, respTime)
+        timing(reqTag, respTime)  
         result
 		  }
     }
@@ -37,7 +37,4 @@ object ServiceFilters {
       next(req)
     }
   }
-
-
 }
-

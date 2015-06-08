@@ -1,6 +1,5 @@
 import play.api._
 import play.api.mvc._
-import play.api.mvc.Results._
 import play.api.GlobalSettings
 
 object Global extends GlobalSettings {

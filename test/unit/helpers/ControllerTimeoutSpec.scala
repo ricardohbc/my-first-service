@@ -24,13 +24,9 @@ with ControllerPayload {
   "ControllerTimeout" should {
     "return error on timeout" in {
       ((contentAsJson(
-        timeout(
-          onHandlerRequestTimeout(
-            FakeRequest(GET, "/microservice-template")).as(JSON)
-        )
-        {
-        Thread.sleep(10000)
-        Ok("Won't get here")
+        syncTimeout( onHandlerRequestTimeout( FakeRequest(GET, "/microservice-template")).as(JSON)) {
+          Thread.sleep(10000)
+          Ok("Won't get here")
         }
       ) \ "errors").asInstanceOf[JsArray](0) \ "error").as[String] == "TimeoutException" shouldBe true
     }

@@ -1,10 +1,5 @@
 package controllers
 
-import play.api.Play.current
-import play.api.libs.concurrent.Akka
-
-import akka.actor.ActorSystem
-import metrics.StatsDClient
 import play.api._
 
 import play.api.mvc._
@@ -19,35 +14,19 @@ import java.lang.management._
 import scala.collection.mutable
 
 
-object Admin extends Controller
-with StatsDClient {
+object Admin extends Controller {
 
-  override val system = Akka.system
+  def ping = Action { request =>
 
-  def ping = Action.async ({
-    request =>
-      //increment("ping")
+    Logger.debug("ping")
+    Ok("pong")
+  }
 
-      Logger.debug("ping")
-      //time("AdminLike_ping") {
-        Future(
-          Ok("pong")
-        )
-     // }
-  })
+  def jvmstats = Action.async { request =>
 
-  def jvmstats = Action.async ({
-    request =>
-      //increment("jvmstats")
-
-      Logger.debug("jvmstats")
-      //time("AdminLike_jvmstats") {
-       // val map = new mutable.HashMap[String, Double]
-        Future(
-          Ok(Json.prettyPrint(Json.toJson(extractJvmStats())))
-        )
-      //}
-  })
+    Logger.debug("jvmstats")
+    Future.successful(Ok(Json.prettyPrint(Json.toJson(extractJvmStats()))))
+  }
 
   private def extractJvmStats() : JsValue = {
     import scala.collection.JavaConverters._

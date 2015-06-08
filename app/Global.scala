@@ -7,6 +7,6 @@ import scala.concurrent.Future
 object Global extends GlobalSettings {
 
   override def doFilter(next: EssentialAction): EssentialAction =
-    Filters(super.doFilter(next), GlobalFilter)
+    Filters(super.doFilter(next), MetricsFilter)
 
 }

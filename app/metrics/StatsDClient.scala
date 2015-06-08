@@ -36,9 +36,7 @@ import helpers.ConfigHelper
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
 
-abstract class StatsDClientLike(val as: ActorSystem) extends ConfigHelper {
-
-  implicit val system: ActorSystem = as
+trait StatsDClient extends ConfigHelper {
 
   val host = config.getString("statsd.server")
   val port = config.getInt("statsd.port")
@@ -51,7 +49,8 @@ abstract class StatsDClientLike(val as: ActorSystem) extends ConfigHelper {
 
   private val rand = new Random()
 
-  private val actorRef = system.actorOf(Props(new StatsDActor(host, port, multiMetrics, packetBufferSize, prefix)))
+  // prefer use of play's actor system
+  private lazy val actorRef = Akka.system.actorOf(Props(new StatsDActor(host, port, multiMetrics, packetBufferSize, prefix)))
 
   /**
    * Sends timing stats in milliseconds to StatsD
@@ -239,5 +238,3 @@ private class StatsDActor(host: String,
     }
   }
 }
-
-object StatsDClient extends StatsDClientLike(Akka.system)

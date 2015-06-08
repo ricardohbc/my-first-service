@@ -7,11 +7,12 @@ import helpers.{ControllerPayload, ControllerTimeout}
 import scala.util.Try
 
 import ch.qos.logback.classic.Level
-import metrics.StatsDClient._
+import metrics.StatsDClient
 
 object Application extends Controller
 with ControllerTimeout
-with ControllerPayload {
+with ControllerPayload
+with StatsDClient {
 
   def index = Action.async { request => 
     timeout(onHandlerRequestTimeout(request).as(JSON)) {

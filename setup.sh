@@ -16,7 +16,7 @@ then
 fi
 
 rm -rf .git
-find ./ -type f -exec sed -i '' -E "s/hbc-microservice-template/$SERVICE_NAME/g" {} \; > /dev/null
+LC_ALL=C find ./ -type f -exec sed -i '' -E "s/hbc-microservice-template/$SERVICE_NAME/g" {} \; > /dev/null
 cd ..
 mv hbc-microservice-template $SERVICE_NAME
 cd $SERVICE_NAME
@@ -30,6 +30,5 @@ mv README-template.mkd README.mkd
 
 git init
 
-echo "Done! Enjoy your new micro service"
-
-
+echo "Done! Enjoy your new micro service!"
+echo "Please run \"cd .\" command, as the current directory you are on right now has been changed."

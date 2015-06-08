@@ -10,7 +10,7 @@ case class ApiResponseModel (
   errors: JsValue
 )
 
-trait ApiResponse{
+trait ApiResponse {
   implicit val apiResponseSchemaWrites: Writes[ApiResponseModel] = (
     (__ \ Constants.REQUEST).write[JsValue] and
       (__ \ Constants.RESPONSE).write[JsValue] and

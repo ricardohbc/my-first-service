@@ -6,7 +6,7 @@ import java.util.Calendar
 import constants.Constants
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, RequestHeader}
 
 case class ApiRequestModel(
   url: String,
@@ -20,7 +20,7 @@ object ApiRequestModel {
       (__ \ Constants.SERVER_RECEIVED_TIME).write[String]
     )(unlift(ApiRequestModel.unapply))
 
-  def apply(request: Request[AnyContent]): ApiRequestModel = {
+  def apply(request: RequestHeader): ApiRequestModel = {
     val fullRequestUrl = "http://" + request.host + request.uri
     val df = new SimpleDateFormat(Constants.ZULU_DATE_FORMAT)
     new ApiRequestModel(

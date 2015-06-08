@@ -16,8 +16,9 @@ with StatsDClient {
 
   def index = Action.async { request => 
     timeout(onHandlerRequestTimeout(request).as(JSON)) {
-      val response = Try("hbc-microservice-template is up and running!")
-      writeResponseGet(request, response)
+      val response = "hbc-microservice-template is up and running!"
+      throw new NoSuchElementException("wut the hell, where is it?")
+      writeResponseGet1(request, response)
     }
   }
 

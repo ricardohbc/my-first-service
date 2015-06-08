@@ -5,7 +5,7 @@ import models._
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.util.Try
+import scala.util.{Try, Success}
 import scala.concurrent._
 import play.api.libs.json.JsSuccess
 import scala.util.Failure
@@ -33,6 +33,9 @@ trait ControllerPayload extends Controller
 
   def writeResponseGet[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
     writeResponse(request, result, Ok)
+
+  def writeResponseGet1[T : Writes](request: Request[AnyContent], result: T): Result =
+    writeResponse(request, Success(result), Ok)
 
   def writeResponseUpdate[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
     writeResponse(request, result, Ok)
@@ -152,7 +155,7 @@ trait ControllerPayload extends Controller
     o.get
   }
 
-  private def getError(err: Throwable): (Status, ApiErrorMessageModel) = {
+  def getError(err: Throwable): (Status, ApiErrorMessageModel) = {
     err match {
       case e: NoSuchElementException =>
         (NotFound, ApiErrorMessageModel.apply(

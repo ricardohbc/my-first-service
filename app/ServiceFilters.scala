@@ -37,4 +37,14 @@ object ServiceFilters {
       next(req)
     }
   }
+
+  object BadTimeFilter extends Filter with StatsDClient {
+    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
+      val reqTag = requestTag(req)
+      Logger.info(s"checkout dodgy time filter $reqTag")
+      time(reqTag) {
+        next(req)
+      }
+    }
+  }
 }

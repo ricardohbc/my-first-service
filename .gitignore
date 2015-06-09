@@ -21,4 +21,5 @@ dist
 .vagrant
 puppet/.tmp
 puppet/modules/*
+changes.patch
 projectFilesBackUp

@@ -35,6 +35,8 @@ import play.Logger
 import helpers.ConfigHelper
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
+import scala.concurrent.Future
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 trait StatsDClient extends ConfigHelper {
 
@@ -58,16 +60,28 @@ trait StatsDClient extends ConfigHelper {
    * @param key name of the stat
    * @param value time in milliseconds
    */
-  def timing(key: String, value: Int, sampleRate: Double = 1.0) = {
+  def timing(key: String, value: Long, sampleRate: Double = 1.0) = {
     send(key, value.toString, StatsDProtocol.TIMING_METRIC, sampleRate)
   }
 
-  def time [A](tag:String)(f: => A):A = {
+  def getTimeSince(start: Long): Long = System.currentTimeMillis - start
+
+  def time[A](tag:String)(f: => A): A = {
     val start = System.currentTimeMillis
     val ret = f
-    val end = System.currentTimeMillis
-    timing(tag, (end - start).toInt)
+    timeTaken(start, ret).map { tm => 
+      timing(tag, tm)
+      Logger.info(s"$tag took $tm")
+    }
     ret
+  }
+
+  // this is theoretically testable by itself
+  def timeTaken[A](start: Long, body: A): Future[Long] = {
+    body match {
+      case x: Future[_] => x.map { _ => getTimeSince(start) }
+      case _ => Future.successful(getTimeSince(start))
+    }
   }
 
   /**

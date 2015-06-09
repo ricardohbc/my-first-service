@@ -14,7 +14,7 @@ with ControllerTimeout
 with ControllerPayload
 with StatsDClient {
 
-  def index = Action.async { request => 
+  def index = Action.async { request =>
     timeout(onHandlerRequestTimeout(request).as(JSON)) {
       val response = "hbc-microservice-template is up and running!"
       throw new NoSuchElementException("wut the hell, where is it?")

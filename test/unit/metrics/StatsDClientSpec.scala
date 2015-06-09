@@ -20,15 +20,14 @@ with StatsDClient {
     }
 
     "time a future" in {
-      timeWithReport("tagString", 0, Future { Thread.sleep(50); 6 }).map { case (tag, time) =>
+      timeTaken(0, Future { Thread.sleep(50); 6 }).map { time =>
         assert(time >= 50)
       }
     }
 
-    "label and time something synchronous" in {
-      timeWithReport("tagString", 0, { val a = 10; a }).map { case (tag, time) =>
+    "time something synchronous" in {
+      timeTaken(0, { val a = 10; a }).map { time =>
         assert(time < 50)
-        assert(tag === "tagString")
       }
     }
   }

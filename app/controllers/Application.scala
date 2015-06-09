@@ -14,7 +14,7 @@ with ControllerTimeout
 with ControllerPayload
 with StatsDClient {
 
-  def index = Action.async { request => 
+  def index = Action.async { request =>
     timeout(onHandlerRequestTimeout(request).as(JSON)) {
       val response = Try("hbc-microservice-template is up and running!")
       writeResponseGet(request, response)

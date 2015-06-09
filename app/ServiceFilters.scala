@@ -12,20 +12,15 @@ object ServiceFilters {
       controller <- requestHeader.tags.get(play.api.Routes.ROUTE_CONTROLLER)
       action <- requestHeader.tags.get(play.api.Routes.ROUTE_ACTION_METHOD)
     } yield controller.replaceFirst("controllers.", "") + "." + action
-    controllerActionTag.getOrElse(requestHeader.path)
+    controllerActionTag.getOrElse(requestHeader.path.replaceAll("/", "_"))
   }
 
   object TimingFilter extends Filter with StatsDClient {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
-		  val startTime = System.currentTimeMillis
-		  next(req).map { result =>
-        val endTime = System.currentTimeMillis
-        val respTime = (endTime - startTime).toInt
-        val reqTag = requestTag(req)
-        Logger.info(s"timer: $reqTag took $respTime")
-        timing(reqTag, respTime)  
-        result
-		  }
+		  val reqTag = requestTag(req)
+      time(reqTag) {
+        next(req)
+      }
     }
   }
 

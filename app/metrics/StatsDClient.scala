@@ -64,19 +64,19 @@ trait StatsDClient extends ConfigHelper {
     send(key, value.toString, StatsDProtocol.TIMING_METRIC, sampleRate)
   }
 
-  def time[A](tag:String)(f: => A): A = {
-    def report(start: Long) = {
-      val end = System.currentTimeMillis
-      val tm = end - start
-      timing(tag, tm)
-      Logger.info(s"$tag took $tm")
-    }
+  def reportTimeSince(tag: String, start: Long) = {
+    val end = System.currentTimeMillis
+    val tm = end - start
+    timing(tag, tm)
+    Logger.info(s"$tag took $tm")
+  }
 
+  def time[A](tag:String)(f: => A): A = {
     val start = System.currentTimeMillis
     val ret = f
     ret match {
-      case x: Future[_] => x.onSuccess { case _ => report(start) }
-      case _ => report(start)
+      case x: Future[_] => x.onSuccess { case _ => reportTimeSince(tag, start) }
+      case _ => reportTimeSince(tag, start)
     }
     ret
   }

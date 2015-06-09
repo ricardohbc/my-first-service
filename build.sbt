@@ -8,7 +8,7 @@ name := """hbc-microservice-template"""
 version := "0.1"
 
 val defaultSettings: Seq[Setting[_]] = Seq(
-      scalaVersion  := "2.11.1",
+      scalaVersion  := "2.11.6",
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
       libraryDependencies ++= commonDependencies
       ) ++ graphSettings

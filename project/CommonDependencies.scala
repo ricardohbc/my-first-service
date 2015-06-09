@@ -5,8 +5,11 @@ import sbt._
 object CommonDependencies {
 
   val scalaTestVersion = "2.2.5"
+  val scalaCheckVersion = "1.12.2"
 
   val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
 
-  val commonDependencies : Seq[ModuleID] = Seq(scalaTest)
+  val scalacheck = "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
+
+  val commonDependencies : Seq[ModuleID] = Seq(scalaTest,scalacheck)
 }

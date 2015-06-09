@@ -60,14 +60,14 @@ trait StatsDClient extends ConfigHelper {
    * @param key name of the stat
    * @param value time in milliseconds
    */
-  def timing(key: String, value: Int, sampleRate: Double = 1.0) = {
+  def timing(key: String, value: Long, sampleRate: Double = 1.0) = {
     send(key, value.toString, StatsDProtocol.TIMING_METRIC, sampleRate)
   }
 
   def time[A](tag:String)(f: => A): A = {
     def report(start: Long) = {
       val end = System.currentTimeMillis
-      val tm = (end - start).toInt
+      val tm = end - start
       timing(tag, tm)
       Logger.info(s"$tag took $tm")
     }

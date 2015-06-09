@@ -17,7 +17,7 @@ object ServiceFilters {
 
   object TimingFilter extends Filter with StatsDClient {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
-		  val reqTag = requestTag(req)
+      val reqTag = requestTag(req)
       time(reqTag) {
         next(req)
       }

@@ -14,12 +14,11 @@ import models.ApiResponseModel
 import scala.util.Success
 import models.ApiErrorMessageModel
 import play.api.libs.json.JsResultException
+import play.Logger
 
 trait ControllerPayload extends Controller
   with ApiResponse
   with ApiError {
-
-  val actorSystemName = "hbcStatus"
 
   ////////////////////////
   //      RESPONSE      //
@@ -156,6 +155,7 @@ trait ControllerPayload extends Controller
   }
 
   def getError(err: Throwable): (Status, ApiErrorMessageModel) = {
+    Logger.info("WHAT IS THE ERR ?? : " + err + "\n\n" + err.getClass)
     err match {
       case e: NoSuchElementException =>
         (NotFound, ApiErrorMessageModel.apply(

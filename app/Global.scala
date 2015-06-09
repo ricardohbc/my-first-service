@@ -16,7 +16,7 @@ object Global extends GlobalSettings with ApiResponse with ApiError {
 
   override def onError(request: RequestHeader, ex: Throwable): Future[Result] = {
 
-    val (status, errModel) = ControllerPayloadLike.getError(ex)
+    val (status, errModel) = ControllerPayloadLike.getError(ex.getCause)
 
     val none: Option[String] = None
 

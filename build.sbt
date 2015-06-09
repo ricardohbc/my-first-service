@@ -15,6 +15,7 @@ resolvers += "Saks Artifactory - Release" at "http://repo.saksdirect.com:8081/ar
 libraryDependencies ++= {
   val scalaTestVersion = "2.2.5"
   Seq(
+  	"org.scalacheck" %% "scalacheck" % "1.12.2" % "test",
     "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
   )
 }

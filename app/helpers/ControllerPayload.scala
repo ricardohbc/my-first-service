@@ -43,7 +43,7 @@ trait ControllerPayload extends Controller
   def writeResponseRemove[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
     writeResponse(request, result, Ok)
 
-  private def writeResponse[T : Writes](request: Request[AnyContent], result: Try[T], responseCode: Status): Result = {
+  private def writeResponse[T : Writes](request: RequestHeader, result: Try[T], responseCode: Status): Result = {
     var response: Status = responseCode
     var status: String = Constants.STATUS_COMPLETE
     var errs: Seq[ApiErrorMessageModel] = Seq[ApiErrorMessageModel]()
@@ -139,7 +139,7 @@ trait ControllerPayload extends Controller
   //      HELPERS       //
   ////////////////////////
 
-  def onHandlerRequestTimeout(request: Request[AnyContent]): Result =
+  def onHandlerRequestTimeout(request: RequestHeader): Result =
     writeResponse(request, Failure[String](new TimeoutException(Constants.TIMEOUT_MSG)), RequestTimeout)
 
   private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue = {

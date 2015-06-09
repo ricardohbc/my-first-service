@@ -64,21 +64,33 @@ trait StatsDClient extends ConfigHelper {
     send(key, value.toString, StatsDProtocol.TIMING_METRIC, sampleRate)
   }
 
-  def reportTimeSince(tag: String, start: Long) = {
+  // side effecting method that triggers a statsD call
+  def getTimeSince(tag: String, start: Long): (String,Long) = {
     val end = System.currentTimeMillis
     val tm = end - start
-    timing(tag, tm)
-    Logger.info(s"$tag took $tm")
+    (tag, tm)
   }
 
   def time[A](tag:String)(f: => A): A = {
     val start = System.currentTimeMillis
     val ret = f
-    ret match {
-      case x: Future[_] => x.onSuccess { case _ => reportTimeSince(tag, start) }
-      case _ => reportTimeSince(tag, start)
+    // ret match {
+    //   case x: Future[_] => x.onSuccess { case _ => reportTimeSince(tag, start) }
+    //   case _ => reportTimeSince(tag, start)
+    // }
+    timeWithReport(tag, start, ret).map { case (tag, tm) => 
+      timing(tag, tm)
+      Logger.info(s"$tag took $tm")
     }
     ret
+  }
+
+  // this is theoretically testable by itself
+  def timeWithReport[A](tag: String, start: Long, body: A): Future[(String, Long)] = {
+    body match {
+      case x: Future[_] => x.map { case _ => getTimeSince(tag, start) }
+      case _ => Future.successful(getTimeSince(tag, start))
+    }
   }
 
   /**

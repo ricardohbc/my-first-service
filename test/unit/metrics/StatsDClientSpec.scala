@@ -1,5 +1,7 @@
 package unit.helpers
 
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import org.scalatest.prop.PropertyChecks
 import metrics.{StatsDClient, StatsDProtocol}
@@ -14,6 +16,19 @@ with StatsDClient {
       forAll("key", "value", "metric", "sampleRate") { (key: String, value: String, metric: String, sampleRate: Double) =>
         val stat = key + ":" + value + "|" + metric + (if (sampleRate < 1) "|@" + sampleRate  else "")
         StatsDProtocol.stat(key, value, metric, sampleRate) should equal (stat)
+      }
+    }
+
+    "time a future" in {
+      timeWithReport("tagString", 0, Future { Thread.sleep(50); 6 }).map { case (tag, time) =>
+        assert(time >= 50)
+      }
+    }
+
+    "label and time something synchronous" in {
+      timeWithReport("tagString", 0, { val a = 10; a }).map { case (tag, time) =>
+        assert(time < 50)
+        assert(tag === "tagString")
       }
     }
   }

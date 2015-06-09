@@ -79,7 +79,7 @@ trait StatsDClient extends ConfigHelper {
   // this is theoretically testable by itself
   def timeTaken[A](start: Long, body: A): Future[Long] = {
     body match {
-      case x: Future[_] => x.map { case _ => getTimeSince(start) }
+      case x: Future[_] => x.map { _ => getTimeSince(start) }
       case _ => Future.successful(getTimeSince(start))
     }
   }

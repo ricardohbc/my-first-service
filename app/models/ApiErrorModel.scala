@@ -9,7 +9,7 @@ case class ApiErrorMessageModel(
   error: String
 )
 
-trait ApiError {
+object ApiErrorMessageModel {
   implicit val errorMessageObjectWrites: Writes[ApiErrorMessageModel] = (
     (__ \ Constants.DATA).write[String] and
       (__ \ Constants.ERROR).write[String]

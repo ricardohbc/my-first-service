@@ -10,6 +10,6 @@ object Global extends GlobalSettings {
     Filters(super.doFilter(next), ServiceFilters.TimingFilter, ServiceFilters.IncrementFilter, ServiceFilters.TimeoutFilter)
 
   override def onError(request: RequestHeader, ex: Throwable): Future[Result] =
-    Future.successful(ControllerPayloadLike.writeResponseFailure(request, ex.getCause))
+    Future.successful(ControllerPayloadLike.writeResponseFailure(ex.getCause)(request))
 
 }

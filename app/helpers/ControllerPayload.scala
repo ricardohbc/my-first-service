@@ -17,40 +17,38 @@ import models.ApiErrorMessageModel
 import play.api.libs.json.JsResultException
 import play.Logger
 
-trait ControllerPayload extends Controller
-  with ApiResponse
-  with ApiError {
+trait ControllerPayload extends Controller {
 
   ////////////////////////
   //      RESPONSE      //
   ////////////////////////
 
-  def writeResponseStore[T : Writes](request: Request[AnyContent], result: T): Result =
-    writeResponseSuccess(request, result, Created)
+  def writeResponseStore[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+    writeResponseSuccess(result, Created)
 
-  def writeResponseStores[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]]): Result =
-    writeResponses(request, results, Created)
+  def writeResponseStores[T : Writes](results: Try[Seq[Try[T]]])(implicit request: Request[AnyContent]): Result =
+    writeResponses(results, Created)
 
-  def writeResponseGet[T : Writes](request: Request[AnyContent], result: T): Result =
-    writeResponseSuccess(request, result, Ok)
+  def writeResponseGet[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+    writeResponseSuccess(result, Ok)
 
-  def writeResponseUpdate[T : Writes](request: Request[AnyContent], result: T): Result =
-    writeResponseSuccess(request, result, Ok)
+  def writeResponseUpdate[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+    writeResponseSuccess(result, Ok)
 
-  def writeResponseUpdates[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]]): Result =
-    writeResponses(request, results, Ok)
+  def writeResponseUpdates[T : Writes](results: Try[Seq[Try[T]]])(implicit request: Request[AnyContent]): Result =
+    writeResponses(results, Ok)
 
-  def writeResponseRemove[T : Writes](request: Request[AnyContent], result: T): Result =
-    writeResponseSuccess(request, result, Ok)
+  def writeResponseRemove[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+    writeResponseSuccess(result, Ok)
 
-  def writeResponseSuccess[T : Writes](request: RequestHeader, result: T, responseStatus: Status): Result =
+  def writeResponseSuccess[T : Writes](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
     writeResponse(responseStatus, constructResponseModel(request, Some(result), Constants.STATUS_COMPLETE))
 
-  def writeResponseFailure(request: RequestHeader, ex: Throwable): Result = {
+  def writeResponseFailure(ex: Throwable)(implicit request: RequestHeader): Result = {
     val nothing: Option[String] = None // seems to forestall a weird implicit conflict on the api json models.!!
-    val (responseCode, err) = getError(ex)
+    val (responseStatus, err) = getError(ex)
     val body = constructResponseModel(request, nothing, Constants.STATUS_ERROR, Seq(err))
-    writeResponse(responseCode, body)
+    writeResponse(responseStatus, body)
   }
   private def writeResponse(responseStatus: Status, body: ApiResponseModel) =
     responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
@@ -69,7 +67,7 @@ trait ControllerPayload extends Controller
         Json.toJson(errs)
       )
 
-  private def writeResponses[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]], responseCode: Status): Result = {
+  private def writeResponses[T : Writes](results: Try[Seq[Try[T]]], responseCode: Status)(implicit request: Request[AnyContent]): Result = {
     var output = Seq[Option[T]]()
     var response: Status = responseCode
     var status: String = Constants.STATUS_COMPLETE
@@ -142,7 +140,7 @@ trait ControllerPayload extends Controller
   ////////////////////////
 
   def onHandlerRequestTimeout(request: RequestHeader): Result = {
-    writeResponseFailure(request, (new TimeoutException(Constants.TIMEOUT_MSG)))
+    writeResponseFailure(new TimeoutException(Constants.TIMEOUT_MSG))(request)
   }
 
   private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue = {

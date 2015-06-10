@@ -21,7 +21,7 @@ with ControllerPayload {
     Logger.debug("hbc-microservice-template change log level called")
     val level = Level.toLevel(levelString)
     Logger.underlyingLogger.asInstanceOf[ch.qos.logback.classic.Logger].setLevel(level)
-    val response = Try(s"Log level changed to $level")
+    val response = s"Log level changed to $level"
     writeResponseGet(request, response)
   }
 }

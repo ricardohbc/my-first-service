@@ -26,57 +26,45 @@ trait ControllerPayload extends Controller
   ////////////////////////
 
   def writeResponseStore[T : Writes](request: Request[AnyContent], result: T): Result =
-    writeResponse(request, result, Created)
+    writeResponseSuccess(request, result, Created)
 
-  def writeResponseStores[T : Writes](request: Request[AnyContent], results: Seq[Try[T]]): Result =
+  def writeResponseStores[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]]): Result =
     writeResponses(request, results, Created)
 
   def writeResponseGet[T : Writes](request: Request[AnyContent], result: T): Result =
-    writeResponse(request, result, Ok)
+    writeResponseSuccess(request, result, Ok)
 
   def writeResponseUpdate[T : Writes](request: Request[AnyContent], result: T): Result =
-    writeResponse(request, result, Ok)
+    writeResponseSuccess(request, result, Ok)
 
-  def writeResponseUpdates[T : Writes](request: Request[AnyContent], results: Seq[Try[T]]): Result =
+  def writeResponseUpdates[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]]): Result =
     writeResponses(request, results, Ok)
 
   def writeResponseRemove[T : Writes](request: Request[AnyContent], result: T): Result =
-    writeResponse(request, result, Ok)
+    writeResponseSuccess(request, result, Ok)
 
-  private def writeResponse[T : Writes](request: RequestHeader, result: T, responseCode: Status): Result = {
-    var response: Status = responseCode
-    var status: String = Constants.STATUS_COMPLETE
-    var errs: Seq[ApiErrorMessageModel] = Seq[ApiErrorMessageModel]()
+  def writeResponseSuccess[T : Writes](request: RequestHeader, result: T, responseStatus: Status): Result =
+    writeResponse(responseStatus, constructResponseModel(request, Some(result), Constants.STATUS_COMPLETE))
 
-    // if (result.isFailure) {
-    //   status = Constants.STATUS_ERROR
-    //   val (resp, err) = getError(result.failed.get)
-    //   response = resp
-    //   errs = errs :+ err
-    // }
-
-    val apiResponse = ApiResponseModel.apply(
-      Json.toJson(ApiRequestModel(request)),
-      Json.obj(
-        Constants.RESPONSE_STATUS -> status,
-        Constants.RESULTS -> result.toOption
-      ),
-      Json.toJson(errs)
-    )
-
-    response.apply(Json.prettyPrint(Json.toJson(apiResponse))).as(JSON)
+  def writeResponseFailure(request: RequestHeader, ex: Throwable): Result = {
+    val nothing: Option[String] = None // seems to forestall a weird implicit conflict on the api json models.!!
+    val (responseCode, err) = getError(ex)
+    val body = constructResponseModel(request, nothing, Constants.STATUS_ERROR, Seq(err))
+    writeResponse(responseCode, body)
   }
+  private def writeResponse(responseStatus: Status, body: ApiResponseModel) =
+    responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
 
-  private def constructResponse[T: Writes](
-    reqHeader: RequestHeader,
-    status: Status,
+  def constructResponseModel[T: Writes](
+    req: RequestHeader,
     result: Option[T],
-    errs: Seq[ApiErrorMessageModel]): ApiResponseModel =
+    statusMessage: String, // not the HttpStatus code, just a string, perhaps rename this guy since it  clashes with Play's Status type??
+    errs: Seq[ApiErrorMessageModel] = Seq()): ApiResponseModel =
       ApiResponseModel.apply(
-        Json.toJson(ApiRequestModel(request)),
+        Json.toJson(ApiRequestModel(req)),
         Json.obj(
-          Constants.RESPONSE_STATUS -> status,
-          Constants.RESULTS -> result.toOption
+          Constants.RESPONSE_STATUS -> statusMessage,
+          Constants.RESULTS -> result
         ),
         Json.toJson(errs)
       )
@@ -153,8 +141,9 @@ trait ControllerPayload extends Controller
   //      HELPERS       //
   ////////////////////////
 
-  def onHandlerRequestTimeout(request: RequestHeader): Result =
-    writeResponse(request, Failure[String](new TimeoutException(Constants.TIMEOUT_MSG)), RequestTimeout)
+  def onHandlerRequestTimeout(request: RequestHeader): Result = {
+    writeResponseFailure(request, (new TimeoutException(Constants.TIMEOUT_MSG)))
+  }
 
   private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue = {
     //Check if valid JSON payload was received
@@ -192,7 +181,7 @@ trait ControllerPayload extends Controller
         e.getMessage,
         e.getClass.getSimpleName
       ))
-    case NonFatal(e) =>
+    case e: Throwable =>
       (InternalServerError, ApiErrorMessageModel.apply(
         "Yikes! An error has occurred: " + e.getMessage,
         e.getClass.getSimpleName

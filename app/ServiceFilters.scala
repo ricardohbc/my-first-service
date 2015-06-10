@@ -3,6 +3,7 @@ import scala.concurrent.Future
 import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import metrics.StatsDClient
+import helpers.{ControllerTimeout, ControllerPayload}
 
 // common logging and metrics for all requests
 object ServiceFilters {
@@ -33,13 +34,10 @@ object ServiceFilters {
     }
   }
 
-  object BadTimeFilter extends Filter with StatsDClient {
-    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
-      val reqTag = requestTag(req)
-      Logger.info(s"checkout dodgy time filter $reqTag")
-      time(reqTag) {
+  object TimeoutFilter extends Filter with ControllerTimeout with ControllerPayload {
+    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = 
+      withTimeout( onHandlerRequestTimeout(req).as(JSON) ) {
         next(req)
       }
-    }
   }
 }

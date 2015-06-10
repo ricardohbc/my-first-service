@@ -9,6 +9,7 @@ import scala.util.{Try, Success}
 import scala.concurrent._
 import play.api.libs.json.JsSuccess
 import scala.util.Failure
+import scala.util.control.NonFatal
 import play.api.mvc.Result
 import models.ApiResponseModel
 import scala.util.Success
@@ -24,38 +25,35 @@ trait ControllerPayload extends Controller
   //      RESPONSE      //
   ////////////////////////
 
-  def writeResponseStore[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
+  def writeResponseStore[T : Writes](request: Request[AnyContent], result: T): Result =
     writeResponse(request, result, Created)
 
-  def writeResponseStores[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]]): Result =
+  def writeResponseStores[T : Writes](request: Request[AnyContent], results: Seq[Try[T]]): Result =
     writeResponses(request, results, Created)
 
-  def writeResponseGet[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
+  def writeResponseGet[T : Writes](request: Request[AnyContent], result: T): Result =
     writeResponse(request, result, Ok)
 
-  def writeResponseGet1[T : Writes](request: Request[AnyContent], result: T): Result =
-    writeResponse(request, Success(result), Ok)
-
-  def writeResponseUpdate[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
+  def writeResponseUpdate[T : Writes](request: Request[AnyContent], result: T): Result =
     writeResponse(request, result, Ok)
 
-  def writeResponseUpdates[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]]): Result =
+  def writeResponseUpdates[T : Writes](request: Request[AnyContent], results: Seq[Try[T]]): Result =
     writeResponses(request, results, Ok)
 
-  def writeResponseRemove[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
+  def writeResponseRemove[T : Writes](request: Request[AnyContent], result: T): Result =
     writeResponse(request, result, Ok)
 
-  private def writeResponse[T : Writes](request: Request[AnyContent], result: Try[T], responseCode: Status): Result = {
+  private def writeResponse[T : Writes](request: RequestHeader, result: T, responseCode: Status): Result = {
     var response: Status = responseCode
     var status: String = Constants.STATUS_COMPLETE
     var errs: Seq[ApiErrorMessageModel] = Seq[ApiErrorMessageModel]()
 
-    if (result.isFailure) {
-      status = Constants.STATUS_ERROR
-      val (resp, err) = getError(result.failed.get)
-      response = resp
-      errs = errs :+ err
-    }
+    // if (result.isFailure) {
+    //   status = Constants.STATUS_ERROR
+    //   val (resp, err) = getError(result.failed.get)
+    //   response = resp
+    //   errs = errs :+ err
+    // }
 
     val apiResponse = ApiResponseModel.apply(
       Json.toJson(ApiRequestModel(request)),
@@ -68,6 +66,20 @@ trait ControllerPayload extends Controller
 
     response.apply(Json.prettyPrint(Json.toJson(apiResponse))).as(JSON)
   }
+
+  private def constructResponse[T: Writes](
+    reqHeader: RequestHeader,
+    status: Status,
+    result: Option[T],
+    errs: Seq[ApiErrorMessageModel]): ApiResponseModel =
+      ApiResponseModel.apply(
+        Json.toJson(ApiRequestModel(request)),
+        Json.obj(
+          Constants.RESPONSE_STATUS -> status,
+          Constants.RESULTS -> result.toOption
+        ),
+        Json.toJson(errs)
+      )
 
   private def writeResponses[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]], responseCode: Status): Result = {
     var output = Seq[Option[T]]()
@@ -141,7 +153,7 @@ trait ControllerPayload extends Controller
   //      HELPERS       //
   ////////////////////////
 
-  def onHandlerRequestTimeout(request: Request[AnyContent]): Result =
+  def onHandlerRequestTimeout(request: RequestHeader): Result =
     writeResponse(request, Failure[String](new TimeoutException(Constants.TIMEOUT_MSG)), RequestTimeout)
 
   private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue = {
@@ -180,7 +192,7 @@ trait ControllerPayload extends Controller
         e.getMessage,
         e.getClass.getSimpleName
       ))
-    case e: Throwable =>
+    case NonFatal(e) =>
       (InternalServerError, ApiErrorMessageModel.apply(
         "Yikes! An error has occurred: " + e.getMessage,
         e.getClass.getSimpleName

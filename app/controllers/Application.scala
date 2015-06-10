@@ -7,28 +7,21 @@ import helpers.{ControllerPayload, ControllerTimeout}
 import scala.util.Try
 
 import ch.qos.logback.classic.Level
-import metrics.StatsDClient
 
 object Application extends Controller
 with ControllerTimeout
-with ControllerPayload
-with StatsDClient {
+with ControllerPayload {
 
-  def index = Action.async { request =>
-    timeout(onHandlerRequestTimeout(request).as(JSON)) {
-      val response = "hbc-microservice-template is up and running!"
-      throw new NoSuchElementException("wut the hell, where is it?")
-      writeResponseGet1(request, response)
-    }
+  def index = Action { request =>
+    val response = "hbc-microservice-template is up and running!"
+    writeResponseGet(request, response)
   }
 
-  def changeLogLevel(levelString: String) = Action.async { request =>
+  def changeLogLevel(levelString: String) = Action { request =>
     Logger.debug("hbc-microservice-template change log level called")
-    timeout(onHandlerRequestTimeout(request).as(JSON)) {
-      val level = Level.toLevel(levelString)
-      Logger.underlyingLogger.asInstanceOf[ch.qos.logback.classic.Logger].setLevel(level)
-      val response = Try(s"Log level changed to $level")
-      writeResponseGet(request, response)
-    }
-  } 
+    val level = Level.toLevel(levelString)
+    Logger.underlyingLogger.asInstanceOf[ch.qos.logback.classic.Logger].setLevel(level)
+    val response = Try(s"Log level changed to $level")
+    writeResponseGet(request, response)
+  }
 }

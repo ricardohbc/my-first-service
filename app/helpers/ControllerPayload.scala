@@ -155,7 +155,7 @@ trait ControllerPayload extends Controller
     o.get
   }
 
-  def getError(err: Throwable): (Status, ApiErrorMessageModel) = err match {
+  private def getError(err: Throwable): (Status, ApiErrorMessageModel) = err match {
     case e: NoSuchElementException =>
       (NotFound, ApiErrorMessageModel.apply(
         "hbcStatus '" + e.getMessage + "' does not exist.",

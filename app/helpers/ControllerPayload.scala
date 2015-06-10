@@ -154,41 +154,39 @@ trait ControllerPayload extends Controller
     o.get
   }
 
-  def getError(err: Throwable): (Status, ApiErrorMessageModel) = {
-    Logger.info("WHAT IS THE ERR ?? : " + err + "\n\n" + err.getClass)
-    err match {
-      case e: NoSuchElementException =>
-        (NotFound, ApiErrorMessageModel.apply(
-          "hbcStatus '" + e.getMessage + "' does not exist.",
-          e.getClass.getSimpleName
-        ))
-      case e: VerifyError =>
-        (PreconditionFailed, ApiErrorMessageModel.apply(
-          e.getMessage,
-          e.getClass.getSimpleName
-        ))
-      case e: ClassCastException =>
-        (UnsupportedMediaType, ApiErrorMessageModel.apply(
-          e.getMessage,
-          e.getClass.getSimpleName
-        ))
-      case e: JsResultException =>
-        (BadRequest, ApiErrorMessageModel.apply(
-          e.getMessage,
-          e.getClass.getSimpleName
-        ))
-      case e: TimeoutException =>
-        (RequestTimeout, ApiErrorMessageModel.apply(
-          e.getMessage,
-          e.getClass.getSimpleName
-        ))
-      case e: Throwable =>
-        (InternalServerError, ApiErrorMessageModel.apply(
-          "Yikes! An error has occurred: " + e.getMessage,
-          e.getClass.getSimpleName
-        ))
-    }
+  def getError(err: Throwable): (Status, ApiErrorMessageModel) = err match {
+    case e: NoSuchElementException =>
+      (NotFound, ApiErrorMessageModel.apply(
+        "hbcStatus '" + e.getMessage + "' does not exist.",
+        e.getClass.getSimpleName
+      ))
+    case e: VerifyError =>
+      (PreconditionFailed, ApiErrorMessageModel.apply(
+        e.getMessage,
+        e.getClass.getSimpleName
+      ))
+    case e: ClassCastException =>
+      (UnsupportedMediaType, ApiErrorMessageModel.apply(
+        e.getMessage,
+        e.getClass.getSimpleName
+      ))
+    case e: JsResultException =>
+      (BadRequest, ApiErrorMessageModel.apply(
+        e.getMessage,
+        e.getClass.getSimpleName
+      ))
+    case e: TimeoutException =>
+      (RequestTimeout, ApiErrorMessageModel.apply(
+        e.getMessage,
+        e.getClass.getSimpleName
+      ))
+    case e: Throwable =>
+      (InternalServerError, ApiErrorMessageModel.apply(
+        "Yikes! An error has occurred: " + e.getMessage,
+        e.getClass.getSimpleName
+      ))
   }
+  
 }
 
 object ControllerPayloadLike extends ControllerPayload

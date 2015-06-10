@@ -1,24 +1,26 @@
 import play.PlayScala
-
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
+import CommonDependencies._
+import net.virtualvoid.sbt.graph.Plugin._
+import ServiceDependencies._
 
 name := """hbc-microservice-template"""
 
 version := "0.1"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+val defaultSettings: Seq[Setting[_]] = Seq(
+      scalaVersion  := "2.11.6",
+      scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature","-Ywarn-unused-import"),
+      libraryDependencies ++= commonDependencies
+      ) ++ graphSettings
 
-scalaVersion := "2.11.1"
+
+lazy val root = (project in file("."))
+    .settings(defaultSettings: _*)
+    .settings(
+        libraryDependencies ++= serviceDependencies
+       )
+    .enablePlugins(PlayScala)
 
 resolvers += "Saks Artifactory - Release" at "http://repo.saksdirect.com:8081/artifactory/libs-release"
 
-libraryDependencies ++= {
-  val scalaTestVersion = "2.2.5"
-  Seq(
-  	"org.scalacheck" %% "scalacheck" % "1.12.2" % "test",
-    "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
-  )
-}
-
-net.virtualvoid.sbt.graph.Plugin.graphSettings
 

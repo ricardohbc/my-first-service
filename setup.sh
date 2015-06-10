@@ -15,18 +15,23 @@ then
         fi
 fi
 
+echo "Removing .git directory"
 rm -rf .git
-LC_ALL=C find ./ -type f -exec sed -i '' -E "s/hbc-microservice-template/$SERVICE_NAME/g" {} \; > /dev/null
-cd ..
-mv hbc-microservice-template $SERVICE_NAME
-cd $SERVICE_NAME
 
-echo "Removing setup.sh and README.mkd since you don't need it anymore"
+echo "Removing setup.sh and README.mkd (these are related to the template, not the new service)"
 rm -f setup.sh
 rm -f README.mkd
 
 echo "Renaming README-template.mkd to README.mkd"
 mv README-template.mkd README.mkd
+
+echo "Replacing all instances of 'hbc-microservice-template' with '$SERVICE_NAME'"
+LC_ALL=C find ./ -type f -exec sed -i '' -E "s/hbc-microservice-template/$SERVICE_NAME/g" {} \; > /dev/null
+
+echo "Renaming current folder from 'hbc-microservice-template' to '$SERVICE_NAME'"
+cd ..
+mv hbc-microservice-template $SERVICE_NAME
+cd $SERVICE_NAME
 
 git init
 

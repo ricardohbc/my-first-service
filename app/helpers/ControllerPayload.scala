@@ -9,13 +9,11 @@ import scala.util.{Try, Success}
 import scala.concurrent._
 import play.api.libs.json.JsSuccess
 import scala.util.Failure
-import scala.util.control.NonFatal
 import play.api.mvc.Result
 import models.ApiResponseModel
 import scala.util.Success
 import models.ApiErrorMessageModel
 import play.api.libs.json.JsResultException
-import play.Logger
 
 trait ControllerPayload extends Controller {
 
@@ -45,9 +43,8 @@ trait ControllerPayload extends Controller {
     writeResponse(responseStatus, constructResponseModel(request, result, Constants.COMPLETE_MESSAGE))
 
   def writeResponseFailure(ex: Throwable)(implicit request: RequestHeader): Result = {
-    val nothing: Option[String] = None // seems to forestall a weird implicit conflict on the api json models.!!
     val (responseStatus, err) = getError(ex)
-    val body = constructResponseModel(request, nothing, Constants.ERROR_MESSAGE, Seq(err))
+    val body = constructResponseModel(request, Option[String](null), Constants.ERROR_MESSAGE, Seq(err))
     writeResponse(responseStatus, body)
   }
   private def writeResponse(responseStatus: Status, body: ApiResponseModel) =

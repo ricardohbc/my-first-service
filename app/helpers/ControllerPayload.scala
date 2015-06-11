@@ -128,19 +128,11 @@ trait ControllerPayload extends Controller {
   //      HELPERS       //
   ////////////////////////
 
-  def onHandlerRequestTimeout(request: RequestHeader): Result = {
+  def onHandlerRequestTimeout(request: RequestHeader): Result =
     writeResponseFailure(new TimeoutException(Constants.TIMEOUT_MSG))(request)
-  }
 
-  private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue = {
-    //Check if valid JSON payload was received
-    val o = request.body.asJson
-    if (o.isEmpty) {
-      throw new IllegalArgumentException()
-    }
-
-    o.get
-  }
+  private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue =
+    request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
 
   private def getError(err: Throwable): (Status, ApiErrorMessageModel) = err match {
     case e: NoSuchElementException =>
@@ -155,6 +147,11 @@ trait ControllerPayload extends Controller {
       ))
     case e: ClassCastException =>
       (UnsupportedMediaType, ApiErrorMessageModel.apply(
+        e.getMessage,
+        e.getClass.getSimpleName
+      ))
+    case e: IllegalArgumentException =>
+      (BadRequest, ApiErrorMessageModel.apply(
         e.getMessage,
         e.getClass.getSimpleName
       ))

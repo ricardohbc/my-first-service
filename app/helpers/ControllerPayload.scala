@@ -5,13 +5,11 @@ import models._
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.util.{Try, Success}
+import scala.util.{Try, Success, Failure}
 import scala.concurrent._
 import play.api.libs.json.JsSuccess
-import scala.util.Failure
 import play.api.mvc.Result
 import models.ApiResponseModel
-import scala.util.Success
 import models.ApiErrorMessageModel
 import play.api.libs.json.JsResultException
 

@@ -42,12 +42,12 @@ trait ControllerPayload extends Controller {
     writeResponseSuccess(result, Ok)
 
   def writeResponseSuccess[T : Writes](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
-    writeResponse(responseStatus, constructResponseModel(request, Some(result), Constants.STATUS_COMPLETE))
+    writeResponse(responseStatus, constructResponseModel(request, result, Constants.COMPLETE_MESSAGE))
 
   def writeResponseFailure(ex: Throwable)(implicit request: RequestHeader): Result = {
     val nothing: Option[String] = None // seems to forestall a weird implicit conflict on the api json models.!!
     val (responseStatus, err) = getError(ex)
-    val body = constructResponseModel(request, nothing, Constants.STATUS_ERROR, Seq(err))
+    val body = constructResponseModel(request, nothing, Constants.ERROR_MESSAGE, Seq(err))
     writeResponse(responseStatus, body)
   }
   private def writeResponse(responseStatus: Status, body: ApiResponseModel) =
@@ -55,13 +55,13 @@ trait ControllerPayload extends Controller {
 
   def constructResponseModel[T: Writes](
     req: RequestHeader,
-    result: Option[T],
-    statusMessage: String, // not the HttpStatus code, just a string, perhaps rename this guy since it  clashes with Play's Status type??
+    result: T,
+    message: String,
     errs: Seq[ApiErrorMessageModel] = Seq()): ApiResponseModel =
       ApiResponseModel.apply(
         Json.toJson(ApiRequestModel(req)),
         Json.obj(
-          Constants.RESPONSE_STATUS -> statusMessage,
+          Constants.RESPONSE_MESSAGE -> message,
           Constants.RESULTS -> result
         ),
         Json.toJson(errs)
@@ -70,7 +70,7 @@ trait ControllerPayload extends Controller {
   private def writeResponses[T : Writes](results: Try[Seq[Try[T]]], responseCode: Status)(implicit request: Request[AnyContent]): Result = {
     var output = Seq[Option[T]]()
     var response: Status = responseCode
-    var status: String = Constants.STATUS_COMPLETE
+    var message: String = Constants.COMPLETE_MESSAGE
     var errs: Seq[ApiErrorMessageModel] = Seq[ApiErrorMessageModel]()
 
     results match {
@@ -90,17 +90,11 @@ trait ControllerPayload extends Controller {
     }
 
     if (!errs.isEmpty){
-      status = Constants.STATUS_ERROR
+      message = Constants.ERROR_MESSAGE
     }
 
-    val apiResponse = ApiResponseModel.apply(
-      Json.toJson(ApiRequestModel(request)),
-      Json.obj(
-        Constants.RESPONSE_STATUS -> status,
-        Constants.RESULTS -> output
-      ),
-      Json.toJson(errs)
-    )
+    val apiResponse = constructResponseModel(request, output, message, errs)
+
     response.apply(Json.prettyPrint(Json.toJson(apiResponse))).as(JSON)
   }
 
@@ -185,7 +179,6 @@ trait ControllerPayload extends Controller {
         e.getClass.getSimpleName
       ))
   }
-  
 }
 
 object ControllerPayloadLike extends ControllerPayload

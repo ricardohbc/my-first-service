@@ -11,7 +11,7 @@ object Constants {
   val TIMEOUT_MSG = "timeout_msg"
   val ZULU_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
   val RESULTS = "results"
-  val RESPONSE_STATUS = "status"
-  val STATUS_COMPLETE = "complete"
-  val STATUS_ERROR = "error"
+  val RESPONSE_MESSAGE = "message"
+  val COMPLETE_MESSAGE = "complete"
+  val ERROR_MESSAGE = "error"
 }

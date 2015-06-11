@@ -5,72 +5,67 @@ import models._
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.util.Try
+import scala.util.{Try, Success, Failure}
 import scala.concurrent._
 import play.api.libs.json.JsSuccess
-import scala.util.Failure
 import play.api.mvc.Result
 import models.ApiResponseModel
-import scala.util.Success
 import models.ApiErrorMessageModel
 import play.api.libs.json.JsResultException
 
-trait ControllerPayload extends Controller
-  with ApiResponse
-  with ApiError {
-
-  val actorSystemName = "hbcStatus"
+trait ControllerPayload extends Controller {
 
   ////////////////////////
   //      RESPONSE      //
   ////////////////////////
 
-  def writeResponseStore[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
-    writeResponse(request, result, Created)
+  def writeResponseStore[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+    writeResponseSuccess(result, Created)
 
-  def writeResponseStores[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]]): Result =
-    writeResponses(request, results, Created)
+  def writeResponseStores[T : Writes](results: Try[Seq[Try[T]]])(implicit request: Request[AnyContent]): Result =
+    writeResponses(results, Created)
 
-  def writeResponseGet[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
-    writeResponse(request, result, Ok)
+  def writeResponseGet[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+    writeResponseSuccess(result, Ok)
 
-  def writeResponseUpdate[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
-    writeResponse(request, result, Ok)
+  def writeResponseUpdate[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+    writeResponseSuccess(result, Ok)
 
-  def writeResponseUpdates[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]]): Result =
-    writeResponses(request, results, Ok)
+  def writeResponseUpdates[T : Writes](results: Try[Seq[Try[T]]])(implicit request: Request[AnyContent]): Result =
+    writeResponses(results, Ok)
 
-  def writeResponseRemove[T : Writes](request: Request[AnyContent], result: Try[T]): Result =
-    writeResponse(request, result, Ok)
+  def writeResponseRemove[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+    writeResponseSuccess(result, Ok)
 
-  private def writeResponse[T : Writes](request: RequestHeader, result: Try[T], responseCode: Status): Result = {
-    var response: Status = responseCode
-    var status: String = Constants.STATUS_COMPLETE
-    var errs: Seq[ApiErrorMessageModel] = Seq[ApiErrorMessageModel]()
+  def writeResponseSuccess[T : Writes](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
+    writeResponse(responseStatus, constructResponseModel(request, result, Constants.COMPLETE_MESSAGE))
 
-    if (result.isFailure) {
-      status = Constants.STATUS_ERROR
-      val (resp, err) = getError(result.failed.get)
-      response = resp
-      errs = errs :+ err
-    }
-
-    val apiResponse = ApiResponseModel.apply(
-      Json.toJson(ApiRequestModel(request)),
-      Json.obj(
-        Constants.RESPONSE_STATUS -> status,
-        Constants.RESULTS -> result.toOption
-      ),
-      Json.toJson(errs)
-    )
-
-    response.apply(Json.prettyPrint(Json.toJson(apiResponse))).as(JSON)
+  def writeResponseFailure(ex: Throwable)(implicit request: RequestHeader): Result = {
+    val (responseStatus, err) = getError(ex)
+    val body = constructResponseModel(request, Option[String](null), Constants.ERROR_MESSAGE, Seq(err))
+    writeResponse(responseStatus, body)
   }
+  private def writeResponse(responseStatus: Status, body: ApiResponseModel) =
+    responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
 
-  private def writeResponses[T : Writes](request: Request[AnyContent], results: Try[Seq[Try[T]]], responseCode: Status): Result = {
+  def constructResponseModel[T: Writes](
+    req: RequestHeader,
+    result: T,
+    message: String,
+    errs: Seq[ApiErrorMessageModel] = Seq()): ApiResponseModel =
+      ApiResponseModel.apply(
+        Json.toJson(ApiRequestModel(req)),
+        Json.obj(
+          Constants.RESPONSE_MESSAGE -> message,
+          Constants.RESULTS -> result
+        ),
+        Json.toJson(errs)
+      )
+
+  private def writeResponses[T : Writes](results: Try[Seq[Try[T]]], responseCode: Status)(implicit request: Request[AnyContent]): Result = {
     var output = Seq[Option[T]]()
     var response: Status = responseCode
-    var status: String = Constants.STATUS_COMPLETE
+    var message: String = Constants.COMPLETE_MESSAGE
     var errs: Seq[ApiErrorMessageModel] = Seq[ApiErrorMessageModel]()
 
     results match {
@@ -90,17 +85,11 @@ trait ControllerPayload extends Controller
     }
 
     if (!errs.isEmpty){
-      status = Constants.STATUS_ERROR
+      message = Constants.ERROR_MESSAGE
     }
 
-    val apiResponse = ApiResponseModel.apply(
-      Json.toJson(ApiRequestModel(request)),
-      Json.obj(
-        Constants.RESPONSE_STATUS -> status,
-        Constants.RESULTS -> output
-      ),
-      Json.toJson(errs)
-    )
+    val apiResponse = constructResponseModel(request, output, message, errs)
+
     response.apply(Json.prettyPrint(Json.toJson(apiResponse))).as(JSON)
   }
 
@@ -140,51 +129,47 @@ trait ControllerPayload extends Controller
   ////////////////////////
 
   def onHandlerRequestTimeout(request: RequestHeader): Result =
-    writeResponse(request, Failure[String](new TimeoutException(Constants.TIMEOUT_MSG)), RequestTimeout)
+    writeResponseFailure(new TimeoutException(Constants.TIMEOUT_MSG))(request)
 
-  private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue = {
-    //Check if valid JSON payload was received
-    val o = request.body.asJson
-    if (o.isEmpty) {
-      throw new IllegalArgumentException()
-    }
+  private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue =
+    request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
 
-    o.get
-  }
-
-  private def getError(err: Throwable): (Status, ApiErrorMessageModel) = {
-    err match {
-      case e: NoSuchElementException =>
-        (NotFound, ApiErrorMessageModel.apply(
-          "hbcStatus '" + e.getMessage + "' does not exist.",
-          e.getClass.getSimpleName
-        ))
-      case e: VerifyError =>
-        (PreconditionFailed, ApiErrorMessageModel.apply(
-          e.getMessage,
-          e.getClass.getSimpleName
-        ))
-      case e: ClassCastException =>
-        (UnsupportedMediaType, ApiErrorMessageModel.apply(
-          e.getMessage,
-          e.getClass.getSimpleName
-        ))
-      case e: JsResultException =>
-        (BadRequest, ApiErrorMessageModel.apply(
-          e.getMessage,
-          e.getClass.getSimpleName
-        ))
-      case e: TimeoutException =>
-        (RequestTimeout, ApiErrorMessageModel.apply(
-          e.getMessage,
-          e.getClass.getSimpleName
-        ))
-      case e: Throwable =>
-        (InternalServerError, ApiErrorMessageModel.apply(
-          "Yikes! An error has occurred: " + e.getMessage,
-          e.getClass.getSimpleName
-        ))
-    }
+  private def getError(err: Throwable): (Status, ApiErrorMessageModel) = err match {
+    case e: NoSuchElementException =>
+      (NotFound, ApiErrorMessageModel.apply(
+        "hbcStatus '" + e.getMessage + "' does not exist.",
+        e.getClass.getSimpleName
+      ))
+    case e: VerifyError =>
+      (PreconditionFailed, ApiErrorMessageModel.apply(
+        e.getMessage,
+        e.getClass.getSimpleName
+      ))
+    case e: ClassCastException =>
+      (UnsupportedMediaType, ApiErrorMessageModel.apply(
+        e.getMessage,
+        e.getClass.getSimpleName
+      ))
+    case e: IllegalArgumentException =>
+      (BadRequest, ApiErrorMessageModel.apply(
+        e.getMessage,
+        e.getClass.getSimpleName
+      ))
+    case e: JsResultException =>
+      (BadRequest, ApiErrorMessageModel.apply(
+        e.getMessage,
+        e.getClass.getSimpleName
+      ))
+    case e: TimeoutException =>
+      (RequestTimeout, ApiErrorMessageModel.apply(
+        e.getMessage,
+        e.getClass.getSimpleName
+      ))
+    case e: Throwable =>
+      (InternalServerError, ApiErrorMessageModel.apply(
+        "Yikes! An error has occurred: " + e.getMessage,
+        e.getClass.getSimpleName
+      ))
   }
 }
 

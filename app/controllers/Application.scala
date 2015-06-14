@@ -4,7 +4,6 @@ import play.api._
 import play.api.mvc._
 
 import helpers.{ControllerPayload, ControllerTimeout}
-import scala.util.Try
 
 import ch.qos.logback.classic.Level
 

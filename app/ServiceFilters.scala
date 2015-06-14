@@ -1,3 +1,4 @@
+import play.api.libs.json.JsResultException
 import play.api.mvc._
 import scala.concurrent.Future
 import play.Logger
@@ -39,5 +40,15 @@ object ServiceFilters {
       withTimeout( onHandlerRequestTimeout(req).as(JSON) ) {
         next(req)
       }
+  }
+
+  object ExceptionFilter extends Filter
+      with ControllerPayload {
+    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
+      next(req) recoverWith {
+        case e: JsResultException =>
+          Future(writeResponseFailure(e)(req))
+      }
+    }
   }
 }

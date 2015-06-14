@@ -6,7 +6,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 trait ControllerTimeout extends ConfigHelper {
-  val actionTimeout = config getInt "controllers.timeout" // millis
+  val actionTimeout = config getInt "controllers.timeout"
 
   // call this with some arbitrary blocking code 
   def timeout[T](errorHandler: => T, time: Int = actionTimeout)(body: => T) : Future[T] =
@@ -18,7 +18,7 @@ trait ControllerTimeout extends ConfigHelper {
 
   private def timingoutFuture[T](errorHandler: => T, time: Int, f: Future[T]): Future[T] = {
     val promise = Promise[T]()
-    val timeoutFuture = play.api.libs.concurrent.Promise.timeout(errorHandler, time.millis)
+    val timeoutFuture = play.api.libs.concurrent.Promise.timeout(errorHandler, time millis)
     promise.tryCompleteWith(f)
     promise.tryCompleteWith(timeoutFuture)
     promise future

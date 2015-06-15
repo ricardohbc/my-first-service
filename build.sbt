@@ -23,4 +23,18 @@ lazy val root = (project in file("."))
 
 resolvers += "Saks Artifactory - Release" at "http://repo.saksdirect.com:8081/artifactory/libs-release"
 
+lazy val buildAll = TaskKey[Unit]("build-all", "Compiles and runs all tests")
+lazy val buildZip = TaskKey[Unit]("build-zip","Compiles, tests, and publishes a zip file with the new code.")
+lazy val preCommit = TaskKey[Unit]("pre-commit", "Compiles, tests, zips code, and then refreshes docker container.")
 
+buildAll <<= Seq(clean, compile in Compile, compile in Test, test in Test).dependOn
+
+buildZip <<= ((packageBin in Universal) map { out =>
+  println("Copying Zip file to docker directory.")
+  IO.move(out, file(out.getParent + "/../../docker/" + out.getName))
+}).dependsOn(buildAll)
+
+
+preCommit := {"./refresh-notification.sh"!}
+
+preCommit <<= preCommit.dependsOn(buildZip)

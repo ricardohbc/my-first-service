@@ -1,0 +1,7 @@
+hbc-microservices-template:
+  build: docker
+  restart: always
+  ports:
+    - "9000:9000"
+  env_file:
+    - ./dev.env

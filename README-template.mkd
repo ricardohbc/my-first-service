@@ -1,6 +1,21 @@
 # hbc-microservice-template
 
-[description of what this service does]
+## Commands
+- To create a new box with containers running
+
+     ```
+      sbt build-zip
+      
+      vagrant up
+      ```
+  - To run clean, test, and deploy your latest code
+
+     ```
+      sbt pre-commit
+      ```
+  - Sbt commands:
+     - build-zip: Compiles, tests, and publishes a zip file with the new code.
+     - pre-commit: Compiles, tests, zips code, and then refreshes docker container.
 
 # Routes
 

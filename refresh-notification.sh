@@ -3,10 +3,10 @@
 echo 'Refreshing services'
 vagrant ssh << EOF
 cd /vagrant
-sudo docker-compose stop hbc-microservice-template
+sudo docker-compose stop currentservice
 yes | sudo docker-compose rm
-sudo docker-compose build hbc-microservice-template
-service docker-compose start hbc-microservice-template
+sudo docker-compose build currentservice
+service docker-compose start currentservice
 EOF
 exit
 echo 'Done'

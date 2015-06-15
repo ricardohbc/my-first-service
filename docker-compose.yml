@@ -1,4 +1,4 @@
-hbc-microservices-template:
+currentservice:
   build: docker
   restart: always
   ports:

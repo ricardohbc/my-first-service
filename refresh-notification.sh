@@ -10,3 +10,4 @@ service docker-compose start hbc-microservice-template
 EOF
 exit
 echo 'Done'
+

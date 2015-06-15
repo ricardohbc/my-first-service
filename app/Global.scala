@@ -15,6 +15,6 @@ object Global extends GlobalSettings with ControllerPayload {
     )
 
   override def onError(request: RequestHeader, ex: Throwable): Future[Result] =
-    Future.successful(getErrorFunction(writeResponseFailure)(request)(ex.getCause))
-
+    Future.successful(InternalServerError("This shouldn't happen"))
+  
 }

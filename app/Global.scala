@@ -1,9 +1,9 @@
 import scala.concurrent.Future
 import play.api.mvc._
 import play.api.GlobalSettings
-import helpers.ControllerPayloadLike
+import helpers.ControllerPayload
 
-object Global extends GlobalSettings {
+object Global extends GlobalSettings with ControllerPayload {
 
   override def doFilter(next: EssentialAction): EssentialAction =
     Filters(
@@ -15,6 +15,6 @@ object Global extends GlobalSettings {
     )
 
   override def onError(request: RequestHeader, ex: Throwable): Future[Result] =
-    Future.successful(ControllerPayloadLike.writeResponseFailure(ex.getCause)(request))
+    Future.successful(getErrorFunction(writeResponseFailure)(request)(ex.getCause))
 
 }

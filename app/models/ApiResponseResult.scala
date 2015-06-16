@@ -13,7 +13,7 @@ object ApiResponseResultModel {
       implicit val tWrites = o.tWrites
       Json.obj(
         "message" -> o.message,
-        "result" -> o.result
+        "results" -> o.result
       )
     }
   }

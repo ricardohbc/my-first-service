@@ -38,11 +38,11 @@ trait ControllerPayload extends Controller {
     writeResponseSuccess(result, Ok)
 
   def writeResponseSuccess[T : Writes](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
-    writeResponse(responseStatus, constructResponseModel(request, result, Constants.COMPLETE_MESSAGE))
+    writeResponse(responseStatus, constructResponseModel(request, ApiResponseResultModel[T](Constants.COMPLETE_MESSAGE, result)))
 
   def writeResponseFailure(ex: Throwable)(implicit request: RequestHeader): Result = {
     val (responseStatus, err) = getError(ex)
-    val body = constructResponseModel(request, Option[String](null), Constants.ERROR_MESSAGE, Seq(err))
+    val body = constructResponseModel(request, ApiResponseResultModel(Constants.ERROR_MESSAGE), Seq(err))
     writeResponse(responseStatus, body)
   }
   private def writeResponse(responseStatus: Status, body: ApiResponseModel) =
@@ -50,15 +50,11 @@ trait ControllerPayload extends Controller {
 
   def constructResponseModel[T: Writes](
     req: RequestHeader,
-    result: T,
-    message: String,
+    result: ApiResponseResultModel[T],
     errs: Seq[ApiErrorMessageModel] = Seq()): ApiResponseModel =
       ApiResponseModel.apply(
         Json.toJson(ApiRequestModel(req)),
-        Json.obj(
-          Constants.RESPONSE_MESSAGE -> message,
-          Constants.RESULTS -> result
-        ),
+        Json.toJson(result),
         Json.toJson(errs)
       )
 
@@ -88,7 +84,7 @@ trait ControllerPayload extends Controller {
       message = Constants.ERROR_MESSAGE
     }
 
-    val apiResponse = constructResponseModel(request, output, message, errs)
+    val apiResponse = constructResponseModel(request, ApiResponseResultModel(message, output), errs)
 
     response.apply(Json.prettyPrint(Json.toJson(apiResponse))).as(JSON)
   }

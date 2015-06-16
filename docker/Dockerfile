@@ -12,4 +12,4 @@ EXPOSE 9000
 
 ENV CONFIG_RESOURCE application.conf
 
-CMD nohup /opt/hbc-microservice-template-0.1/bin/hbc-microservice-template -Dhttp.port=9000 -Dpidfile.path=/dev/null -DconfigDir=/opt/config -Denv=dev -Dconfig.resource=${CONFIG_RESOURCE}
+CMD nohup /opt/hbc-microservice-template-0.1/bin/hbc-microservice-template -Dhttp.port=9000 -Dpidfile.path=/dev/null -Dconfig.resource=${CONFIG_RESOURCE}

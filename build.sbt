@@ -35,6 +35,6 @@ buildZip <<= ((packageBin in Universal) map { out =>
 }).dependsOn(buildAll)
 
 
-preCommit := {"./refresh-notification.sh"!}
+preCommit := {"./refresh-service.sh"!}
 
 preCommit <<= preCommit.dependsOn(buildZip)

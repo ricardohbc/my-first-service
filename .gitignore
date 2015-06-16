@@ -23,3 +23,5 @@ puppet/.tmp
 puppet/modules/*
 changes.patch
 projectFilesBackUp
+*.zip
+.*~

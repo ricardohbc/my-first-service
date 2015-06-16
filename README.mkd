@@ -153,6 +153,9 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 
 - IDE support
 
+- OOTB provision of basic metrics (count and timing for each endpoint), a default (configurable) timeout for all endpoints and some standardized catching of show-stopper exceptions and providing a standard error response.
+
+
 Navigate to the root project directory and call sbt
 
  - Intellij

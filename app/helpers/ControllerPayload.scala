@@ -148,7 +148,7 @@ trait ControllerPayload extends Controller {
   def responseExec (handlerInfo: (Status, ApiErrorMessageModel))(request: RequestHeader) = {
     handlerInfo match {
       case (status, err) =>
-        val body = constructResponseModel(request, Option[String](null), Constants.ERROR_MESSAGE, Seq(err))
+        val body = constructResponseModel(request, ApiResponseResultModel(Constants.ERROR_MESSAGE), Seq(err))
         writeResponse(status, body)
     }
   }

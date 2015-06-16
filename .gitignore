@@ -25,3 +25,4 @@ changes.patch
 projectFilesBackUp
 *.zip
 .*~
+*.log

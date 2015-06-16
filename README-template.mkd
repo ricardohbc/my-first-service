@@ -1,5 +1,8 @@
 # hbc-microservice-template
 
+## Prequisites
+- [vagrant plugins](#https://github.com/saksdirect/HBCPlatformDocs/tree/master/gettingStarted/backendDevWorkstation#install-vagrant-plugins)
+
 ## Commands
 - To create a new box with containers running
 
@@ -17,7 +20,7 @@
      - build-zip: Compiles, tests, and publishes a zip file with the new code.
      - pre-commit: Compiles, tests, zips code, and then refreshes docker container.
 
-# Routes
+## Routes
 
 [list all routes that this service supports]
 

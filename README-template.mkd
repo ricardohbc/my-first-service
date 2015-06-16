@@ -1,7 +1,7 @@
 # hbc-microservice-template
 
 ## Prequisites
-- [vagrant plugins](#https://github.com/saksdirect/HBCPlatformDocs/tree/master/gettingStarted/backendDevWorkstation#install-vagrant-plugins)
+- [vagrant plugins](https://github.com/saksdirect/HBCPlatformDocs/tree/master/gettingStarted/backendDevWorkstation#install-vagrant-plugins)
 
 ## Commands
 - To create a new box with containers running

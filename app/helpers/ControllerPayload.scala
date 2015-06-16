@@ -5,12 +5,12 @@ import models._
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.util.{Try, Success, Failure}
+import scala.util.Try
 import scala.concurrent._
 import play.api.libs.json.JsSuccess
+import scala.util.Failure
 import play.api.mvc.Result
-import models.ApiResponseModel
-import models.ApiErrorMessageModel
+import scala.util.Success
 import play.api.libs.json.JsResultException
 
 trait ControllerPayload extends Controller {
@@ -40,11 +40,6 @@ trait ControllerPayload extends Controller {
   def writeResponseSuccess[T : Writes](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
     writeResponse(responseStatus, constructResponseModel(request, ApiResponseResultModel[T](Constants.COMPLETE_MESSAGE, result)))
 
-  def writeResponseFailure(ex: Throwable)(implicit request: RequestHeader): Result = {
-    val (responseStatus, err) = getError(ex)
-    val body = constructResponseModel(request, ApiResponseResultModel(Constants.ERROR_MESSAGE), Seq(err))
-    writeResponse(responseStatus, body)
-  }
   private def writeResponse(responseStatus: Status, body: ApiResponseModel) =
     responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
 
@@ -63,15 +58,16 @@ trait ControllerPayload extends Controller {
     var response: Status = responseCode
     var message: String = Constants.COMPLETE_MESSAGE
     var errs: Seq[ApiErrorMessageModel] = Seq[ApiErrorMessageModel]()
+    val errorFunction =
 
     results match {
       case Failure(e) =>
-        val (resp, err) = getError(results.failed.get)
+        val (resp, err) = findResponseHandler(results.failed.get)
         response = resp
         errs = errs :+ err
       case Success(seq) =>
         errs = errs ++ seq.filter(_.isFailure).map(f => {
-          val (resp, err) = getError(f.failed.get)
+          val (resp, err) = findResponseHandler(f.failed.get)
           if (response.header.status < resp.header.status){
             response = resp
           }
@@ -125,47 +121,36 @@ trait ControllerPayload extends Controller {
   ////////////////////////
 
   def onHandlerRequestTimeout(request: RequestHeader): Result =
-    writeResponseFailure(new TimeoutException(Constants.TIMEOUT_MSG))(request)
+    responseExec(findResponseHandler(new TimeoutException(Constants.TIMEOUT_MSG)))(request)
 
   private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue =
     request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
 
-  private def getError(err: Throwable): (Status, ApiErrorMessageModel) = err match {
+  def findResponseHandler: PartialFunction[Throwable, (Status, ApiErrorMessageModel)] = {
     case e: NoSuchElementException =>
-      (NotFound, ApiErrorMessageModel.apply(
-        "hbcStatus '" + e.getMessage + "' does not exist.",
-        e.getClass.getSimpleName
-      ))
+      (NotFound, ApiErrorMessageModel(
+        "hbcStatus '" + e.getMessage + "' does not exist.", e))
     case e: VerifyError =>
-      (PreconditionFailed, ApiErrorMessageModel.apply(
-        e.getMessage,
-        e.getClass.getSimpleName
-      ))
+      (PreconditionFailed, ApiErrorMessageModel(e))
     case e: ClassCastException =>
-      (UnsupportedMediaType, ApiErrorMessageModel.apply(
-        e.getMessage,
-        e.getClass.getSimpleName
-      ))
+      (UnsupportedMediaType, ApiErrorMessageModel(e))
     case e: IllegalArgumentException =>
-      (BadRequest, ApiErrorMessageModel.apply(
-        e.getMessage,
-        e.getClass.getSimpleName
-      ))
+      (BadRequest, ApiErrorMessageModel(e))
     case e: JsResultException =>
-      (BadRequest, ApiErrorMessageModel.apply(
-        e.getMessage,
-        e.getClass.getSimpleName
-      ))
+      (BadRequest, ApiErrorMessageModel(e))
     case e: TimeoutException =>
-      (RequestTimeout, ApiErrorMessageModel.apply(
-        e.getMessage,
-        e.getClass.getSimpleName
-      ))
+      (RequestTimeout, ApiErrorMessageModel(e))
     case e: Throwable =>
-      (InternalServerError, ApiErrorMessageModel.apply(
-        "Yikes! An error has occurred: " + e.getMessage,
-        e.getClass.getSimpleName
-      ))
+      (InternalServerError, ApiErrorMessageModel(
+        "Yikes! An error has occurred: " + e.getMessage, e))
+  }
+
+  def responseExec (handlerInfo: (Status, ApiErrorMessageModel))(request: RequestHeader) = {
+    handlerInfo match {
+      case (status, err) =>
+        val body = constructResponseModel(request, ApiResponseResultModel(Constants.ERROR_MESSAGE), Seq(err))
+        writeResponse(status, body)
+    }
   }
 }
 

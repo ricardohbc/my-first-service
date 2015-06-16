@@ -1,15 +1,20 @@
 import scala.concurrent.Future
-import play.api._
 import play.api.mvc._
 import play.api.GlobalSettings
-import helpers.ControllerPayloadLike
+import helpers.ControllerPayload
 
-object Global extends GlobalSettings {
+object Global extends GlobalSettings with ControllerPayload {
 
   override def doFilter(next: EssentialAction): EssentialAction =
-    Filters(super.doFilter(next), ServiceFilters.TimingFilter, ServiceFilters.IncrementFilter, ServiceFilters.TimeoutFilter)
+    Filters(
+      super.doFilter(next),
+      ServiceFilters.TimingFilter,
+      ServiceFilters.IncrementFilter,
+      ServiceFilters.TimeoutFilter,
+      ServiceFilters.ExceptionFilter
+    )
 
   override def onError(request: RequestHeader, ex: Throwable): Future[Result] =
-    Future.successful(ControllerPayloadLike.writeResponseFailure(ex.getCause)(request))
+    Future.successful(InternalServerError("This shouldn't happen"))
 
 }

@@ -10,6 +10,15 @@ case class ApiErrorMessageModel(
 )
 
 object ApiErrorMessageModel {
+
+  def apply(ex: Throwable) = {
+    new ApiErrorMessageModel(ex.getMessage, ex.getClass.getSimpleName)
+  }
+
+  def apply(message: String, ex: Throwable) = {
+    new ApiErrorMessageModel(message, ex.getClass.getSimpleName)
+  }
+
   implicit val errorMessageObjectWrites: Writes[ApiErrorMessageModel] = (
     (__ \ Constants.DATA).write[String] and
       (__ \ Constants.ERROR).write[String]

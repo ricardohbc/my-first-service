@@ -40,4 +40,11 @@ object ServiceFilters {
         next(req)
       }
   }
+
+  object ExceptionFilter extends Filter
+      with ControllerPayload {
+    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
+      next(req) recover (findResponseHandler andThen {case exceptionInfo => responseExec(exceptionInfo)(req)})
+    }
+  }
 }

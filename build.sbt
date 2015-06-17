@@ -21,8 +21,11 @@ lazy val root = (project in file("."))
        )
     .enablePlugins(PlayScala)
 
-resolvers += "Saks Artifactory - Release" at "http://repo.saksdirect.com:8081/artifactory/libs-release"
-
+resolvers ++= Seq("Saks Artifactory - Ext Release Local" at "http://repo.saksdirect.com:8081/artifactory/ext-release-local",
+	"Saks Artifactory - Libs Release Local" at "http://repo.saksdirect.com:8081/artifactory/libs-release-local",
+	"Saks Artifactory - Libs Release" at "http://repo.saksdirect.com:8081/artifactory/libs-release"
+	)
+		   
 lazy val buildAll = TaskKey[Unit]("build-all", "Compiles and runs all tests")
 lazy val buildZip = TaskKey[Unit]("build-zip","Compiles, tests, and publishes a zip file with the new code.")
 lazy val preCommit = TaskKey[Unit]("pre-commit", "Compiles, tests, zips code, and then refreshes docker container.")

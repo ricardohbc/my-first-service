@@ -18,11 +18,10 @@ else
         fi
 fi
 
-read -p "What is the version of this patch (ex v1.0.0)?: " VERSION_TAG
-
-if [[ -z $VERSION_TAG || $VERSION_TAG =~ \  ]]
+read -p "What is the version of this patch (must follow semantic versioning, ex v1.0.0)?: " VERSION_TAG
+if [[ -z $VERSION_TAG || ! $VERSION_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
 then
-        echo "Please enter a valid version! (https://www.kernel.org/pub/software/scm/git/docs/git-check-ref-format.html)"
+        echo "Please enter a valid version! (http://semver.org/)"
         exit;
 elif [[ $(git tag -l $VERSION_TAG | wc -l) -ne 0 ]]
 then

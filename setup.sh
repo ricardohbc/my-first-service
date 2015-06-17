@@ -39,7 +39,7 @@ echo "Renaming README-template.mkd to README.mkd"
 mv README-template.mkd README.mkd
 
 echo "Replacing all instances of 'hbc-microservice-template' with '$SERVICE_NAME'"
-LC_ALL=C find ./ -type f -exec sed -i '' -E "s/hbc-microservice-template/$SERVICE_NAME/g" {} \; > /dev/null
+LC_ALL=C find . -path ./.git -prune -o -type f -exec sed -i '' -E "s/hbc-microservice-template/$SERVICE_NAME/g" {} \; > /dev/null
 
 git commit -a -m "Setup new service"
 git push -u origin master

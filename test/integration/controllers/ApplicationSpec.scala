@@ -34,6 +34,14 @@ with BeforeAndAfterAll {
       (contentAsJson(index) \ "response" \ "results").as[String] == "hbc-microservice-template is up and running!" shouldBe true
     }
 
+    "get Swagger spec" in {
+      val index = route(FakeRequest(GET, "/api/v1/api-docs")).get
+
+      status(index) shouldBe OK
+      contentType(index).get == "application/json" shouldBe true
+      (contentAsJson(index) \ "swagger").as[String] == "2.0" shouldBe true
+    }
+
     "change the log Level" in {
       val changeLog = route(FakeRequest(GET, "/hbc-microservice-template/logLevel/WARN")).get
       status(changeLog) shouldBe OK

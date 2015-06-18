@@ -6,10 +6,16 @@ object CommonDependencies {
 
   val scalaTestVersion = "2.2.5"
   val scalaCheckVersion = "1.12.2"
+  val apiDocVersion = "1.0"
 
   val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
-
+  val apiDoc = "com.hbc" %% "api_doc" % apiDocVersion
   val scalacheck = "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
 
-  val commonDependencies : Seq[ModuleID] = Seq(scalaTest,scalacheck)
+  val commonDependencies : Seq[ModuleID] =
+    Seq(
+      scalaTest,
+      apiDoc,
+      scalacheck
+      )
 }

@@ -6,7 +6,7 @@ object CommonDependencies {
 
   val scalaTestVersion = "2.2.5"
   val scalaCheckVersion = "1.12.2"
-  val apiDocVersion = "7"
+  val apiDocVersion = "8"
 
   val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
   val apiDoc = "com.hbc" %% "api_doc" % apiDocVersion

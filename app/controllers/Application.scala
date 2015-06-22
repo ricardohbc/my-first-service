@@ -49,7 +49,7 @@ with ControllerPayload {
       Change the log level of this service
 
     PARAMETERS
-      level: Enum(ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF) Int <- The log level you want to set
+      level: Enum(ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF) String <- The log level you want to set
 
     RESULT
       Response
@@ -64,7 +64,7 @@ with ControllerPayload {
       Change the log level of this service
 
     PARAMETERS
-      level: Enum(ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF) Int <- The log level you want to set
+      level: Enum(ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF) String <- The log level you want to set
 
     RESULT
       Response

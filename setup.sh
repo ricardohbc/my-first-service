@@ -4,7 +4,7 @@ if [ -z "$SERVICE_NAME" ]
 then
         echo "Please enter a valid service name!"
         exit;
-elif ! [[ "$SERVICE_NAME" =~ ^[a-z]+-service$ ]]
+elif ! [[ "$SERVICE_NAME" =~ ^[a-z][a-z-]*-service$ ]]
 then
         echo "Service name does not conform to current naming scheme! Please check README.mkd for correct scheme!"
         read -p "Are you sure you want to continue? [y/n]: " -n 1 -r

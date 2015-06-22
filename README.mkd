@@ -43,7 +43,7 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 - All microservices should have a suffix of "-service", so we can easily search for and distinguish all microservices in github.
 - Examples of good service names:
       - find-in-store-serivce
-      - storepickup-service
+      - store-pickup-service
       - endeca-service
       - lookahead-service
 

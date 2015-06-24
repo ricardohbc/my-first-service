@@ -3,6 +3,7 @@
 - [ ] Write unit tests
 - [ ] Write integration tests
 - [ ] Tests all pass
+- [ ] Add necessary documentation
 - [ ] Commit code to branch
 - [ ] Submit pull request for review
 - [ ] Address all pull request comments

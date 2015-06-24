@@ -1,0 +1,13 @@
+- [ ] Implement solution to the story
+- [ ] Code compiles
+- [ ] Write unit tests
+- [ ] Write integration tests
+- [ ] Tests all pass
+- [ ] Commit code to branch
+- [ ] Submit pull request for review
+- [ ] Address all pull request comments
+- [ ] Create GO pipeline
+- [ ] Confirm GO pipeline passes (and does what it should)
+- [ ] Move story to QA
+- [ ] Communicate dev completion to QA (GO pipeline version included)
+- [ ] Perform quick showcase to the team

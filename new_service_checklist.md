@@ -8,9 +8,9 @@
 - [ ] Commit code to branch
 - [ ] Submit pull request for review
 - [ ] Address all pull request comments
+- [ ] Confirm git branch is merged
 - [ ] Create GO pipeline
 - [ ] Confirm GO pipeline passes (and does what it should)
-- [ ] Confirm git branch is merged
 - [ ] Move story card to QA
 - [ ] Communicate dev completion to QA (GO pipeline version included)
 - [ ] Perform quick showcase to the team of the new service

@@ -28,11 +28,11 @@ with ControllerPayload {
       message: String
       results: String
 
-    Error: models.ApiErrorMessageModel
+    Error: models.ApiErrorModel
       data: String
       error: String
 
-    Response: models.ApiResponseModel
+    Response: models.ApiModel
       request: Request
       response: ResponseResult
       errors: Array Error

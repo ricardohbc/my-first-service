@@ -19,45 +19,46 @@ trait ControllerPayload extends Controller {
   //      RESPONSE      //
   ////////////////////////
 
-  def writeResponseStore[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+  def writeResponseStore[T : Format](result: T)(implicit request: Request[AnyContent]): Result =
     writeResponseSuccess(result, Created)
 
-  def writeResponseStores[T : Writes](results: Try[Seq[Try[T]]])(implicit request: Request[AnyContent]): Result =
+  def writeResponseStores[T : Format](results: Try[Seq[Try[T]]])(implicit request: Request[AnyContent]): Result =
     writeResponses(results, Created)
 
-  def writeResponseGet[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+  def writeResponseGet[T : Format](result: T)(implicit request: Request[AnyContent]): Result =
     writeResponseSuccess(result, Ok)
 
-  def writeResponseUpdate[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+  def writeResponseUpdate[T : Format](result: T)(implicit request: Request[AnyContent]): Result =
     writeResponseSuccess(result, Ok)
 
-  def writeResponseUpdates[T : Writes](results: Try[Seq[Try[T]]])(implicit request: Request[AnyContent]): Result =
+  def writeResponseUpdates[T : Format](results: Try[Seq[Try[T]]])(implicit request: Request[AnyContent]): Result =
     writeResponses(results, Ok)
 
-  def writeResponseRemove[T : Writes](result: T)(implicit request: Request[AnyContent]): Result =
+  def writeResponseRemove[T : Format](result: T)(implicit request: Request[AnyContent]): Result =
     writeResponseSuccess(result, Ok)
 
-  def writeResponseSuccess[T : Writes](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
-    writeResponse(responseStatus, constructResponseModel(request, ApiResponseResultModel[T](Constants.COMPLETE_MESSAGE, result)))
+  def writeResponseSuccess[T : Format](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
+    writeResponse(responseStatus, constructResponseModel(request, Constants.COMPLETE_MESSAGE, result))
 
-  private def writeResponse(responseStatus: Status, body: ApiResponseModel) =
+  def writeResponse(responseStatus: Status, body: ApiModel) =
     responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
 
-  def constructResponseModel[T: Writes](
+  def constructResponseModel[T: Format](
     req: RequestHeader,
-    result: ApiResponseResultModel[T],
-    errs: Seq[ApiErrorMessageModel] = Seq()): ApiResponseModel =
-      ApiResponseModel.apply(
-        Json.toJson(ApiRequestModel(req)),
-        Json.toJson(result),
-        Json.toJson(errs)
+    resultMessage: String,
+    result: T = Json.toJson(JsNull),
+    errs: Seq[ApiErrorModel] = Seq()): ApiModel =
+      ApiModel.apply(
+        ApiRequestModel.fromReq(req),
+        ApiResultModel(resultMessage, Json.toJson(result)),
+        errs
       )
 
-  private def writeResponses[T : Writes](results: Try[Seq[Try[T]]], responseCode: Status)(implicit request: Request[AnyContent]): Result = {
-    var output = Seq[Option[T]]()
+  private def writeResponses[T : Format](results: Try[Seq[Try[T]]], responseCode: Status)(implicit request: Request[AnyContent]): Result = {
+    var output = Seq[T]()
     var response: Status = responseCode
     var message: String = Constants.COMPLETE_MESSAGE
-    var errs: Seq[ApiErrorMessageModel] = Seq[ApiErrorMessageModel]()
+    var errs: Seq[ApiErrorModel] = Seq[ApiErrorModel]()
     val errorFunction =
 
     results match {
@@ -73,14 +74,14 @@ trait ControllerPayload extends Controller {
           }
           err
         })
-        output = seq.map(_.toOption)
+        output = seq.flatMap(_.toOption.toList)
     }
 
     if (!errs.isEmpty){
       message = Constants.ERROR_MESSAGE
     }
 
-    val apiResponse = constructResponseModel(request, ApiResponseResultModel(message, output), errs)
+    val apiResponse = constructResponseModel(request, message, output, errs)
 
     response.apply(Json.prettyPrint(Json.toJson(apiResponse))).as(JSON)
   }
@@ -126,29 +127,29 @@ trait ControllerPayload extends Controller {
   private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue =
     request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
 
-  def findResponseHandler: PartialFunction[Throwable, (Status, ApiErrorMessageModel)] = {
+  def findResponseHandler: PartialFunction[Throwable, (Status, ApiErrorModel)] = {
     case e: NoSuchElementException =>
-      (NotFound, ApiErrorMessageModel(
+      (NotFound, ApiErrorModel.fromExceptionAndMessage(
         "hbcStatus '" + e.getMessage + "' does not exist.", e))
     case e: VerifyError =>
-      (PreconditionFailed, ApiErrorMessageModel(e))
+      (PreconditionFailed, ApiErrorModel.fromException(e))
     case e: ClassCastException =>
-      (UnsupportedMediaType, ApiErrorMessageModel(e))
+      (UnsupportedMediaType, ApiErrorModel.fromException(e))
     case e: IllegalArgumentException =>
-      (BadRequest, ApiErrorMessageModel(e))
+      (BadRequest, ApiErrorModel.fromException(e))
     case e: JsResultException =>
-      (BadRequest, ApiErrorMessageModel(e))
+      (BadRequest, ApiErrorModel.fromException(e))
     case e: TimeoutException =>
-      (RequestTimeout, ApiErrorMessageModel(e))
+      (RequestTimeout, ApiErrorModel.fromException(e))
     case e: Throwable =>
-      (InternalServerError, ApiErrorMessageModel(
+      (InternalServerError, ApiErrorModel.fromExceptionAndMessage(
         "Yikes! An error has occurred: " + e.getMessage, e))
   }
 
-  def responseExec (handlerInfo: (Status, ApiErrorMessageModel))(request: RequestHeader) = {
+  def responseExec (handlerInfo: (Status, ApiErrorModel))(request: RequestHeader) = {
     handlerInfo match {
       case (status, err) =>
-        val body = constructResponseModel(request, ApiResponseResultModel(Constants.ERROR_MESSAGE), Seq(err))
+        val body = constructResponseModel(request, Constants.ERROR_MESSAGE, errs = Seq(err))
         writeResponse(status, body)
     }
   }

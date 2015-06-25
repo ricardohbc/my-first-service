@@ -40,7 +40,7 @@ trait ControllerPayload extends Controller {
   def writeResponseSuccess[T : Format](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
     writeResponse(responseStatus, constructResponseModel(request, Constants.COMPLETE_MESSAGE, result))
 
-  private def writeResponse(responseStatus: Status, body: ApiModel) =
+  def writeResponse(responseStatus: Status, body: ApiModel) =
     responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
 
   def constructResponseModel[T: Format](

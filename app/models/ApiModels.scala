@@ -18,7 +18,7 @@ object ApiResultModel {
 }
 
 
-// ****** errors and messages
+// error info
 case class ApiErrorModel(data: String, error: String)
 
 object ApiErrorModel {
@@ -33,11 +33,8 @@ object ApiErrorModel {
 }
 
 
-// ***** the request url
+// the request url
 case class ApiRequestModel(url: String, server_received_time: String)
-// {  could do this in case of actual use of this field in scala land, and aethestic objection to snake case
-  //def serverReceivedTime = server_received_time
-//}
 
 object ApiRequestModel {
   implicit val reqFormat = Json.format[ApiRequestModel]
@@ -65,7 +62,6 @@ object ApiModel {
     asJs.validate[ApiModel]
   }
 
-  // you can map, flatmap on JsResult, or  call asOpt, or toEither on it...
   // call this like this: ApiModel.resultsAs[List[String]](res.body)  => JsResult
   // obviously you need to specify the success type you're expecting  :)
   // https://www.playframework.com/documentation/2.3.x/api/scala/index.html#play.api.libs.json.JsResult
@@ -80,10 +76,12 @@ object ApiModel {
   def withHeader(body: String)(implicit req: RequestHeader): ApiModel = {
     val reqModel = ApiRequestModel.fromReq(req)
     fromBody(body)
-      .fold(_ => defaultErrorModel("unexpected failure parsing ApiModel"), apiModel => apiModel.copy(request = reqModel)) // success, just copy the new req header info
+      .fold(f => defaultErrorModel("unexpected failure parsing ApiModel\n${f.toString}"), _.copy(request = reqModel))
   }
 
   def defaultErrorModel(errorMessage: String)(implicit req: RequestHeader): ApiModel =
-    ApiModel(ApiRequestModel.fromReq(req), ApiResultModel.defaultErrorModel, Seq(ApiErrorModel.defaultErrorModel(errorMessage)))
+    ApiModel( ApiRequestModel.fromReq(req), 
+              ApiResultModel.defaultErrorModel, 
+              Seq(ApiErrorModel.defaultErrorModel(errorMessage)))
 
 }

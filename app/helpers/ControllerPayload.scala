@@ -46,16 +46,16 @@ trait ControllerPayload extends Controller {
   def constructResponseModel[T: Format](
     req: RequestHeader,
     resultMessage: String,
-    result: T = JsNull,
+    result: T = Json.toJson(JsNull),
     errs: Seq[ApiErrorModel] = Seq()): ApiModel =
       ApiModel.apply(
         ApiRequestModel.fromReq(req),
-        ApiResultModel(message, result),
-        ApiErrorModel(errs)
+        ApiResultModel(resultMessage, Json.toJson(result)),
+        errs
       )
 
-  private def writeResponses[T : Writes](results: Try[Seq[Try[T]]], responseCode: Status)(implicit request: Request[AnyContent]): Result = {
-    var output = Seq[Option[T]]()
+  private def writeResponses[T : Format](results: Try[Seq[Try[T]]], responseCode: Status)(implicit request: Request[AnyContent]): Result = {
+    var output = Seq[T]()
     var response: Status = responseCode
     var message: String = Constants.COMPLETE_MESSAGE
     var errs: Seq[ApiErrorModel] = Seq[ApiErrorModel]()
@@ -74,7 +74,7 @@ trait ControllerPayload extends Controller {
           }
           err
         })
-        output = seq.map(_.toOption)
+        output = seq.flatMap(_.toOption.toList)
     }
 
     if (!errs.isEmpty){

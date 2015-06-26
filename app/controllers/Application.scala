@@ -7,9 +7,10 @@ import helpers.{ControllerPayload, ControllerTimeout}
 
 import ch.qos.logback.classic.Level
 
+
 object Application extends Controller
 with ControllerTimeout
-with ControllerPayload {
+with ControllerPayload with metrics.StatsDClient{
 
   @no.samordnaopptak.apidoc.ApiDoc(doc="""
     GET /hbc-microservice-template
@@ -39,6 +40,9 @@ with ControllerPayload {
   """)
   def index = Action { implicit request =>
     val response = "hbc-microservice-template is up and running!"
+    time("goat", request) {
+      Logger.info("wake up goat")
+    }
     writeResponseGet(response)
   }
 

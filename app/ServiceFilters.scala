@@ -8,18 +8,11 @@ import helpers.{ControllerTimeout, ControllerPayload}
 // common logging and metrics for all requests
 object ServiceFilters {
 
-  def requestTag(requestHeader: RequestHeader): String = {
-    val controllerActionTag = for {
-      controller <- requestHeader.tags.get(play.api.Routes.ROUTE_CONTROLLER)
-      action <- requestHeader.tags.get(play.api.Routes.ROUTE_ACTION_METHOD)
-    } yield controller.replaceFirst("controllers.", "") + "." + action
-    controllerActionTag.getOrElse(requestHeader.path.replaceAll("/", "_"))
-  }
-
   object TimingFilter extends Filter with StatsDClient {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
       val reqTag = requestTag(req)
-      time(reqTag) {
+      time("", req) {
+        Logger.info("TRIGGER SOME CODE IN THE TIMED BLOCK")
         next(req)
       }
     }

@@ -1,5 +1,6 @@
 import play.api.mvc._
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import metrics.StatsDClient
@@ -12,7 +13,6 @@ object ServiceFilters {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
       val reqTag = requestTag(req)
       time("", req) {
-        Logger.info("TRIGGER SOME CODE IN THE TIMED BLOCK")
         next(req)
       }
     }
@@ -34,10 +34,9 @@ object ServiceFilters {
       }
   }
 
-  object ExceptionFilter extends Filter
-      with ControllerPayload {
+  object ExceptionFilter extends Filter with ControllerPayload {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
-      next(req) recover (findResponseHandler andThen {case exceptionInfo => responseExec(exceptionInfo)(req)})
+      next(req) recover { case NonFatal(ex) => defaultExceptionHandler(ex)(req) }
     }
   }
 }

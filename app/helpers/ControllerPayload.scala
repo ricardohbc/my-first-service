@@ -40,7 +40,7 @@ trait ControllerPayload extends Controller {
   def writeResponseSuccess[T : Format](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
     writeResponse(responseStatus, constructResponseModel(request, Constants.COMPLETE_MESSAGE, result))
 
-  def writeResponse(responseStatus: Status, body: ApiModel) =
+  def writeResponse(responseStatus: Status, body: ApiModel): Result =
     responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
 
   def constructResponseModel[T: Format](
@@ -122,12 +122,12 @@ trait ControllerPayload extends Controller {
   ////////////////////////
 
   def onHandlerRequestTimeout(request: RequestHeader): Result =
-    responseExec(findResponseHandler(new TimeoutException(Constants.TIMEOUT_MSG)))(request)
+    defaultExceptionHandler(new TimeoutException(Constants.TIMEOUT_MSG))(request)
 
   private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue =
     request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
 
-  def findResponseHandler: PartialFunction[Throwable, (Status, ApiErrorModel)] = {
+  val findResponseHandler: PartialFunction[Throwable, (Status, ApiErrorModel)] = {
     case e: NoSuchElementException =>
       (NotFound, ApiErrorModel.fromExceptionAndMessage(
         "hbcStatus '" + e.getMessage + "' does not exist.", e))
@@ -146,13 +146,13 @@ trait ControllerPayload extends Controller {
         "Yikes! An error has occurred: " + e.getMessage, e))
   }
 
-  def responseExec (handlerInfo: (Status, ApiErrorModel))(request: RequestHeader) = {
-    handlerInfo match {
-      case (status, err) =>
-        val body = constructResponseModel(request, Constants.ERROR_MESSAGE, errs = Seq(err))
-        writeResponse(status, body)
-    }
+  val responseExec: (Status, ApiErrorModel) => RequestHeader => Result = { case (status, err) => req =>
+    val body = constructResponseModel(req, Constants.ERROR_MESSAGE, errs = Seq(err))
+    writeResponse(status, body)
   }
+
+  val defaultExceptionHandler: Throwable => RequestHeader => Result =
+    findResponseHandler andThen responseExec.tupled
 }
 
 object ControllerPayloadLike extends ControllerPayload

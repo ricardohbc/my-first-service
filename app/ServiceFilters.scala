@@ -36,7 +36,7 @@ object ServiceFilters {
 
   object ExceptionFilter extends Filter with ControllerPayload {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
-      next(req) recover { case NonFatal(ex) => defaultExceptionHandler(ex)(req) }
+      next(req) recover { defaultExceptionHandler(req) }
     }
   }
 }

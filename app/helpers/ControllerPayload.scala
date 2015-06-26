@@ -63,12 +63,12 @@ trait ControllerPayload extends Controller {
 
     results match {
       case Failure(e) =>
-        val (resp, err) = findResponseHandler(results.failed.get)
+        val (resp, err) = findResponseStatus(results.failed.get)
         response = resp
         errs = errs :+ err
       case Success(seq) =>
         errs = errs ++ seq.filter(_.isFailure).map(f => {
-          val (resp, err) = findResponseHandler(f.failed.get)
+          val (resp, err) = findResponseStatus(f.failed.get)
           if (response.header.status < resp.header.status){
             response = resp
           }
@@ -122,12 +122,12 @@ trait ControllerPayload extends Controller {
   ////////////////////////
 
   def onHandlerRequestTimeout(request: RequestHeader): Result =
-    defaultExceptionHandler(new TimeoutException(Constants.TIMEOUT_MSG))(request)
+    defaultExceptionHandler(request)(new TimeoutException(Constants.TIMEOUT_MSG))
 
   private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue =
     request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
 
-  val findResponseHandler: PartialFunction[Throwable, (Status, ApiErrorModel)] = {
+  val findResponseStatus: PartialFunction[Throwable, (Status, ApiErrorModel)] = {
     case e: NoSuchElementException =>
       (NotFound, ApiErrorModel.fromExceptionAndMessage(
         "hbcStatus '" + e.getMessage + "' does not exist.", e))
@@ -146,13 +146,15 @@ trait ControllerPayload extends Controller {
         "Yikes! An error has occurred: " + e.getMessage, e))
   }
 
-  val responseExec: (Status, ApiErrorModel) => RequestHeader => Result = { case (status, err) => req =>
-    val body = constructResponseModel(req, Constants.ERROR_MESSAGE, errs = Seq(err))
-    writeResponse(status, body)
-  }
+  def handlerForRequest(req: RequestHeader): (Status, ApiErrorModel) => Result = (status, err) =>
+    writeResponse(
+      status, 
+     constructResponseModel(req, Constants.ERROR_MESSAGE, errs = Seq(err))
+    )
+    
+  def defaultExceptionHandler(req: RequestHeader): PartialFunction[Throwable, Result] =
+    findResponseStatus andThen handlerForRequest(req).tupled
 
-  val defaultExceptionHandler: Throwable => RequestHeader => Result =
-    findResponseHandler andThen responseExec.tupled
 }
 
 object ControllerPayloadLike extends ControllerPayload

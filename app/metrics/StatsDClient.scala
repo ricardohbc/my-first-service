@@ -34,6 +34,7 @@ import akka.actor._
 import play.Logger
 import helpers.ConfigHelper
 import play.api.Play.current
+import play.api.mvc._
 import play.api.libs.concurrent.Akka
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -66,10 +67,24 @@ trait StatsDClient extends ConfigHelper {
 
   def getTimeSince(start: Long): Long = System.currentTimeMillis - start
 
+  // prefix tags with controller.action
+  def requestTag(requestHeader: RequestHeader): String = {
+    val controllerActionTag = for {
+      controller <- requestHeader.tags.get(play.api.Routes.ROUTE_CONTROLLER)
+      action <- requestHeader.tags.get(play.api.Routes.ROUTE_ACTION_METHOD)
+    } yield controller.replaceFirst("controllers.", "") + "." + action
+    controllerActionTag.getOrElse(requestHeader.path.replaceAll("/", "_"))
+  }
+
+  def time[A](tag: String, req: RequestHeader)(f: => A): A= {
+    val fullTag = requestTag(req) + ( if (tag == "") "" else "." + tag)
+    time(fullTag)(f)
+  }
+
   def time[A](tag:String)(f: => A): A = {
     val start = System.currentTimeMillis
     val ret = f
-    timeTaken(start, ret).map { tm => 
+    timeTaken(start, ret).map { tm =>
       timing(tag, tm)
       Logger.info(s"$tag took $tm")
     }

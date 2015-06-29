@@ -9,6 +9,7 @@ import scala.util.Try
 import scala.concurrent._
 import play.api.libs.json.JsSuccess
 import scala.util.Failure
+import scala.util.control.NonFatal
 import play.api.mvc.Result
 import scala.util.Success
 import play.api.libs.json.JsResultException
@@ -40,7 +41,10 @@ trait ControllerPayload extends Controller {
   def writeResponseSuccess[T : Format](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
     writeResponse(responseStatus, constructResponseModel(request, Constants.COMPLETE_MESSAGE, result))
 
-  def writeResponse(responseStatus: Status, body: ApiModel) =
+  def writeResponseError(ex: Throwable)(implicit request: RequestHeader): Result =
+    defaultExceptionHandler(request)(ex)
+
+  def writeResponse(responseStatus: Status, body: ApiModel): Result =
     responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
 
   def constructResponseModel[T: Format](
@@ -63,12 +67,12 @@ trait ControllerPayload extends Controller {
 
     results match {
       case Failure(e) =>
-        val (resp, err) = findResponseHandler(results.failed.get)
+        val (resp, err) = findResponseStatus(results.failed.get)
         response = resp
         errs = errs :+ err
       case Success(seq) =>
         errs = errs ++ seq.filter(_.isFailure).map(f => {
-          val (resp, err) = findResponseHandler(f.failed.get)
+          val (resp, err) = findResponseStatus(f.failed.get)
           if (response.header.status < resp.header.status){
             response = resp
           }
@@ -121,13 +125,11 @@ trait ControllerPayload extends Controller {
   //      HELPERS       //
   ////////////////////////
 
-  def onHandlerRequestTimeout(request: RequestHeader): Result =
-    responseExec(findResponseHandler(new TimeoutException(Constants.TIMEOUT_MSG)))(request)
 
   private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue =
     request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
 
-  def findResponseHandler: PartialFunction[Throwable, (Status, ApiErrorModel)] = {
+  val findResponseStatus: PartialFunction[Throwable, (Status, ApiErrorModel)] = {
     case e: NoSuchElementException =>
       (NotFound, ApiErrorModel.fromExceptionAndMessage(
         "hbcStatus '" + e.getMessage + "' does not exist.", e))
@@ -141,18 +143,20 @@ trait ControllerPayload extends Controller {
       (BadRequest, ApiErrorModel.fromException(e))
     case e: TimeoutException =>
       (RequestTimeout, ApiErrorModel.fromException(e))
-    case e: Throwable =>
+    case NonFatal(e) =>
       (InternalServerError, ApiErrorModel.fromExceptionAndMessage(
         "Yikes! An error has occurred: " + e.getMessage, e))
   }
 
-  def responseExec (handlerInfo: (Status, ApiErrorModel))(request: RequestHeader) = {
-    handlerInfo match {
-      case (status, err) =>
-        val body = constructResponseModel(request, Constants.ERROR_MESSAGE, errs = Seq(err))
-        writeResponse(status, body)
-    }
-  }
+  def handlerForRequest(req: RequestHeader): (Status, ApiErrorModel) => Result = (status, err) =>
+    writeResponse(
+      status, 
+     constructResponseModel(req, Constants.ERROR_MESSAGE, errs = Seq(err))
+    )
+    
+  def defaultExceptionHandler(req: RequestHeader): PartialFunction[Throwable, Result] =
+    findResponseStatus andThen handlerForRequest(req).tupled
+
 }
 
 object ControllerPayloadLike extends ControllerPayload

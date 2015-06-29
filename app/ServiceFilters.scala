@@ -1,25 +1,18 @@
 import play.api.mvc._
-import scala.concurrent.Future
+import scala.util.control.NonFatal
+import scala.concurrent._
 import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import metrics.StatsDClient
 import helpers.{ControllerTimeout, ControllerPayload}
+import constants._
 
 // common logging and metrics for all requests
 object ServiceFilters {
 
-  def requestTag(requestHeader: RequestHeader): String = {
-    val controllerActionTag = for {
-      controller <- requestHeader.tags.get(play.api.Routes.ROUTE_CONTROLLER)
-      action <- requestHeader.tags.get(play.api.Routes.ROUTE_ACTION_METHOD)
-    } yield controller.replaceFirst("controllers.", "") + "." + action
-    controllerActionTag.getOrElse(requestHeader.path.replaceAll("/", "_"))
-  }
-
   object TimingFilter extends Filter with StatsDClient {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
-      val reqTag = requestTag(req)
-      time(reqTag) {
+      time("", req) {
         next(req)
       }
     }
@@ -36,15 +29,14 @@ object ServiceFilters {
 
   object TimeoutFilter extends Filter with ControllerTimeout with ControllerPayload {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = 
-      withTimeout( onHandlerRequestTimeout(req).as(JSON) ) {
+      withTimeout( writeResponseError(new TimeoutException(Constants.TIMEOUT_MSG))(req) ) { 
         next(req)
       }
   }
 
-  object ExceptionFilter extends Filter
-      with ControllerPayload {
+  object ExceptionFilter extends Filter with ControllerPayload {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
-      next(req) recover (findResponseHandler andThen {case exceptionInfo => responseExec(exceptionInfo)(req)})
+      next(req) recover { defaultExceptionHandler(req) }
     }
   }
 }

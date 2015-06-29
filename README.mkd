@@ -151,6 +151,12 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
   - Wrap your async controller body like:
     - timeout(errorHandler: => T) {BODY}
 
+- Time requests and calls within
+  - calls to each endpoint are timed OOTB. Tag is controller.action
+  - If you want to time more fine-grained sections of code, you can mix in the StatsDClient trait, use it like:
+    - time("mytag", request) {code} if you want the tag to be prefixed with controller.action 
+    - or just time("mytag") {code} if you don't want to controller/action tagging 
+
 - IDE support
 
 - OOTB provision of basic metrics (count and timing for each endpoint), a default (configurable) timeout for all endpoints and some standardized catching of show-stopper exceptions and providing a standard error response.

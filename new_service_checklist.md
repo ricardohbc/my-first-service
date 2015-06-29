@@ -4,13 +4,16 @@
 - [ ] Code compiles
 - [ ] Tests all pass
 - [ ] Add necessary documentation
-- [ ] Swaggerize
+- [ ] Swaggerize endpoints
+- [ ] Patch your branch with template
+- [ ] Update service docker-compose.yml with any service dependencies
 - [ ] Commit code to branch
 - [ ] Submit pull request for review
 - [ ] Address all pull request comments
 - [ ] Confirm git branch is merged
-- [ ] Create GO pipeline
-- [ ] Confirm GO pipeline passes (and does what it should)
+- [ ] Create GO pipeline ([Steps Here](#https://github.com/saksdirect/How-to-Start/blob/master/GO%20Pipelines/Create_Service_Pipeline.md))
+- [ ] Confirm GO pipeline passes (and docker image is created)
+- [ ] Update HBCDevWorkstation docker-compose.yml with new service and submit pull request
 - [ ] Move story card to QA
 - [ ] Communicate dev completion to QA (GO pipeline version included)
 - [ ] Perform quick showcase to the team of the new service

@@ -13,13 +13,12 @@ object CommonDependencies {
   val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
   val apiDoc = "com.hbc" %% "api_doc" % apiDocVersion
   val scalacheck = "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
-
-  val playWS = "com.typesafe.play" %% "play-ws" % playWSVersion
-  val playMockWS = "de.leanovate.play-mockws" %% "play-mockws" % playMockWSVersion % "test"
+  val playWS = "com.typesafe.play" %% "play-ws" % playWSVersion
+  val playMockWS = "de.leanovate.play-mockws" %% "play-mockws" % playMockWSVersion % "test"
 
   val commonDependencies : Seq[ModuleID] =
     Seq(
-      playWs,
+      playWS,
       playMockWS,
       scalaTest,
       apiDoc,

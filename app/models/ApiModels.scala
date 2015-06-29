@@ -70,6 +70,6 @@ object ApiModel {
   def withHeader(body: String)(implicit req: RequestHeader): ApiModel = {
     val reqModel = ApiRequestModel.fromReq(req)
     fromBody(body)
-      .fold(f => throw new Exception("unexpected failure parsing ApiModel\n${f.toString}"), _.copy(request = reqModel))
+      .fold(f => throw new Exception(s"unexpected failure parsing ApiModel\n${f.toString}"), _.copy(request = reqModel))
   }
 }

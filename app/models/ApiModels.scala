@@ -13,8 +13,6 @@ case class ApiResultModel(message: String, results: JsValue)
 
 object ApiResultModel {
   implicit val resultFormat = Json.format[ApiResultModel]
-
-  val defaultErrorModel = ApiResultModel(Constants.ERROR_MESSAGE, Json.toJson(JsNull))
 }
 
 
@@ -28,8 +26,6 @@ object ApiErrorModel {
   // we could move the implicits somewhere else.  I tried but didn't care enough.  I wouldn't object if anyone wants to look into it!
   def fromException(ex: Throwable) = new ApiErrorModel(ex.getMessage, ex.getClass.getSimpleName)
   def fromExceptionAndMessage(message: String, ex: Throwable) = new ApiErrorModel(message, ex.getClass.getSimpleName)
-
-  def defaultErrorModel(message: String) = fromException(new Exception(message))
 }
 
 
@@ -57,10 +53,8 @@ object ApiModel {
   implicit val apiModelFormat = Json.format[ApiModel]
 
   // call it with request.body from WS api for example
-  def fromBody(body: String): JsResult[ApiModel] = {
-    val asJs: JsValue = Json.parse(body)
-    asJs.validate[ApiModel]
-  }
+  def fromBody(body: String): JsResult[ApiModel] =
+    Json.parse(body).validate[ApiModel]
 
   // call this like this: ApiModel.resultsAs[List[String]](res.body)  => JsResult
   // obviously you need to specify the success type you're expecting  :)
@@ -76,12 +70,6 @@ object ApiModel {
   def withHeader(body: String)(implicit req: RequestHeader): ApiModel = {
     val reqModel = ApiRequestModel.fromReq(req)
     fromBody(body)
-      .fold(f => defaultErrorModel("unexpected failure parsing ApiModel\n${f.toString}"), _.copy(request = reqModel))
+      .fold(f => throw new Exception("unexpected failure parsing ApiModel\n${f.toString}"), _.copy(request = reqModel))
   }
-
-  def defaultErrorModel(errorMessage: String)(implicit req: RequestHeader): ApiModel =
-    ApiModel( ApiRequestModel.fromReq(req), 
-              ApiResultModel.defaultErrorModel, 
-              Seq(ApiErrorModel.defaultErrorModel(errorMessage)))
-
 }

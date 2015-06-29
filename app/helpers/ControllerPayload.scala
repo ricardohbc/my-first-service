@@ -9,6 +9,7 @@ import scala.util.Try
 import scala.concurrent._
 import play.api.libs.json.JsSuccess
 import scala.util.Failure
+import scala.util.control.NonFatal
 import play.api.mvc.Result
 import scala.util.Success
 import play.api.libs.json.JsResultException
@@ -39,6 +40,9 @@ trait ControllerPayload extends Controller {
 
   def writeResponseSuccess[T : Format](result: T, responseStatus: Status)(implicit request: RequestHeader): Result =
     writeResponse(responseStatus, constructResponseModel(request, Constants.COMPLETE_MESSAGE, result))
+
+  def writeResponseError(ex: Throwable)(implicit request: RequestHeader): Result =
+    defaultExceptionHandler(request)(ex)
 
   def writeResponse(responseStatus: Status, body: ApiModel): Result =
     responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
@@ -121,8 +125,6 @@ trait ControllerPayload extends Controller {
   //      HELPERS       //
   ////////////////////////
 
-  def onHandlerRequestTimeout(request: RequestHeader): Result =
-    defaultExceptionHandler(request)(new TimeoutException(Constants.TIMEOUT_MSG))
 
   private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue =
     request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
@@ -141,7 +143,7 @@ trait ControllerPayload extends Controller {
       (BadRequest, ApiErrorModel.fromException(e))
     case e: TimeoutException =>
       (RequestTimeout, ApiErrorModel.fromException(e))
-    case e: Throwable =>
+    case NonFatal(e) =>
       (InternalServerError, ApiErrorModel.fromExceptionAndMessage(
         "Yikes! An error has occurred: " + e.getMessage, e))
   }

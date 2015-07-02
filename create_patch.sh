@@ -6,7 +6,9 @@ for i in $(git rev-list --all --remotes); do
 
   if [[ "$i" == $COMMIT_HASH* ]]; then
     FOUND=$((FOUND+1))
-    echo "Found $COMMIT_COUNT commits after '$COMMIT_HASH'!"
+    echo "Found $COMMIT_COUNT commits after '$COMMIT_HASH':"
+    git log --pretty=oneline -$COMMIT_COUNT
+    echo
   elif [[ "$FOUND" -eq 0 ]]; then
     COMMIT_COUNT=$((COMMIT_COUNT+1))
   fi

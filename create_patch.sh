@@ -1,22 +1,23 @@
-echo "Here are the last 20 commits:"
-git log --pretty=oneline -20
+read -p "Enter commit hash of your existing service: " COMMIT_HASH
+COMMIT_COUNT=0
+FOUND=0
 
-read -p "How many commits do you want to include in this patch?: " COMMIT_COUNT
+for i in $(git rev-list --all --remotes); do
 
-if [[ -z $COMMIT_COUNT || ! $COMMIT_COUNT =~ ^[0-9]+$ ]]
-then
-        echo "Please enter a number!"
-        exit;
-else
-        echo "You have selected the following commits:"
-        git log --pretty=oneline -$COMMIT_COUNT
-        read -p "Is this correct? [y/n]: " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[^Yy]$ ]]
-        then
-                exit;
-        fi
+  if [[ "$i" == $COMMIT_HASH* ]]; then
+    FOUND=$((FOUND+1))
+    echo "Found $COMMIT_COUNT commits after '$COMMIT_HASH'!"
+  elif [[ "$FOUND" -eq 0 ]]; then
+    COMMIT_COUNT=$((COMMIT_COUNT+1))
+  fi
+
+done
+
+if [[ $FOUND == 0 ]]; then
+  echo "Cannot find commit hash '$COMMIT_HASH'!"
+  exit;
 fi
+
 
 read -p "What is the version of this patch (must follow semantic versioning, ex v1.0.0)?: " VERSION_TAG
 if [[ -z $VERSION_TAG || ! $VERSION_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]

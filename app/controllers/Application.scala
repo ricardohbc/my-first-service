@@ -38,7 +38,7 @@ with ControllerPayload {
       request: Request
       response: ResponseResult
       errors: Array Error
-                                       """)
+  """)
   def index = Action { implicit request =>
     val response = "hbc-microservice-template is up and running!"
     writeResponseGet(response)

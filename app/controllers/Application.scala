@@ -23,6 +23,8 @@ with ControllerPayload {
     Request: models.ApiRequestModel
       url: String
       server_received_time: String
+      api_version: String
+      help: String
 
     ResponseResult: !
       message: String
@@ -36,7 +38,7 @@ with ControllerPayload {
       request: Request
       response: ResponseResult
       errors: Array Error
-  """)
+                                       """)
   def index = Action { implicit request =>
     val response = "hbc-microservice-template is up and running!"
     writeResponseGet(response)

@@ -126,8 +126,7 @@ trait ControllerPayload extends Controller {
         "Yikes! An error has occurred: " + e.getMessage, e))
   }
 
-  def handlerForRequest(req: RequestHeader): (Status, ApiErrorModel) => Result = {
-    implicit val request = req
+  def handlerForRequest(implicit req: RequestHeader): (Status, ApiErrorModel) => Result = {
     (status, err) =>
       writeResponse(
         status,
@@ -135,7 +134,7 @@ trait ControllerPayload extends Controller {
       )
   }
     
-  def defaultExceptionHandler(implicit req: RequestHeader): PartialFunction[Throwable, Result] =
+  def defaultExceptionHandler(req: RequestHeader): PartialFunction[Throwable, Result] =
     findResponseStatus andThen handlerForRequest(req).tupled
 }
 

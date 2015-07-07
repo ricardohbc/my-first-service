@@ -16,6 +16,8 @@ object ApiResultModel {
   implicit val resultFormat = Json.format[ApiResultModel]
 }
 
+object EmptyApiResultModel extends ApiResultModel(JsNull)
+
 
 // error info
 case class ApiErrorModel(data: String, error: String)

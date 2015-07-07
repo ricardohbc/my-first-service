@@ -5,7 +5,6 @@ import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import metrics.StatsDClient
 import helpers.{ControllerTimeout, ControllerPayload}
-import constants._
 
 // common logging and metrics for all requests
 object ServiceFilters {
@@ -29,7 +28,7 @@ object ServiceFilters {
 
   object TimeoutFilter extends Filter with ControllerTimeout with ControllerPayload {
     def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = 
-      withTimeout( writeResponseError(new TimeoutException(Constants.TIMEOUT_MSG))(req) ) { 
+      withTimeout() {
         next(req)
       }
   }

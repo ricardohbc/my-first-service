@@ -15,22 +15,22 @@ trait ControllerPayload extends Controller {
   //      RESPONSE      //
   ////////////////////////
 
-  def writeResponseStore[T : Format](result: T)(implicit request: Request[AnyContent]): Result =
+  def writeResponseStore[T : Format](result: T)(implicit request: Request[_]): Result =
     writeResponseSuccess(result, Created)
 
-  def writeResponseStores[T : Format](results: Seq[T])(implicit request: Request[AnyContent]): Result =
+  def writeResponseStores[T : Format](results: Seq[T])(implicit request: Request[_]): Result =
     writeResponses(results, Created)
 
-  def writeResponseGet[T : Format](response: T, errors: Seq[ApiErrorModel] = Seq())(implicit request: Request[AnyContent]): Result =
+  def writeResponseGet[T : Format](response: T, errors: Seq[ApiErrorModel] = Seq())(implicit request: Request[_]): Result =
     writeResponseSuccess(response, Ok, errors)
 
-  def writeResponseUpdate[T : Format](result: T)(implicit request: Request[AnyContent]): Result =
+  def writeResponseUpdate[T : Format](result: T)(implicit request: Request[_]): Result =
     writeResponseSuccess(result, Ok)
 
-  def writeResponseUpdates[T : Format](results: Seq[T])(implicit request: Request[AnyContent]): Result =
+  def writeResponseUpdates[T : Format](results: Seq[T])(implicit request: Request[_]): Result =
     writeResponses(results, Ok)
 
-  def writeResponseRemove[T : Format](result: T)(implicit request: Request[AnyContent]): Result =
+  def writeResponseRemove[T : Format](result: T)(implicit request: Request[_]): Result =
     writeResponseSuccess(result, Ok)
 
   def writeResponseSuccess[T : Format](result: T, status: Status, errors: Seq[ApiErrorModel] = Seq())(implicit request: RequestHeader): Result =
@@ -65,7 +65,7 @@ trait ControllerPayload extends Controller {
 
   private def writeResponses[T : Format](
       results: Seq[T],
-      status: Status)(implicit request: Request[AnyContent]): Result =
+      status: Status)(implicit request: Request[_]): Result =
     formatResponse(constructResponseModel(results), status)
 
   ////////////////////////
@@ -80,7 +80,7 @@ trait ControllerPayload extends Controller {
         //Validate the hbcStatus object
         hbcStatusObject.validate[T] match {
           case JsSuccess(hbcStatus, _) => hbcStatus
-          case JsError(e) => throw new ClassCastException("Could not cast input into proper type")
+          case JsError(e) => throw new JsResultException(e)
         }
     }
   }
@@ -93,7 +93,7 @@ trait ControllerPayload extends Controller {
         hbcStatusObjectList.map(hbcStatusObject =>
           hbcStatusObject.validate[T] match {
             case JsSuccess(hbcStatus, _) => hbcStatus
-            case JsError(e) => throw new ClassCastException("Could not cast '" + hbcStatusObject + "' into proper type")
+            case JsError(e) => throw new JsResultException(e)
           }
         )
     }
@@ -135,7 +135,7 @@ trait ControllerPayload extends Controller {
       )
   }
     
-  def defaultExceptionHandler(req: RequestHeader): PartialFunction[Throwable, Result] =
+  def defaultExceptionHandler(implicit req: RequestHeader): PartialFunction[Throwable, Result] =
     findResponseStatus andThen handlerForRequest(req).tupled
 }
 

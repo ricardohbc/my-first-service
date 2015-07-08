@@ -40,7 +40,6 @@ with ControllerPayload {
       errors: Array Error
   """)
   def index = Action { implicit request =>
-    Thread.sleep(2000) //************ REMOVE **************
     val response = "hbc-microservice-template is up and running!"
     writeResponseGet(response)
   }

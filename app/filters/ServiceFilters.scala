@@ -1,5 +1,6 @@
+package filters
+
 import play.api.mvc._
-import scala.util.control.NonFatal
 import scala.concurrent._
 import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -32,8 +33,7 @@ object ServiceFilters {
   }
 
   object ExceptionFilter extends Filter with ControllerPayload {
-    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
+    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] =
       next(req) recover (defaultExceptionHandler(req))
-    }
   }
 }

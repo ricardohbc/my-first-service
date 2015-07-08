@@ -6,7 +6,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import constants.Constants
 import play.libs.Akka
-import java.util.concurrent.TimeUnit
+import akka.pattern._
 
 trait ControllerTimeout extends ConfigHelper {
   val actionTimeout = config getInt "controllers.timeout"
@@ -20,10 +20,7 @@ trait ControllerTimeout extends ConfigHelper {
     timingoutFuture(time, f)
 
   private def timingoutFuture[T](time: Int, f: Future[T]): Future[T] = {
-    val promise = Promise[T]()
-    Akka.system.scheduler.scheduleOnce(FiniteDuration(time, TimeUnit.MILLISECONDS)) {
-      promise.tryFailure(new TimeoutException(Constants.TIMEOUT_MSG))
-    }
-    promise.tryCompleteWith(f) future
+    val timeoutFuture = after(time millis, using = Akka.system.scheduler)(Future.failed(new TimeoutException(Constants.TIMEOUT_MSG)))
+    Future.firstCompletedOf(Seq(f, timeoutFuture))
   }
 }

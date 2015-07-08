@@ -27,10 +27,8 @@ object ServiceFilters {
   }
 
   object TimeoutFilter extends Filter with ControllerTimeout with ControllerPayload {
-    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = 
-      withTimeout() {
-        next(req)
-      }
+    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] =
+      withTimeout()(next(req))
   }
 
   object ExceptionFilter extends Filter with ControllerPayload {

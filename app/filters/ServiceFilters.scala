@@ -1,11 +1,11 @@
+package filters
+
 import play.api.mvc._
-import scala.util.control.NonFatal
 import scala.concurrent._
 import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import metrics.StatsDClient
 import helpers.{ControllerTimeout, ControllerPayload}
-import constants._
 
 // common logging and metrics for all requests
 object ServiceFilters {
@@ -28,15 +28,12 @@ object ServiceFilters {
   }
 
   object TimeoutFilter extends Filter with ControllerTimeout with ControllerPayload {
-    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = 
-      withTimeout( writeResponseError(new TimeoutException(Constants.TIMEOUT_MSG))(req) ) { 
-        next(req)
-      }
+    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] =
+      withTimeout()(next(req))
   }
 
   object ExceptionFilter extends Filter with ControllerPayload {
-    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
-      next(req) recover { defaultExceptionHandler(req) }
-    }
+    def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] =
+      next(req) recover (defaultExceptionHandler(req))
   }
 }

@@ -4,23 +4,23 @@ import scala.concurrent._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import constants.Constants
+import play.libs.Akka
+import akka.pattern._
 
 trait ControllerTimeout extends ConfigHelper {
   val actionTimeout = config getInt "controllers.timeout"
 
   // call this with some arbitrary blocking code 
-  def timeout[T](errorHandler: => T, time: Int = actionTimeout)(body: => T) : Future[T] =
-    timingoutFuture(errorHandler, time, Future(body))
+  def timeout[T](time: Int = actionTimeout)(body: => T) : Future[T] =
+    timingoutFuture(time, Future(body))
 
   // call this if you already have a future
-  def withTimeout[T](errorHandler: => T, time: Int = actionTimeout)(f: Future[T]) : Future[T] =
-    timingoutFuture(errorHandler, time, f)
+  def withTimeout[T](time: Int = actionTimeout)(f: Future[T]) : Future[T] =
+    timingoutFuture(time, f)
 
-  private def timingoutFuture[T](errorHandler: => T, time: Int, f: Future[T]): Future[T] = {
-    val promise = Promise[T]()
-    val timeoutFuture = play.api.libs.concurrent.Promise.timeout(errorHandler, time millis)
-    promise.tryCompleteWith(f)
-    promise.tryCompleteWith(timeoutFuture)
-    promise future
+  private def timingoutFuture[T](time: Int, f: Future[T]): Future[T] = {
+    val timeoutFuture = after(time millis, using = Akka.system.scheduler)(Future.failed(new TimeoutException(Constants.TIMEOUT_MSG)))
+    Future.firstCompletedOf(Seq(f, timeoutFuture))
   }
 }

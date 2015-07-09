@@ -23,6 +23,8 @@ with ControllerPayload {
     Request: models.ApiRequestModel
       url: String
       server_received_time: String
+      api_version: String
+      help: String
 
     ResponseResult: !
       message: String

@@ -6,14 +6,17 @@ import java.util.Calendar
 import constants.Constants
 import play.api.libs.json._
 import play.api.mvc.RequestHeader
+import helpers.ConfigHelper
 
 
 // results if we are successful
-case class ApiResultModel(message: String, results: JsValue)
+case class ApiResultModel(results: JsValue)
 
 object ApiResultModel {
   implicit val resultFormat = Json.format[ApiResultModel]
 }
+
+object EmptyApiResultModel extends ApiResultModel(JsNull)
 
 
 // error info
@@ -30,17 +33,22 @@ object ApiErrorModel {
 
 
 // the request url
-case class ApiRequestModel(url: String, server_received_time: String)
+case class ApiRequestModel(url: String, server_received_time: String, api_version: String, help: String)
 
-object ApiRequestModel {
+object ApiRequestModel
+    extends ConfigHelper {
   implicit val reqFormat = Json.format[ApiRequestModel]
 
   def fromReq(request: RequestHeader): ApiRequestModel = {
-    val fullRequestUrl = "http://" + request.host + request.uri
+    val fullRequestUrl = if (request.secure) "https://" else "http" + request.host + request.uri
     val df = new SimpleDateFormat(Constants.ZULU_DATE_FORMAT)
+    val version = config.getString("service-version")
+    val help = if (request.secure) "https://" else "http://" + request.host + "/api/v1/api-docs"
     new ApiRequestModel(
       fullRequestUrl,
-      df.format(Calendar.getInstance.getTime)
+      df.format(Calendar.getInstance.getTime),
+      version,
+      help
     )
   }
 }

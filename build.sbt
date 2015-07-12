@@ -2,6 +2,7 @@ import play.PlayScala
 import CommonDependencies._
 import net.virtualvoid.sbt.graph.Plugin._
 import ServiceDependencies._
+import scalariform.formatter.preferences._
 
 name := """hbc-microservice-template"""
 
@@ -41,3 +42,9 @@ buildZip <<= ((packageBin in Universal) map { out =>
 preCommit := {"./refresh-service.sh"!}
 
 preCommit <<= preCommit.dependsOn(buildZip)
+
+scalariformSettings
+
+ScalariformKeys.preferences := FormattingPreferences()
+  .setPreference( AlignParameters, true )
+  .setPreference( AlignSingleLineCaseStatements, true )

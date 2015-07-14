@@ -74,7 +74,7 @@ trait ControllerPayload extends Controller {
   //     GET ITEMS      //
   ////////////////////////
 
-  def getRequestItem[T: Format](request: Request[AnyContent]): T = {
+  def getRequestItem[T: Format](implicit request: Request[AnyContent]): T = {
     val readJsonObject: Format[JsValue] = (__ \ "item").format[JsValue]
     getRequestBodyAsJson(request).validate(readJsonObject) match {
       case JsError(e) => throw new JsResultException(e)
@@ -87,7 +87,7 @@ trait ControllerPayload extends Controller {
     }
   }
 
-  def getRequestItems[T: Format](request: Request[AnyContent]): Seq[T] = {
+  def getRequestItems[T: Format](implicit request: Request[AnyContent]): Seq[T] = {
     val readJsonObject: Format[Seq[JsValue]] = (__ \ "items").format[Seq[JsValue]]
     getRequestBodyAsJson(request).validate(readJsonObject) match {
       case JsError(e) => throw new JsResultException(e)
@@ -104,7 +104,7 @@ trait ControllerPayload extends Controller {
   //      HELPERS       //
   ////////////////////////
 
-  private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue =
+  private def getRequestBodyAsJson(implicit request: Request[AnyContent]): JsValue =
     request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
 
   val findResponseStatus: PartialFunction[Throwable, (Status, ApiErrorModel)] = {

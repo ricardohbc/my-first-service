@@ -76,12 +76,12 @@ trait StatsDClient extends ConfigHelper {
     controllerActionTag.getOrElse(requestHeader.path.replaceAll("/", "_"))
   }
 
-  def time[A](tag: String, req: RequestHeader)(f: => A): A= {
-    val fullTag = requestTag(req) + ( if (tag == "") "" else "." + tag)
+  def time[A](tag: String, req: RequestHeader)(f: => A): A = {
+    val fullTag = requestTag(req) + (if (tag == "") "" else "." + tag)
     time(fullTag)(f)
   }
 
-  def time[A](tag:String)(f: => A): A = {
+  def time[A](tag: String)(f: => A): A = {
     val start = System.currentTimeMillis
     val ret = f
     timeTaken(start, ret).map { tm =>
@@ -95,7 +95,7 @@ trait StatsDClient extends ConfigHelper {
   def timeTaken[A](start: Long, body: A): Future[Long] = {
     body match {
       case x: Future[_] => x.map { _ => getTimeSince(start) }
-      case _ => Future.successful(getTimeSince(start))
+      case _            => Future.successful(getTimeSince(start))
     }
   }
 
@@ -147,8 +147,7 @@ trait StatsDClient extends ConfigHelper {
 
       actorRef ! SendStat(StatsDProtocol.stat(key, value, metric, sampleRate))
       true
-    }
-    else {
+    } else {
       false
     }
   }
@@ -181,11 +180,13 @@ private case class SendStat(stat: String)
  * @param multiMetrics If true, multiple stats will be sent in a single UDP packet
  * @param packetBufferSize If multiMetrics is true, this is the max buffer size before sending the UDP packet
  */
-private class StatsDActor(host: String,
-                          port: Int,
-                          multiMetrics: Boolean,
-                          packetBufferSize: Int,
-                          prefix: String) extends Actor {
+private class StatsDActor(
+  host:             String,
+  port:             Int,
+  multiMetrics:     Boolean,
+  packetBufferSize: Int,
+  prefix:           String
+) extends Actor {
 
   private val sendBuffer = ByteBuffer.allocate(packetBufferSize)
 
@@ -231,8 +232,7 @@ private class StatsDActor(host: String,
         flush
       }
 
-    }
-    catch {
+    } catch {
       case e: IOException => {
         Logger.error("Could not send stat {} to host {}:{}", sendBuffer.toString, address.getHostName(), address.getPort().toString, e)
       }
@@ -259,8 +259,7 @@ private class StatsDActor(host: String,
           address.getHostName(), address.getPort().toString, nbSentBytes.toString, sizeOfBuffer.toString)
       }
 
-    }
-    catch {
+    } catch {
       case e: IOException => {
         Logger.error("Could not send stat {} to host {}:{}", sendBuffer.toString, address.getHostName(), address.getPort().toString, e)
       }

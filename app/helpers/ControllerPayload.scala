@@ -15,25 +15,25 @@ trait ControllerPayload extends Controller {
   //      RESPONSE      //
   ////////////////////////
 
-  def writeResponseStore[T : Format](result: T)(implicit request: Request[_]): Result =
+  def writeResponseStore[T: Format](result: T)(implicit request: Request[_]): Result =
     writeResponseSuccess(result, Created)
 
-  def writeResponseStores[T : Format](results: Seq[T])(implicit request: Request[_]): Result =
+  def writeResponseStores[T: Format](results: Seq[T])(implicit request: Request[_]): Result =
     writeResponses(results, Created)
 
-  def writeResponseGet[T : Format](response: T, errors: Seq[ApiErrorModel] = Seq())(implicit request: Request[_]): Result =
+  def writeResponseGet[T: Format](response: T, errors: Seq[ApiErrorModel] = Seq())(implicit request: Request[_]): Result =
     writeResponseSuccess(response, Ok, errors)
 
-  def writeResponseUpdate[T : Format](result: T)(implicit request: Request[_]): Result =
+  def writeResponseUpdate[T: Format](result: T)(implicit request: Request[_]): Result =
     writeResponseSuccess(result, Ok)
 
-  def writeResponseUpdates[T : Format](results: Seq[T])(implicit request: Request[_]): Result =
+  def writeResponseUpdates[T: Format](results: Seq[T])(implicit request: Request[_]): Result =
     writeResponses(results, Ok)
 
-  def writeResponseRemove[T : Format](result: T)(implicit request: Request[_]): Result =
+  def writeResponseRemove[T: Format](result: T)(implicit request: Request[_]): Result =
     writeResponseSuccess(result, Ok)
 
-  def writeResponseSuccess[T : Format](result: T, status: Status, errors: Seq[ApiErrorModel] = Seq())(implicit request: RequestHeader): Result =
+  def writeResponseSuccess[T: Format](result: T, status: Status, errors: Seq[ApiErrorModel] = Seq())(implicit request: RequestHeader): Result =
     writeResponse(status, constructResponseModel(result, errors))
 
   def writeResponseError(errors: Seq[ApiErrorModel], status: Status)(implicit request: RequestHeader): Result =
@@ -44,14 +44,15 @@ trait ControllerPayload extends Controller {
 
   def constructResultModel[T: Format](result: T): ApiResultModel = ApiResultModel(Json.toJson(result))
 
-  def constructResponseModel[T : Format](
+  def constructResponseModel[T: Format](
     result: T,
-    errs: Seq[ApiErrorModel] = Seq())(implicit request: RequestHeader): ApiModel =
-      ApiModel.apply(
-        ApiRequestModel.fromReq(request),
-        constructResultModel(result),
-        errs
-      )
+    errs:   Seq[ApiErrorModel] = Seq()
+  )(implicit request: RequestHeader): ApiModel =
+    ApiModel.apply(
+      ApiRequestModel.fromReq(request),
+      constructResultModel(result),
+      errs
+    )
 
   def constructErrorResponseModel(errs: Seq[ApiErrorModel])(implicit request: RequestHeader): ApiModel =
     ApiModel.apply(
@@ -63,16 +64,17 @@ trait ControllerPayload extends Controller {
   private def formatResponse(responseModel: ApiModel, response: Status): Result =
     response.apply(Json.prettyPrint(Json.toJson(responseModel))).as(JSON)
 
-  private def writeResponses[T : Format](
-      results: Seq[T],
-      status: Status)(implicit request: Request[_]): Result =
+  private def writeResponses[T: Format](
+    results: Seq[T],
+    status:  Status
+  )(implicit request: Request[_]): Result =
     formatResponse(constructResponseModel(results), status)
 
   ////////////////////////
   //     GET ITEMS      //
   ////////////////////////
 
-  def getRequestItem[T: Format](request: Request[AnyContent]): T = {
+  def getRequestItem[T: Format](implicit request: Request[AnyContent]): T = {
     val readJsonObject: Format[JsValue] = (__ \ "item").format[JsValue]
     getRequestBodyAsJson(request).validate(readJsonObject) match {
       case JsError(e) => throw new JsResultException(e)
@@ -80,12 +82,12 @@ trait ControllerPayload extends Controller {
         //Validate the hbcStatus object
         hbcStatusObject.validate[T] match {
           case JsSuccess(hbcStatus, _) => hbcStatus
-          case JsError(e) => throw new JsResultException(e)
+          case JsError(e)              => throw new JsResultException(e)
         }
     }
   }
 
-  def getRequestItems[T: Format](request: Request[AnyContent]): Seq[T] = {
+  def getRequestItems[T: Format](implicit request: Request[AnyContent]): Seq[T] = {
     val readJsonObject: Format[Seq[JsValue]] = (__ \ "items").format[Seq[JsValue]]
     getRequestBodyAsJson(request).validate(readJsonObject) match {
       case JsError(e) => throw new JsResultException(e)
@@ -93,9 +95,8 @@ trait ControllerPayload extends Controller {
         hbcStatusObjectList.map(hbcStatusObject =>
           hbcStatusObject.validate[T] match {
             case JsSuccess(hbcStatus, _) => hbcStatus
-            case JsError(e) => throw new JsResultException(e)
-          }
-        )
+            case JsError(e)              => throw new JsResultException(e)
+          })
     }
   }
 
@@ -103,14 +104,14 @@ trait ControllerPayload extends Controller {
   //      HELPERS       //
   ////////////////////////
 
-
-  private def getRequestBodyAsJson(request: Request[AnyContent]): JsValue =
+  private def getRequestBodyAsJson(implicit request: Request[AnyContent]): JsValue =
     request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
 
   val findResponseStatus: PartialFunction[Throwable, (Status, ApiErrorModel)] = {
     case e: NoSuchElementException =>
       (NotFound, ApiErrorModel.fromExceptionAndMessage(
-        "hbcStatus '" + e.getMessage + "' does not exist.", e))
+        "hbcStatus '" + e.getMessage + "' does not exist.", e
+      ))
     case e: VerifyError =>
       (PreconditionFailed, ApiErrorModel.fromException(e))
     case e: ClassCastException =>
@@ -123,7 +124,8 @@ trait ControllerPayload extends Controller {
       (RequestTimeout, ApiErrorModel.fromException(e))
     case NonFatal(e) =>
       (InternalServerError, ApiErrorModel.fromExceptionAndMessage(
-        "Yikes! An error has occurred: " + e.getMessage, e))
+        "Yikes! An error has occurred: " + e.getMessage, e
+      ))
   }
 
   def handlerForRequest(implicit req: RequestHeader): (Status, ApiErrorModel) => Result = {
@@ -133,7 +135,7 @@ trait ControllerPayload extends Controller {
         constructErrorResponseModel(Seq(err))
       )
   }
-    
+
   def defaultExceptionHandler(req: RequestHeader): PartialFunction[Throwable, Result] =
     findResponseStatus andThen handlerForRequest(req).tupled
 }

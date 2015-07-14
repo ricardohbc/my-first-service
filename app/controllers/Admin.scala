@@ -12,11 +12,10 @@ import java.lang.management._
 import scala.collection.mutable
 import helpers.ControllerPayload
 
-
 object Admin extends Controller
-    with ControllerPayload{
+  with ControllerPayload {
 
-  @no.samordnaopptak.apidoc.ApiDoc(doc="""
+  @no.samordnaopptak.apidoc.ApiDoc(doc = """
     GET /hbc-microservice-template/admin/ping
 
     DESCRIPTION
@@ -31,7 +30,7 @@ object Admin extends Controller
     writeResponseGet("pong")
   }
 
-  @no.samordnaopptak.apidoc.ApiDoc(doc="""
+  @no.samordnaopptak.apidoc.ApiDoc(doc = """
     GET /hbc-microservice-template/admin/jvmstats
 
     DESCRIPTION
@@ -92,7 +91,7 @@ object Admin extends Controller
     Future.successful(Ok(Json.prettyPrint(Json.toJson(extractJvmStats()))))
   }
 
-  private def extractJvmStats() : JsValue = {
+  private def extractJvmStats(): JsValue = {
     import scala.collection.JavaConverters._
 
     val out: mutable.Map[String, Double] = mutable.Map.empty
@@ -124,7 +123,7 @@ object Admin extends Controller
       case unix: com.sun.management.UnixOperatingSystemMXBean =>
         out += ("jvm_fd_count" -> unix.getOpenFileDescriptorCount)
         out += ("jvm_fd_limit" -> unix.getMaxFileDescriptorCount)
-      case _ =>   // ew, Windows... or something
+      case _ => // ew, Windows... or something
     }
 
     val compilation = ManagementFactory.getCompilationMXBean

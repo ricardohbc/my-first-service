@@ -8,7 +8,6 @@ import play.api.libs.json._
 import play.api.mvc.RequestHeader
 import helpers.ConfigHelper
 
-
 // results if we are successful
 case class ApiResultModel(results: JsValue)
 
@@ -17,7 +16,6 @@ object ApiResultModel {
 }
 
 object EmptyApiResultModel extends ApiResultModel(JsNull)
-
 
 // error info
 case class ApiErrorModel(data: String, error: String)
@@ -31,12 +29,11 @@ object ApiErrorModel {
   def fromExceptionAndMessage(message: String, ex: Throwable) = new ApiErrorModel(message, ex.getClass.getSimpleName)
 }
 
-
 // the request url
 case class ApiRequestModel(url: String, server_received_time: String, api_version: String, help: String)
 
 object ApiRequestModel
-    extends ConfigHelper {
+  extends ConfigHelper {
   implicit val reqFormat = Json.format[ApiRequestModel]
 
   def fromReq(request: RequestHeader): ApiRequestModel = {
@@ -55,7 +52,7 @@ object ApiRequestModel
 
 // top level response structure
 // I think it needs to go last to pick up the implicit  vals above...
-case class ApiModel (request: ApiRequestModel, response: ApiResultModel, errors: Seq[ApiErrorModel])
+case class ApiModel(request: ApiRequestModel, response: ApiResultModel, errors: Seq[ApiErrorModel])
 
 object ApiModel {
   implicit val apiModelFormat = Json.format[ApiModel]
@@ -68,12 +65,12 @@ object ApiModel {
   // obviously you need to specify the success type you're expecting  :)
   // https://www.playframework.com/documentation/2.3.x/api/scala/index.html#play.api.libs.json.JsResult
   // you can pattern match on JsSuccess/JsError, or map, flatMap, asOpt, asEither ...etc
-  def resultsAs[A : Format](body: String): JsResult[A] =
+  def resultsAs[A: Format](body: String): JsResult[A] =
     for {
       apiModel <- fromBody(body)
       result <- apiModel.response.results.validate[A]
     } yield result
-  
+
   // maybe you just want to proxy the rest of the apiModel, but update the header
   def withHeader(body: String)(implicit req: RequestHeader): ApiModel = {
     val reqModel = ApiRequestModel.fromReq(req)

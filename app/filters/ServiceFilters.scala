@@ -5,7 +5,7 @@ import scala.concurrent._
 import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import metrics.StatsDClient
-import helpers.{ControllerTimeout, ControllerPayload}
+import helpers.{ ControllerTimeout, ControllerPayload }
 
 // common logging and metrics for all requests
 object ServiceFilters {

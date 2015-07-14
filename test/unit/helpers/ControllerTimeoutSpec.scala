@@ -3,19 +3,18 @@ package unit.helpers
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
-import helpers.{ControllerPayload, ControllerTimeout}
+import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
+import helpers.{ ControllerPayload, ControllerTimeout }
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import play.api.Play
 import play.api.test.FakeApplication
 
 class ControllerTimeoutSpec extends WordSpec
-with Matchers
-with BeforeAndAfterAll
-with ControllerTimeout
-with ControllerPayload {
-
+  with Matchers
+  with BeforeAndAfterAll
+  with ControllerTimeout
+  with ControllerPayload {
 
   override def beforeAll() = {
     Play.start(FakeApplication())

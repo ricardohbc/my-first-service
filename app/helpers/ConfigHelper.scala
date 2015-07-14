@@ -13,7 +13,7 @@ trait ConfigHelper {
   }.getOrElse(param)
 
   def getStringProp(param: String) = config.getString(getParam(param))
-  def getIntProp(param:String) = config.getInt(getParam(param))
-  def getBooleanProp(param:String) = config.getBoolean(getParam(param))
+  def getIntProp(param: String) = config.getInt(getParam(param))
+  def getBooleanProp(param: String) = config.getBoolean(getParam(param))
   def getStringListProp(param: String) = config.getStringList(getParam(param))
 }

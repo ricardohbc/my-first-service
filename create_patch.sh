@@ -57,7 +57,7 @@ git push origin $(git rev-parse --abbrev-ref HEAD)
 git branch -d patch_$COMMIT_HASH
 git checkout -b patch_$COMMIT_HASH
 git reset --soft HEAD~$(($COMMIT_COUNT + 2)) && git commit -m "squash commits for patch"
-git format-patch HEAD --stdout > changes.patch
+git format-patch HEAD^..HEAD --stdout > changes.patch
 
 
 

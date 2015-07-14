@@ -51,12 +51,12 @@ sed -i "" s/template-commit-hash=[^$]*$/template-commit-hash=\"$COMMIT_HASH\"/g 
 
 git tag -a "$VERSION_TAG" -m "Adding new tag for patching" -f
 git push origin --tags -f
-
 git add conf/application.conf
 git commit -m "Adding commit for new application.conf"
 git push origin $(git rev-parse --abbrev-ref HEAD)
-
-git format-patch HEAD~$(($COMMIT_COUNT + 1))..HEAD --stdout > changes.patch
-
-
+git checkout -b patch_$COMMIT_HASH
+git reset --soft HEAD~$(($COMMIT_COUNT + 2)) && git commit -m "squash commits for patch"
+git format-patch HEAD^..HEAD --stdout > changes.patch
+git checkout master
+git branch -D patch_$COMMIT_HASH
 

@@ -5,7 +5,7 @@ import play.api.mvc._
 import scala.concurrent._
 import play.api.mvc.Results._
 import play.api.test.FakeRequest
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
+import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 import play.api.Play
 import play.api.test.Helpers._
 import play.api.http.HttpVerbs.GET
@@ -20,10 +20,10 @@ import play.api.libs.json.Json
 object TestGlobal extends GlobalServiceSettings
 
 class FiltersSpec
-    extends WordSpec
-    with Matchers
-    with BeforeAndAfterAll
-    with ConfigHelper {
+  extends WordSpec
+  with Matchers
+  with BeforeAndAfterAll
+  with ConfigHelper {
 
   val actionTimeout = config getInt "controllers.timeout"
 
@@ -47,7 +47,6 @@ class FiltersSpec
   override def afterAll() = {
     Play.stop()
   }
-
 
   "ServiceFilters" should {
 

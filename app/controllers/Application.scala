@@ -3,15 +3,14 @@ package controllers
 import play.api._
 import play.api.mvc._
 
-import helpers.{ControllerPayload, ControllerTimeout}
+import helpers.ControllerPayload
 
 import ch.qos.logback.classic.Level
 
 object Application extends Controller
-with ControllerTimeout
-with ControllerPayload {
+  with ControllerPayload {
 
-  @no.samordnaopptak.apidoc.ApiDoc(doc="""
+  @no.samordnaopptak.apidoc.ApiDoc(doc = """
     GET /hbc-microservice-template
 
     DESCRIPTION
@@ -26,8 +25,7 @@ with ControllerPayload {
       api_version: String
       help: String
 
-    ResponseResult: !
-      message: String
+    ResponseResult: models.ApiResultModel
       results: String
 
     Error: models.ApiErrorModel
@@ -44,7 +42,7 @@ with ControllerPayload {
     writeResponseGet(response)
   }
 
-  @no.samordnaopptak.apidoc.ApiDoc(doc="""
+  @no.samordnaopptak.apidoc.ApiDoc(doc = """
     GET /hbc-microservice-template/logLevel/{level}
 
     DESCRIPTION
@@ -59,7 +57,7 @@ with ControllerPayload {
   """)
   def changeLogLevelGet(levelString: String) = changeLogLevel(levelString)
 
-  @no.samordnaopptak.apidoc.ApiDoc(doc="""
+  @no.samordnaopptak.apidoc.ApiDoc(doc = """
     PUT /hbc-microservice-template/logLevel/{level}
 
     DESCRIPTION

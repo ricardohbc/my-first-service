@@ -15,9 +15,9 @@ class GlobalServiceSettings extends GlobalSettings with ControllerPayload {
       ServiceFilters.IncrementFilter,
       ServiceFilters.ExceptionFilter,
       ServiceFilters.TimeoutFilter
-)
+    )
 
-override def onError(request: RequestHeader, ex: Throwable): Future[Result] =
-Future.successful(InternalServerError("This shouldn't happen"))
+  override def onError(request: RequestHeader, ex: Throwable): Future[Result] =
+    Future.successful(InternalServerError("This shouldn't happen"))
 
 }

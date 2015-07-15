@@ -181,11 +181,11 @@ private case class SendStat(stat: String)
  * @param packetBufferSize If multiMetrics is true, this is the max buffer size before sending the UDP packet
  */
 private class StatsDActor(
-  host:             String,
-  port:             Int,
-  multiMetrics:     Boolean,
-  packetBufferSize: Int,
-  prefix:           String
+    host:             String,
+    port:             Int,
+    multiMetrics:     Boolean,
+    packetBufferSize: Int,
+    prefix:           String
 ) extends Actor {
 
   private val sendBuffer = ByteBuffer.allocate(packetBufferSize)

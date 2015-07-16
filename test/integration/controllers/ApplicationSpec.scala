@@ -10,8 +10,8 @@ import scala.concurrent.Await
 import scala.language.postfixOps
 
 class ApplicationSpec extends WordSpec
-  with Matchers
-  with BeforeAndAfterAll {
+    with Matchers
+    with BeforeAndAfterAll {
 
   override def beforeAll() = {
     Play.start(FakeApplication())

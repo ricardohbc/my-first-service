@@ -33,7 +33,7 @@ object ApiErrorModel {
 case class ApiRequestModel(url: String, server_received_time: String, api_version: String, help: String)
 
 object ApiRequestModel
-  extends ConfigHelper {
+    extends ConfigHelper {
   implicit val reqFormat = Json.format[ApiRequestModel]
 
   def fromReq(request: RequestHeader): ApiRequestModel = {

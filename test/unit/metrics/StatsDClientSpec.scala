@@ -7,9 +7,9 @@ import org.scalatest.prop.PropertyChecks
 import metrics.{ StatsDClient, StatsDProtocol }
 
 class StatsDClientSpec extends WordSpec
-  with Matchers
-  with PropertyChecks
-  with StatsDClient {
+    with Matchers
+    with PropertyChecks
+    with StatsDClient {
 
   "StatsDProtocol" should {
     "format a string according to the StatsD protocol" in {

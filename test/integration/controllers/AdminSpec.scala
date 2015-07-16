@@ -8,8 +8,8 @@ import play.api.test.FakeApplication
 import scala.Some
 
 class AdminSpec extends WordSpec
-  with Matchers
-  with BeforeAndAfterAll {
+    with Matchers
+    with BeforeAndAfterAll {
 
   override def beforeAll() = {
     Play.start(FakeApplication())

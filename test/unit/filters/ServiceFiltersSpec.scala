@@ -20,10 +20,10 @@ import play.api.libs.json.Json
 object TestGlobal extends GlobalServiceSettings
 
 class FiltersSpec
-  extends WordSpec
-  with Matchers
-  with BeforeAndAfterAll
-  with ConfigHelper {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with ConfigHelper {
 
   val actionTimeout = config getInt "controllers.timeout"
 

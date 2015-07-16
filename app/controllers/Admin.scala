@@ -13,7 +13,7 @@ import scala.collection.mutable
 import helpers.ControllerPayload
 
 object Admin extends Controller
-  with ControllerPayload {
+    with ControllerPayload {
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
     GET /hbc-microservice-template/admin/ping

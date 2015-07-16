@@ -11,6 +11,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import java.lang.management._
 import scala.collection.mutable
 import helpers.ControllerPayload
+import commands.DemoCommand
+import java.util.concurrent
 
 object Admin extends Controller
   with ControllerPayload {
@@ -160,5 +162,18 @@ object Admin extends Controller
     }
 
     Json.toJson(out.toMap)
+  }
+
+  @no.samordnaopptak.apidoc.ApiDoc(doc = """
+    GET /hbc-microservice-template/admin/hystrix-demo
+
+    DESCRIPTION
+      Basic test of Hystrix
+
+    RESULT
+      Response
+                                         """)
+  def hystrixDemo = Action {
+    Ok(DemoCommand().execute().toString)
   }
 }

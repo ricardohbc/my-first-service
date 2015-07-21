@@ -2,10 +2,15 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import actions.TimingOutAction
 
 import helpers.ControllerPayload
 
 import ch.qos.logback.classic.Level
+
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent._
+import scala.concurrent.duration._
 
 object Application extends Controller
     with ControllerPayload {
@@ -37,9 +42,18 @@ object Application extends Controller
       response: ResponseResult
       errors: Array Error
   """)
-  def index = Action { implicit request =>
-    val response = "hbc-microservice-template is up and running!"
-    writeResponseGet(response)
+  def index = Action.async { implicit request =>
+    Future {
+      println("invoke action\n")
+      val response = "hbc-microservice-template is up and running!"
+      Thread.sleep(20000)
+      println("wake up again\n")
+      writeResponseGet(response)
+    }
+    //val timeoutFuture = play.api.libs.concurrent.Promise.timeout(RequestTimeout("Timed Out"), 1.seconds)
+    //val other = Future { Thread.sleep(2000); writeResponseGet("hi there") }
+    // val goodResult = block(request)
+    //Future.firstCompletedOf(Seq(other, goodResult))
   }
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """

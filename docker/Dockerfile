@@ -1,4 +1,4 @@
-FROM hd1cutl01lx.saksdirect.com:5000/library/jvm-base:centos-6.6
+FROM sd1pgo01lx.saksdirect.com/rhel7:2
 
 # Add and unzip the Play app
 ADD hbc-microservice-template-0.1.zip /opt/hbc-microservice-template-0.1.zip

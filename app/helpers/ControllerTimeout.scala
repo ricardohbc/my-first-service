@@ -14,7 +14,7 @@ class TimingoutAction(ea: EssentialAction, timeout: Long = 1000L) extends Action
 
   override def apply(req: Request[AnyContent]): Future[Result] = {
     val goodResult: Future[Result] = ea.apply(req).run
-    val timeoutFuture = after(timeout millis, using = Akka.system.scheduler)(Future.failed(new TimeoutException("request timed out")))
+    val timeoutFuture = after(timeout millis, using = Akka.system.scheduler)(Future.failed(new TimeoutException(Constants.TIMEOUT_MSG)))
     Future.firstCompletedOf(Seq(timeoutFuture, goodResult))
   }
 }

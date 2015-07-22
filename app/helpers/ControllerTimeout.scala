@@ -7,6 +7,17 @@ import scala.language.postfixOps
 import constants.Constants
 import play.libs.Akka
 import akka.pattern._
+import play.api.mvc._
+
+class TimingoutAction(ea: EssentialAction, timeout: Long = 1000L) extends Action[AnyContent] {
+  override def parser = BodyParsers.parse.anyContent
+
+  override def apply(req: Request[AnyContent]): Future[Result] = {
+    val goodResult: Future[Result] = ea.apply(req).run
+    val timeoutFuture = after(timeout millis, using = Akka.system.scheduler)(Future.failed(new TimeoutException("request timed out")))
+    Future.firstCompletedOf(Seq(timeoutFuture, goodResult))
+  }
+}
 
 trait ControllerTimeout extends ConfigHelper {
   val actionTimeout = config getInt "controllers.timeout"

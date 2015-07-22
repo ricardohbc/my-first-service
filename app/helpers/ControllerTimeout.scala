@@ -8,6 +8,7 @@ import constants.Constants
 import play.libs.Akka
 import akka.pattern._
 import play.api.mvc._
+import globals.Contexts
 
 class TimingoutAction(ea: EssentialAction, timeout: Long = 1000L) extends Action[AnyContent] {
   override def parser = BodyParsers.parse.anyContent
@@ -15,7 +16,7 @@ class TimingoutAction(ea: EssentialAction, timeout: Long = 1000L) extends Action
   override def apply(req: Request[AnyContent]): Future[Result] = {
     val goodResult: Future[Result] = ea.apply(req).run
     val timeoutFuture = after(timeout millis, using = Akka.system.scheduler)(Future.failed(new TimeoutException(Constants.TIMEOUT_MSG)))
-    Future.firstCompletedOf(Seq(timeoutFuture, goodResult))
+    Future.firstCompletedOf(Seq(timeoutFuture, goodResult))(Contexts.ctx)
   }
 }
 
@@ -32,6 +33,6 @@ trait ControllerTimeout extends ConfigHelper {
 
   private def timingoutFuture[T](time: Int, f: Future[T]): Future[T] = {
     val timeoutFuture = after(time millis, using = Akka.system.scheduler)(Future.failed(new TimeoutException(Constants.TIMEOUT_MSG)))
-    Future.firstCompletedOf(Seq(f, timeoutFuture))
+    Future.firstCompletedOf(Seq(f, timeoutFuture))(Contexts.ctx)
   }
 }

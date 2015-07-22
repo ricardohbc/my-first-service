@@ -3,7 +3,7 @@ package globals
 import filters.ServiceFilters
 import play.api.mvc._
 import play.api.GlobalSettings
-import helpers.{ ControllerPayload, TimingoutAction, ConfigHelper }
+import helpers.{ControllerPayload, TimingoutAction, ConfigHelper}
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent._

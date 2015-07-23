@@ -39,7 +39,7 @@ import play.api.libs.concurrent.Akka
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-trait StatsDClient extends ConfigHelper {
+object StatsDClient extends ConfigHelper {
 
   val host = config.getString("statsd.server")
   val port = config.getInt("statsd.port")
@@ -200,10 +200,10 @@ private class StatsDActor(
 
   override def postStop() = {
     //save any remaining data to StatsD
-    flush
+    flush()
 
     //Close the channel
-    if (channel.isOpen()) {
+    if (channel.isOpen) {
       channel.close()
     }
 
@@ -217,7 +217,7 @@ private class StatsDActor(
       // If we're going to go past the threshold of the buffer then flush.
       // the +1 is for the potential '\n' in multi_metrics below
       if (sendBuffer.remaining() < (data.length + 1)) {
-        flush
+        flush()
       }
 
       // multiple metrics are separated by '\n'
@@ -229,13 +229,12 @@ private class StatsDActor(
       sendBuffer.put(data)
 
       if (!multiMetrics) {
-        flush
+        flush()
       }
 
     } catch {
-      case e: IOException => {
-        Logger.error("Could not send stat {} to host {}:{}", sendBuffer.toString, address.getHostName(), address.getPort().toString, e)
-      }
+      case e: IOException =>
+        Logger.error("Could not send stat {} to host {}:{}", sendBuffer.toString, address.getHostName, address.getPort.toString, e)
     }
   }
 
@@ -255,14 +254,13 @@ private class StatsDActor(
       sendBuffer.rewind()
 
       if (sizeOfBuffer != nbSentBytes) {
-        Logger.error("Could not send entirely stat {} to host {}:{}. Only sent {} bytes out of {} bytes", sendBuffer.toString(),
-          address.getHostName(), address.getPort().toString, nbSentBytes.toString, sizeOfBuffer.toString)
+        Logger.error("Could not send entirely stat {} to host {}:{}. Only sent {} bytes out of {} bytes", sendBuffer.toString,
+          address.getHostName, address.getPort.toString, nbSentBytes.toString, sizeOfBuffer.toString)
       }
 
     } catch {
-      case e: IOException => {
-        Logger.error("Could not send stat {} to host {}:{}", sendBuffer.toString, address.getHostName(), address.getPort().toString, e)
-      }
+      case e: IOException =>
+        Logger.error("Could not send stat {} to host {}:{}", sendBuffer.toString, address.getHostName, address.getPort.toString, e)
     }
   }
 }

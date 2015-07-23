@@ -54,6 +54,7 @@ class FiltersSpec
       val result: Result = Await.result(route(FakeRequest(GET, "/slowRequest")).get, (actionTimeout * 2) millis)
       val bytesContent = Await.result(result.body |>>> Iteratee.consume[Array[Byte]](), Duration.Inf)
       val contentAsJson = Json.parse(new String(bytesContent))
+      result.header.status shouldBe 503
       ((contentAsJson \ "errors")(0) \ "error").as[String] == "TimeoutException" shouldBe true
     }
 

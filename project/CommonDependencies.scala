@@ -9,8 +9,6 @@ object CommonDependencies {
   val apiDocVersion = "14"
   val playWSVersion = "2.3.9"
   val playMockWSVersion = "2.3.0"
-  val hystrixVersion = "1.4.12"
-  val rxVersion = "0.20.7"
 
   val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
   val apiDoc = "com.hbc" %% "api_doc" % apiDocVersion

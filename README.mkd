@@ -16,6 +16,9 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
       ```sh
       git clone https://github.com/saksdirect/hbc-microservice-template.git
       ```
+
+- This is expected to run on a empty Repository as it does create README.
+
 - Run the 'setup.sh' script inside this repo (works in Mac OSX only at the moment):
       
       ```sh

@@ -33,11 +33,11 @@ object ApiErrorModel {
 case class ApiRequestModel(url: String, server_received_time: String, api_version: String, help: String)
 
 object ApiRequestModel
-  extends ConfigHelper {
+    extends ConfigHelper {
   implicit val reqFormat = Json.format[ApiRequestModel]
 
   def fromReq(request: RequestHeader): ApiRequestModel = {
-    val fullRequestUrl = if (request.secure) "https://" else "http" + request.host + request.uri
+    val fullRequestUrl = if (request.secure) "https://" else "http://" + request.host + request.uri
     val df = new SimpleDateFormat(Constants.ZULU_DATE_FORMAT)
     val version = config.getString("service-version")
     val help = if (request.secure) "https://" else "http://" + request.host + "/api/v1/api-docs"

@@ -17,3 +17,4 @@ GET     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ER
 GET     /hbc-microservice-template/admin/ping                controllers.Admin.ping
 GET     /hbc-microservice-template/admin/jvmstats            controllers.Admin.jvmstats
 
+

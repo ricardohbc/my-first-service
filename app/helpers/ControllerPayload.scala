@@ -121,7 +121,7 @@ trait ControllerPayload extends Controller {
     case e: JsResultException =>
       (BadRequest, ApiErrorModel.fromException(e))
     case e: TimeoutException =>
-      (RequestTimeout, ApiErrorModel.fromException(e))
+      (ServiceUnavailable, ApiErrorModel.fromException(e))
     case NonFatal(e) =>
       (InternalServerError, ApiErrorModel.fromExceptionAndMessage(
         "Yikes! An error has occurred: " + e.getMessage, e

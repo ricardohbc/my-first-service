@@ -2,14 +2,14 @@ package unit.helpers
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
+import org.scalatest.{ Matchers, WordSpec }
 import org.scalatest.prop.PropertyChecks
-import metrics.{ StatsDClient, StatsDProtocol }
+import metrics.StatsDProtocol
+import metrics.StatsDClient._
 
 class StatsDClientSpec extends WordSpec
-  with Matchers
-  with PropertyChecks
-  with StatsDClient {
+    with Matchers
+    with PropertyChecks {
 
   "StatsDProtocol" should {
     "format a string according to the StatsD protocol" in {

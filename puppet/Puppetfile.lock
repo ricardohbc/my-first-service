@@ -1,21 +1,16 @@
 FORGE
   remote: https://forgeapi.puppetlabs.com
   specs:
-    garethr-docker (4.0.2)
-      puppetlabs-apt (<= 1.8.0, >= 1.1.0)
-      puppetlabs-stdlib (>= 4.1.0)
-      stahnma-epel (>= 0.0.6)
-    puppetlabs-apt (1.8.0)
-      puppetlabs-stdlib (>= 2.2.1)
-    puppetlabs-stdlib (4.6.0)
+    puppetlabs-stdlib (4.7.0)
     stahnma-epel (1.0.2)
-    stankevich-python (1.9.4)
-      puppetlabs-stdlib (>= 4.0.0)
+    stankevich-python (1.9.5)
+      puppetlabs-stdlib (< 6.0.0, >= 4.0.0)
+      stahnma-epel (< 2.0.0, >= 1.0.1)
 
 GIT
   remote: git@github.com:saksdirect/hbcd-dockercompose.git
   ref: master
-  sha: 1ea55e9e2fdf5cc0826d0c233a31a414aaaa513d
+  sha: eabb4f4f86d0fe05294290397971c59cb560d39c
   specs:
     hbcd-dockercompose (0.1.0)
       hbcd-pythonbase (>= 0)
@@ -24,7 +19,7 @@ GIT
 GIT
   remote: git@github.com:saksdirect/hbcd-pythonbase.git
   ref: master
-  sha: e432ddc5753c29c8f89cd65cfc0c6fa7a01f6d6c
+  sha: 9d08fb58cb2d0a1294c31dbe8f30c461cf2b9843
   specs:
     hbcd-pythonbase (0.1.0)
       puppetlabs-stdlib (>= 1.0.0)
@@ -34,10 +29,9 @@ GIT
 GIT
   remote: git@github.com:saksdirect/hbcd-service-profile.git
   ref: master
-  sha: 1f3ef17b773bb3be134aa73774e243d1b3fbf609
+  sha: bbc80caabe52be9eb9f4e9af2962f4b5bca454b8
   specs:
     hbcd-service-profile (0.1.0)
-      garethr-docker (>= 3.5)
       hbcd-dockercompose (>= 0)
       hbcd-pythonbase (>= 0)
       puppetlabs-stdlib (>= 1.0.0)
@@ -45,7 +39,7 @@ GIT
 GIT
   remote: git@github.com:saksdirect/hbcd-servicehost-role.git
   ref: master
-  sha: 17b261cdfdb51e6954a8e3c9247682ae05b5c469
+  sha: 8a6ac1b1ad366a2c27b99ced0d9e02a72336d4de
   specs:
     hbcd-servicehost-role (0.1.0)
       hbcd-service-profile (>= 0)

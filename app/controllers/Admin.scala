@@ -6,14 +6,13 @@ import play.api.mvc._
 import play.api.libs.json._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import java.lang.management._
 import scala.collection.mutable
 import helpers.ControllerPayload
 
 object Admin extends Controller
-  with ControllerPayload {
+    with ControllerPayload {
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
     GET /hbc-microservice-template/admin/ping

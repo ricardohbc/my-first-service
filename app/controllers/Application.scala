@@ -8,7 +8,7 @@ import helpers.ControllerPayload
 import ch.qos.logback.classic.Level
 
 object Application extends Controller
-  with ControllerPayload {
+    with ControllerPayload {
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
     GET /hbc-microservice-template

@@ -11,10 +11,10 @@ import play.api.Play
 import play.api.test.FakeApplication
 
 class ControllerTimeoutSpec extends WordSpec
-  with Matchers
-  with BeforeAndAfterAll
-  with ControllerTimeout
-  with ControllerPayload {
+    with Matchers
+    with BeforeAndAfterAll
+    with ControllerTimeout
+    with ControllerPayload {
 
   override def beforeAll() = {
     Play.start(FakeApplication())

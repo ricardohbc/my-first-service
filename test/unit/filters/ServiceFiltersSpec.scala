@@ -20,10 +20,10 @@ import play.api.libs.json.Json
 object TestGlobal extends GlobalServiceSettings
 
 class FiltersSpec
-  extends WordSpec
-  with Matchers
-  with BeforeAndAfterAll
-  with ConfigHelper {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with ConfigHelper {
 
   val actionTimeout = config getInt "controllers.timeout"
 
@@ -50,14 +50,13 @@ class FiltersSpec
 
   "ServiceFilters" should {
 
-    //TODO We need to fix our timeout handling
-    /*
     "return TimeoutException after configured time" in {
       val result: Result = Await.result(route(FakeRequest(GET, "/slowRequest")).get, (actionTimeout * 2) millis)
       val bytesContent = Await.result(result.body |>>> Iteratee.consume[Array[Byte]](), Duration.Inf)
       val contentAsJson = Json.parse(new String(bytesContent))
+      result.header.status shouldBe 503
       ((contentAsJson \ "errors")(0) \ "error").as[String] == "TimeoutException" shouldBe true
-    }*/
+    }
 
     "handle exception when it's thrown by controller" in {
       val result = route(FakeRequest(GET, "/errorRequest")).get

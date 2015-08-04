@@ -23,5 +23,5 @@ object CommonDependencies {
       scalaTest,
       apiDoc,
       scalacheck
-      )
+    )
 }

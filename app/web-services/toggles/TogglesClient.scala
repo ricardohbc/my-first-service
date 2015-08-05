@@ -21,10 +21,6 @@ object TogglesClient extends ConfigHelper {
   private val allTogglesCache: Cache[Seq[Toggle]] = LruCache(maxCapacity = 1, initialCapacity = 1, timeToLive = Duration(10, "minutes"))
   val unpackJsonResults: JsValue => JsValue = (json) => (json \ "response" \ "results")
 
-  private def getCachedToggle(name: String): Future[Toggle] = toggleCache(name) {
-    getFromToggleSvc(s"$svcUrl/$name") { js => unpackJsonResults(js).as[Toggle] }
-  }
-
   private def getFromToggleSvc[T](reqUrl: String)(handler: JsValue => T): Future[T] =
     WS.url(reqUrl).get().map { response =>
       if (response.status == 200)
@@ -35,6 +31,10 @@ object TogglesClient extends ConfigHelper {
         throw new Exception(msg)
       }
     }
+
+  private def getCachedToggle(name: String): Future[Toggle] = toggleCache(name) {
+    getFromToggleSvc(s"$svcUrl/$name") { js => unpackJsonResults(js).as[Toggle] }
+  }
 
   private def getAllToggles(): Future[Seq[Toggle]] =
     getFromToggleSvc(svcUrl) { js => unpackJsonResults(js).as[Seq[Toggle]] }.map { toggles =>

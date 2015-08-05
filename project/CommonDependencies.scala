@@ -9,12 +9,15 @@ object CommonDependencies {
   val apiDocVersion = "14"
   val playWSVersion = "2.3.9"
   val playMockWSVersion = "2.3.0"
+  val sprayVersion = "1.3.3"
 
   val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
   val apiDoc = "com.hbc" %% "api_doc" % apiDocVersion
   val scalacheck = "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
   val playWS = "com.typesafe.play" %% "play-ws" % playWSVersion
   val playMockWS = "de.leanovate.play-mockws" %% "play-mockws" % playMockWSVersion % "test"
+  val sprayUtil = "io.spray" %% "spray-util" % sprayVersion
+  val sprayCaching = "io.spray" %% "spray-caching" % sprayVersion
 
   val commonDependencies : Seq[ModuleID] =
     Seq(
@@ -22,6 +25,8 @@ object CommonDependencies {
       playMockWS,
       scalaTest,
       apiDoc,
-      scalacheck
+      scalacheck,
+      sprayUtil,
+      sprayCaching
     )
 }

@@ -17,14 +17,16 @@
       sbt pre-commit
       ```
   - Sbt commands:
-     - clean-build: Cleans code and builds project. Note clean will take more time than normal sbt build.
-     - integration: Runs all Integration Tests.
-     - test: Runs all Unit Tests.
-     - test-all: Runs all integration, functional, and unit tests.
-     - buildAll: Compiles and runs all unit and integration tests.
-     - build-zip: Compiles, tests, and publishes a zip file with the new code.
-     - deploy-build: Builds the distribution zip, and deploys the current code for our service.
-     - pre-commit: Compiles, tests, zips code, refreshes docker container, and then runs integration tests.
+     - clean-build:   Cleans code and builds project. Note clean will take more time than normal sbt build.
+     - integration:   Runs all Integration Tests.
+     - functional:    Runs all Functional Tests.
+     - contract:      Runs all Contract Tests.
+     - test:          Runs all Unit Tests.
+     - test-all:      Runs all integration, functional, and unit tests.
+     - buildAll:      Compiles and runs all unit and integration tests.
+     - build-zip:     Compiles, tests, and publishes a zip file with the new code.
+     - deploy-build:  Builds the distribution zip, and deploys the current code for our service.
+     - pre-commit:    Compiles, tests, zips code, refreshes docker container, and then runs integration tests.
 
 ## Routes
 

@@ -61,6 +61,5 @@ object TogglesClient extends ConfigHelper {
   def clearCache(name: Option[String]) =
     name.fold(clearBothCaches)(k => toggleCache.remove(k))
 
-  def clearAllTogglesCache() = allTogglesCache.clear
 }
 

@@ -19,9 +19,10 @@ object TogglesClient extends ConfigHelper {
   // the dev toggle server returns about 260 toggles total right now
   private val toggleCache: Cache[Toggle] = LruCache(maxCapacity = 500, initialCapacity = 275, timeToLive = Duration(30, "minutes"))
   private val allTogglesCache: Cache[Seq[Toggle]] = LruCache(maxCapacity = 1, initialCapacity = 1, timeToLive = Duration(10, "minutes"))
+  val unpackJsonResults: JsValue => JsValue = (json) => (json \ "response" \ "results")
 
   private def getCachedToggle(name: String): Future[Toggle] = toggleCache(name) {
-    getFromToggleSvc(s"$svcUrl/$name") { json => (json \ "response" \ "results").as[Toggle] }
+    getFromToggleSvc(s"$svcUrl/$name") { js => unpackJsonResults(js).as[Toggle] }
   }
 
   private def getFromToggleSvc[T](reqUrl: String)(handler: JsValue => T): Future[T] =
@@ -36,7 +37,7 @@ object TogglesClient extends ConfigHelper {
     }
 
   private def getAllToggles(): Future[Seq[Toggle]] =
-    getFromToggleSvc(svcUrl) { json => (json \ "response" \ "results").as[Seq[Toggle]] }.map { toggles =>
+    getFromToggleSvc(svcUrl) { js => unpackJsonResults(js).as[Seq[Toggle]] }.map { toggles =>
       // shove them in the individual toggle cache
       toggles.foreach { toggle =>
         toggleCache(toggle.toggle_name, { () => Future.successful(toggle) })

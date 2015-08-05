@@ -17,5 +17,6 @@ GET     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ER
 GET     /hbc-microservice-template/admin/ping                controllers.Admin.ping
 GET     /hbc-microservice-template/admin/jvmstats            controllers.Admin.jvmstats
 GET     /hbc-microservice-template/clear_toggles             controllers.Application.clearToggles(name: Option[String] ?= None)
+GET     /hbc-microservice-template/toggles                    controllers.Application.toggles(name: Option[String] ?= None)
 
 

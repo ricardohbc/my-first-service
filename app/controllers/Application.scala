@@ -8,6 +8,8 @@ import helpers.ControllerPayload
 
 import ch.qos.logback.classic.Level
 
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
 object Application extends Controller
     with ControllerPayload {
 
@@ -87,11 +89,37 @@ object Application extends Controller
 
     RESULT
       String
-      
+
      """)
   def clearToggles(name: Option[String]) = Action { implicit request =>
-    // might have a selected assortment id, we then need to find where in the tree it is so we can highlight its parent
     TogglesClient.clearCache(name)
-    Ok("done!")
+    writeResponseGet("done!")
+  }
+
+  @no.samordnaopptak.apidoc.ApiDoc(doc = """
+    GET  /hbc-microservice-template/toggles
+
+    DESCRIPTION
+      See what toggles our service has, if you pass a toggle name under ?name=toggle_name it will fetch that toggle, otherwise fetch everything
+
+    RESULT
+      ToggleResponse
+
+    Toggle: models.Toggle
+      toggle_name: String
+      toggle_state: Boolean
+
+    ToggleResult: models.ApiResultModel
+      results: Array Toggle
+
+    ToggleResponse: models.ApiModel
+      request: Request
+      response: ToggleResult
+      errors: Array Error
+
+     """)
+  def toggles(name: Option[String]) = Action.async { implicit request =>
+    name.map(n => TogglesClient.getToggle(n).map(t => Seq(t))).getOrElse(TogglesClient.getToggles)
+      .map(r => writeResponseGet(Seq(r)))
   }
 }

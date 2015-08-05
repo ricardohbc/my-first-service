@@ -11,11 +11,11 @@ object CommonDependencies {
   val playMockWSVersion = "2.3.0"
   val sprayVersion = "1.3.3"
 
-  val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
+  val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % "test, it, ct, ft"
   val apiDoc = "com.hbc" %% "api_doc" % apiDocVersion
-  val scalacheck = "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
+  val scalacheck = "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test, it, ct, ft"
   val playWS = "com.typesafe.play" %% "play-ws" % playWSVersion
-  val playMockWS = "de.leanovate.play-mockws" %% "play-mockws" % playMockWSVersion % "test"
+  val playMockWS = "de.leanovate.play-mockws" %% "play-mockws" % playMockWSVersion % "test, it, ct, ft"
   val sprayUtil = "io.spray" %% "spray-util" % sprayVersion
   val sprayCaching = "io.spray" %% "spray-caching" % sprayVersion
 

@@ -48,8 +48,18 @@ object TogglesClient extends ConfigHelper {
     getAllToggles()
   }
 
+  private def clearBothCaches(): Unit = {
+    toggleCache.clear
+    allTogglesCache.clear
+  }
+
   def getToggle(name: String): Future[Toggle] = getCachedToggle(name)
 
   def getToggles(): Future[Seq[Toggle]] = getCachedToggles()
+
+  def clearCache(name: Option[String]) =
+    name.fold(clearBothCaches)(k => toggleCache.remove(k))
+
+  def clearAllTogglesCache() = allTogglesCache.clear
 }
 

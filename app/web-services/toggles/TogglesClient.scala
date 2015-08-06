@@ -15,10 +15,10 @@ object TogglesClient extends ConfigHelper {
 
   private val svcUrl = config.getString("webservices.toggles.url")
 
-  // no idea about ttl just yet
+  // no idea about ttl just yet. Do they change much? The service is pretty snappy so could be less aggressive with the cache if useful
   // the dev toggle server returns about 260 toggles total right now
-  private val toggleCache: Cache[Toggle] = LruCache(maxCapacity = 500, initialCapacity = 275, timeToLive = Duration(30, "minutes"))
-  private val allTogglesCache: Cache[Seq[Toggle]] = LruCache(maxCapacity = 1, initialCapacity = 1, timeToLive = Duration(10, "minutes"))
+  private val toggleCache: Cache[Toggle] = LruCache(maxCapacity = 500, initialCapacity = 275, timeToLive = Duration(24, "hours"))
+  private val allTogglesCache: Cache[Seq[Toggle]] = LruCache(maxCapacity = 1, initialCapacity = 1, timeToLive = Duration(24, "hours"))
   val unpackJsonResults: JsValue => JsValue = (json) => (json \ "response" \ "results")
 
   private def getFromToggleSvc[T](reqUrl: String)(handler: JsValue => T): Future[T] =
@@ -53,6 +53,8 @@ object TogglesClient extends ConfigHelper {
     toggleCache.clear
     allTogglesCache.clear
   }
+
+  // ************** Exposed Services ****************************
 
   def getToggle(name: String): Future[Toggle] = getCachedToggle(name)
 

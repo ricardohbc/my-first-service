@@ -117,7 +117,7 @@ object Application extends Controller
       response: ToggleResult
       errors: Array Error
 
-     """)
+     """) // This is useful for debugging, and perhaps pre-populating appropriate toggles ...
   def toggles(name: Option[String]) = Action.async { implicit request =>
     name.map(n => TogglesClient.getToggle(n).map(t => Seq(t))).getOrElse(TogglesClient.getToggles)
       .map(r => writeResponseGet(r))

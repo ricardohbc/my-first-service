@@ -6,7 +6,7 @@ object CommonDependencies {
 
   val scalaTestVersion = "2.2.5"
   val scalaCheckVersion = "1.12.2"
-  val apiDocVersion = "14"
+  val apiDocVersion = "18"
   val playWSVersion = "2.3.9"
   val playMockWSVersion = "2.3.0"
   val sprayVersion = "1.3.3"

@@ -3,7 +3,7 @@
 # ~~~~
 
 # Swagger api json doc page
-GET     /api/v1/api-docs     no.samordnaopptak.apidoc.controllers.ApiDocController.get
+GET     /api-docs                               no.samordnaopptak.apidoc.controllers.ApiDocController.get
 
 # Index page
 GET     /hbc-microservice-template              controllers.Application.index
@@ -17,6 +17,4 @@ GET     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ER
 GET     /hbc-microservice-template/admin/ping                controllers.Admin.ping
 GET     /hbc-microservice-template/admin/jvmstats            controllers.Admin.jvmstats
 GET     /hbc-microservice-template/clear_toggles             controllers.Application.clearToggles(name: Option[String] ?= None)
-GET     /hbc-microservice-template/toggles                    controllers.Application.toggles(name: Option[String] ?= None)
-
-
+GET     /hbc-microservice-template/toggles                   controllers.Application.toggles(name: Option[String] ?= None)

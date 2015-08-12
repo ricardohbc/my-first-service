@@ -39,12 +39,12 @@ object ApiRequestModel
   def fromReq(request: RequestHeader): ApiRequestModel = {
     val fullRequestUrl = if (request.secure) "https://" else "http://" + request.host + request.uri
     val df = new SimpleDateFormat(Constants.ZULU_DATE_FORMAT)
-    val version = config.getString("service-version")
-    val help = if (request.secure) "https://" else "http://" + request.host + "/api/v1/api-docs"
+    val versionURI = config.getString("application.context")
+    val help = if (request.secure) "https://" else "http://" + request.host + versionURI + "/api-docs"
     new ApiRequestModel(
       fullRequestUrl,
       df.format(Calendar.getInstance.getTime),
-      version,
+      versionURI.substring(1),
       help
     )
   }

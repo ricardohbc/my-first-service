@@ -65,10 +65,10 @@ object StatsDClient extends ConfigHelper {
     send(key, value.toString, StatsDProtocol.TIMING_METRIC, sampleRate)
   }
 
-  def timing(key: String, value: Long) : Unit = {
+  def timing(key: String, value: Long): Unit = {
     timing(key, value, 1.0)
   }
-  
+
   def getTimeSince(start: Long): Long = System.currentTimeMillis - start
 
   // prefix tags with controller.action
@@ -113,7 +113,7 @@ object StatsDClient extends ConfigHelper {
     increment(key, magnitude, sampleRate)
   }
 
-  def decrement(key: String) :Unit = {
+  def decrement(key: String): Unit = {
     increment(key, -1, 1.0)
   }
 
@@ -127,7 +127,7 @@ object StatsDClient extends ConfigHelper {
     send(key, magnitude.toString, StatsDProtocol.COUNTER_METRIC, sampleRate)
   }
 
-  def increment(key: String) : Unit= {
+  def increment(key: String): Unit = {
     increment(key, 1, 1.0)
   }
 

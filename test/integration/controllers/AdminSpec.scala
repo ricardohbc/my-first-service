@@ -23,14 +23,14 @@ class AdminSpec extends WordSpec
 
     "show **pong** when /hbc-microservice-template/admin/ping endpoint is called" in {
 
-      val ping = route(FakeRequest(GET, "/hbc-microservice-template/admin/ping")).get
+      val ping = route(FakeRequest(GET, "/v1/hbc-microservice-template/admin/ping")).get
 
       status(ping) shouldBe OK
       contentAsString(ping).contains("pong") shouldBe true
     }
 
     "show **JVM Stats** when /hbc-microservice-template/admin/jvmstats endpoint is called" in {
-      val jvmstats = route(FakeRequest(GET, "/hbc-microservice-template/admin/jvmstats")).get
+      val jvmstats = route(FakeRequest(GET, "/v1/hbc-microservice-template/admin/jvmstats")).get
 
       status(jvmstats) shouldBe OK
       contentAsString(jvmstats).contains("jvm_num_cpus") shouldBe true

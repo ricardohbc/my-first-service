@@ -27,7 +27,7 @@ class ApplicationSpec extends WordSpec
     }
 
     "render the index page" in {
-      val index = route(FakeRequest(GET, "/hbc-microservice-template")).get
+      val index = route(FakeRequest(GET, "/v1/hbc-microservice-template")).get
 
       status(index) shouldBe OK
       contentType(index).get == "application/json" shouldBe true
@@ -35,7 +35,7 @@ class ApplicationSpec extends WordSpec
     }
 
     "get Swagger spec" in {
-      val index = route(FakeRequest(GET, "/api/v1/api-docs")).get
+      val index = route(FakeRequest(GET, "/v1/api-docs")).get
 
       status(index) shouldBe OK
       contentType(index).get == "application/json" shouldBe true
@@ -43,17 +43,17 @@ class ApplicationSpec extends WordSpec
     }
 
     "change the log Level" in {
-      val changeLog = route(FakeRequest(GET, "/hbc-microservice-template/logLevel/WARN")).get
+      val changeLog = route(FakeRequest(GET, "/v1/hbc-microservice-template/logLevel/WARN")).get
       status(changeLog) shouldBe OK
       contentType(changeLog).get == "application/json" shouldBe true
       (contentAsJson(changeLog) \ "response" \ "results").as[String] == "Log level changed to WARN" shouldBe true
       Logger.isDebugEnabled shouldBe false
-      Await.result(route(FakeRequest(GET, "/hbc-microservice-template/logLevel/DEBUG")).get, 10 seconds)
+      Await.result(route(FakeRequest(GET, "/v1/hbc-microservice-template/logLevel/DEBUG")).get, 10 seconds)
       Logger.isDebugEnabled shouldBe true
     }
 
     "ignore incorrect log Level" in {
-      route(FakeRequest(GET, "/hbc-microservice-template/logLevel/WARN2")) shouldBe None
+      route(FakeRequest(GET, "/v1/hbc-microservice-template/logLevel/WARN2")) shouldBe None
     }
   }
 }

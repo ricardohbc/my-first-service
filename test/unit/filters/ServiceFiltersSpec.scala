@@ -16,6 +16,7 @@ import play.api.test.FakeApplication
 import scala.Some
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.json.Json
+import helpers.ControllerTimeoutLike._
 
 object TestGlobal extends GlobalServiceSettings
 
@@ -29,9 +30,12 @@ class FiltersSpec
 
   val testRouter: PartialFunction[(String, String), Handler] = {
     case (GET, "/slowRequest") =>
-      Action {
-        Thread.sleep(actionTimeout * 3)
-        Ok("Should never get here")
+      Action.async {
+        implicit request =>
+          timeout {
+            Thread.sleep(actionTimeout * 3)
+            Ok("Should never get here")
+          }
       }
     case (GET, "/errorRequest") =>
       Action {

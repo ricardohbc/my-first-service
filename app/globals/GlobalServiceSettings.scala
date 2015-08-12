@@ -1,16 +1,10 @@
 package globals
 
 import filters.ServiceFilters
-import play.api.mvc._
 import play.api.GlobalSettings
-import helpers.{ ControllerPayload, TimingoutAction, ConfigHelper }
-
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import helpers.{ ControllerPayload, ConfigHelper }
 import scala.concurrent._
 import play.api.mvc._
-import play.api.mvc.BodyParsers
-import play.libs.Akka
-import constants.Constants
 
 class GlobalServiceSettings extends GlobalSettings with ControllerPayload with ConfigHelper {
 
@@ -18,7 +12,7 @@ class GlobalServiceSettings extends GlobalSettings with ControllerPayload with C
 
   override def doFilter(next: EssentialAction): EssentialAction =
     Filters(
-      super.doFilter(new TimingoutAction(next, actionTimeout)),
+      super.doFilter(next),
       ServiceFilters.TimingFilter,
       ServiceFilters.IncrementFilter,
       ServiceFilters.ExceptionFilter

@@ -4,16 +4,17 @@ import play.api._
 import play.api.mvc._
 
 import webservices.toggles.TogglesClient
-import helpers.ControllerPayload
+import helpers.ControllerPayloadLike._
+import helpers.ControllerTimeoutLike._
 
 import ch.qos.logback.classic.Level
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-object Application extends Controller
-    with ControllerPayload {
+object Application extends Controller {
 
-  @no.samordnaopptak.apidoc.ApiDoc(doc = """
+  @no.samordnaopptak.apidoc.ApiDoc(doc =
+    """
     GET /hbc-microservice-template
 
     DESCRIPTION
@@ -40,12 +41,17 @@ object Application extends Controller
       response: ResponseResult
       errors: Array Error
   """)
-  def index = Action { implicit request =>
-    val response = "hbc-microservice-template is up and running!"
-    writeResponseGet(response)
+  def index = Action.async {
+    implicit request =>
+      timeout {
+        val response = "hbc-microservice-template is up and running!"
+        writeResponseGet(response)
+      }
   }
 
-  @no.samordnaopptak.apidoc.ApiDoc(doc = """
+  @no.samordnaopptak.apidoc.ApiDoc(doc =
+
+    """
     GET /hbc-microservice-template/logLevel/{level}
 
     DESCRIPTION
@@ -60,7 +66,9 @@ object Application extends Controller
   """)
   def changeLogLevelGet(levelString: String) = changeLogLevel(levelString)
 
-  @no.samordnaopptak.apidoc.ApiDoc(doc = """
+  @no.samordnaopptak.apidoc.ApiDoc(doc =
+
+    """
     PUT /hbc-microservice-template/logLevel/{level}
 
     DESCRIPTION
@@ -73,15 +81,20 @@ object Application extends Controller
       Response
 
   """)
-  def changeLogLevel(levelString: String) = Action { implicit request =>
-    Logger.debug("hbc-microservice-template change log level called")
-    val level = Level.toLevel(levelString)
-    Logger.underlyingLogger.asInstanceOf[ch.qos.logback.classic.Logger].setLevel(level)
-    val response = s"Log level changed to $level"
-    writeResponseGet(response)
+  def changeLogLevel(levelString: String) = Action.async {
+    implicit request =>
+      timeout {
+        Logger.debug("hbc-microservice-template change log level called")
+        val level = Level.toLevel(levelString)
+        Logger.underlyingLogger.asInstanceOf[ch.qos.logback.classic.Logger].setLevel(level)
+        val response = s"Log level changed to $level"
+        writeResponseGet(response)
+      }
   }
 
-  @no.samordnaopptak.apidoc.ApiDoc(doc = """
+  @no.samordnaopptak.apidoc.ApiDoc(doc =
+
+    """
     GET  /hbc-microservice-template/clear_toggles
 
     DESCRIPTION
@@ -91,9 +104,12 @@ object Application extends Controller
       String
 
      """)
-  def clearToggles(name: Option[String]) = Action { implicit request =>
-    TogglesClient.clearCache(name)
-    writeResponseGet("done!")
+  def clearToggles(name: Option[String]) = Action.async {
+    implicit request =>
+      timeout {
+        TogglesClient.clearCache(name)
+        writeResponseGet("done!")
+      }
   }
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
@@ -118,8 +134,10 @@ object Application extends Controller
       errors: Array Error
 
      """) // This is useful for debugging, and perhaps pre-populating appropriate toggles ...
-  def toggles(name: Option[String]) = Action.async { implicit request =>
-    name.map(n => TogglesClient.getToggle(n).map(t => Seq(t))).getOrElse(TogglesClient.getToggles)
-      .map(r => writeResponseGet(r))
+  def toggles(name: Option[String]) = Action.async {
+    implicit request =>
+      withTimeout {
+        name.map(n => TogglesClient.getToggle(n).map(t => Seq(t))).getOrElse(TogglesClient.getToggles()).map(r => writeResponseGet(r))
+      }
   }
 }

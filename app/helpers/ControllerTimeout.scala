@@ -7,27 +7,23 @@ import scala.language.postfixOps
 import constants.Constants
 import play.libs.Akka
 import akka.pattern._
-import play.api.mvc._
 import globals.Contexts
-
-class TimingoutAction(ea: EssentialAction, timeout: Long = 1000L) extends Action[AnyContent] {
-  override def parser = BodyParsers.parse.anyContent
-
-  override def apply(req: Request[AnyContent]): Future[Result] = {
-    val goodResult: Future[Result] = ea.apply(req).run
-    ControllerTimeoutLike.withTimeout(timeout)(goodResult)
-  }
-}
 
 trait ControllerTimeout extends ConfigHelper {
   val actionTimeout = config getInt "controllers.timeout"
 
-  // call this with some arbitrary blocking code 
-  def timeout[T](time: Long = actionTimeout)(body: => T): Future[T] =
+  // call these with some arbitrary blocking code
+  def timeout[T](body: => T): Future[T] =
+    timingoutFuture(actionTimeout, Future(body))
+
+  def timeout[T](time: Long)(body: => T): Future[T] =
     timingoutFuture(time, Future(body))
 
-  // call this if you already have a future
-  def withTimeout[T](time: Long = actionTimeout)(f: Future[T]): Future[T] =
+  // call these if you already have a future
+  def withTimeout[T](f: Future[T]): Future[T] =
+    timingoutFuture(actionTimeout, f)
+
+  def withTimeout[T](time: Long)(f: Future[T]): Future[T] =
     timingoutFuture(time, f)
 
   private def timingoutFuture[T](time: Long, f: Future[T]): Future[T] = {

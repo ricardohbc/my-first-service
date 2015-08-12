@@ -28,7 +28,7 @@ class ControllerTimeoutSpec extends WordSpec
     "return error on timeout" in {
       intercept[TimeoutException](
         Await.result(
-          timeout() {
+          timeout {
             Thread.sleep(10000)
             Ok("Won't get here")
           },
@@ -39,7 +39,7 @@ class ControllerTimeoutSpec extends WordSpec
     "return error on an async timeout" in {
       intercept[TimeoutException](
         Await.result(
-          withTimeout() {
+          withTimeout {
             Future {
               Thread.sleep(10000)
               Ok("Won't get here")

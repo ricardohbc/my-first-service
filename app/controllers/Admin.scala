@@ -36,7 +36,7 @@ object Admin extends Controller {
       JVM statistics for the service
 
     RESULT
-      JvmStats
+      JvmStatsResponse
 
     JvmStats: !
       jvm_num_cpus: Double
@@ -83,7 +83,15 @@ object Admin extends Controller {
       jvm_nonheap_used: Double
       jvm_current_mem_PS Perm Gen_max: Double
       jvm_nonheap_committed: Double
-  """)
+
+    JvmStatsResponseResult: models.ApiResultModel
+      results: String
+
+    JvmStatsResponse: models.ApiModel
+      request: Request
+      response: JvmStatsResponseResult
+      errors: Array Error
+                                         """)
   def jvmstats = Action.async {
     implicit request =>
       timeout {

@@ -33,7 +33,7 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
       lookahead-service
       ```
 
-- If you ran this script as a source script, it will change the directory for you automatically. Otherwise, change it manually as it has been renamed:
+- If you ran this script as a source script, it will change the current directory for you automatically. Otherwise, change it manually as it has been renamed:
 
       ```sh
       cd .

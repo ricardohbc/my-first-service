@@ -8,7 +8,7 @@ import play.api.test.FakeApplication
 import org.scalatest.{ Matchers, BeforeAndAfterAll, WordSpec }
 import scala.concurrent.Await
 import scala.language.postfixOps
-import play.api.Play.current
+import utils.TestUtils._
 
 class ApplicationSpec extends WordSpec
     with Matchers
@@ -28,7 +28,6 @@ class ApplicationSpec extends WordSpec
     }
 
     "render the index page" in {
-      val versionCtx = current.configuration.getString("application.context").getOrElse("")
       val index = route(FakeRequest(GET, versionCtx + "/hbc-microservice-template")).get
 
       status(index) shouldBe OK
@@ -37,7 +36,6 @@ class ApplicationSpec extends WordSpec
     }
 
     "get Swagger spec" in {
-      val versionCtx = current.configuration.getString("application.context").getOrElse("")
       val index = route(FakeRequest(GET, versionCtx + "/api-docs")).get
 
       status(index) shouldBe OK
@@ -46,7 +44,6 @@ class ApplicationSpec extends WordSpec
     }
 
     "change the log Level" in {
-      val versionCtx = current.configuration.getString("application.context").getOrElse("")
       val changeLog = route(FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/WARN")).get
       status(changeLog) shouldBe OK
       contentType(changeLog).get == "application/json" shouldBe true
@@ -57,7 +54,6 @@ class ApplicationSpec extends WordSpec
     }
 
     "ignore incorrect log Level" in {
-      val versionCtx = current.configuration.getString("application.context").getOrElse("")
       route(FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/WARN2")) shouldBe None
     }
   }

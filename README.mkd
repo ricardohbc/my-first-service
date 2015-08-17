@@ -19,11 +19,11 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 
 - Create an empty Git repository without the README.
 
-- Run the 'setup.sh' script inside this repo (works in Mac OSX only at the moment):
+- Run the 'setup.sh' as a source script inside this repo (works in Mac OSX only at the moment):
       
       ```sh
       cd hbc-microservice-template
-      ./setup.sh
+      . setup.sh
       ```
 
 - Give the new microservice a name. The script will perform a search & replace to change all "hbc-microservice-template" string instances to the name you have provided (please conform to the naming scheme described below):
@@ -33,10 +33,10 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
       lookahead-service
       ```
 
-- Finally, change out of the current directory, as it has been renamed.
+- If you ran this script as a source script, it will change the current directory for you automatically. Otherwise, change it manually as it has been renamed:
 
       ```sh
-      cd ..
+      cd .
       ```
 
 ## Microservice Naming Scheme  

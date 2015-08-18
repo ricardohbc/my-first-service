@@ -1,0 +1,9 @@
+hbcmicroservicetemplate:
+  image: sd1pgo01lx.saksdirect.com/hbc-microservice-template:<version>
+  restart: always
+  ports:
+    - "9000:9000"
+  volumes:
+    - /saksservices/config:/opt/hbc-microservice-template-0.1/conf/custom
+  env_file:
+    - ./ms.env

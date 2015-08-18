@@ -60,6 +60,10 @@ elif [ "$1" == "run" ]; then
         mv hbc-microservice-template $SERVICE_NAME
         cd $SERVICE_NAME
 
+        echo "Rename conf file from 'hbc-microservice-template-application.conf' to '$SERVICE_NAME'"
+        cd conf
+        mv hbc-microservice-template-application.conf $SERVICE_NAME-application.conf
+
         echo "Done! Enjoy your new micro service!"
 fi
 

@@ -14,8 +14,8 @@ import models._
 // no idea about ttl just yet. Do they change much? The service is pretty snappy so could be less aggressive with the cache if useful
 // the dev toggle server returns about 260 toggles total right now
 trait IndividualToggleCache {
-  val toggleCache: Cache[Toggle] = LruCache(maxCapacity = 500, initialCapacity = 275, timeToLive = Duration(24, "hours"))
-  def addToCache(toggle: Toggle) = toggleCache(toggle.toggle_name, () => Future.successful(toggle))
+  val toggleCache: Cache[Option[Toggle]] = LruCache(maxCapacity = 500, initialCapacity = 275, timeToLive = Duration(24, "hours"))
+  def addToCache(toggle: Toggle) = toggleCache(toggle.toggle_name, () => Future.successful(Some(toggle)))
 }
 
 trait AllTogglesCache {
@@ -33,10 +33,15 @@ object TogglesClient extends IndividualToggleCache with AllTogglesCache with Con
   //private val allTogglesCache: Cache[Seq[Toggle]] = LruCache(maxCapacity = 1, initialCapacity = 1, timeToLive = Duration(24, "hours"))
   val unpackJsonResults: JsValue => JsValue = (json) => (json \ "response" \ "results")
 
-  private def getFromToggleSvc[T](reqUrl: String)(handler: JsValue => T): Future[T] =
+  private def getFromToggleSvc[T](reqUrl: String)(handler: JsValue => T): Future[Option[T]] =
     WS.url(reqUrl).get().map { response =>
+      Logger.info("response status: " + response.status)
+      Logger.info("body: " + response.body)
+
       if (response.status == 200)
-        handler(response.json)
+        Some(handler(response.json))
+      else if (response.status == 404)
+        None
       else {
         val msg = "toggle web request failed with: " + response.body
         Logger.info(msg)
@@ -44,14 +49,16 @@ object TogglesClient extends IndividualToggleCache with AllTogglesCache with Con
       }
     }
 
-  private def getCachedToggle(name: String): Future[Toggle] = toggleCache(name) {
+  private def getCachedToggle(name: String): Future[Option[Toggle]] = toggleCache(name) {
     getFromToggleSvc(s"$svcUrl/$name") { js => unpackJsonResults(js).as[Toggle] }
   }
 
   private def getAllToggles(): Future[Seq[Toggle]] =
-    getFromToggleSvc(svcUrl) { js => unpackJsonResults(js).as[Seq[Toggle]] }.map { toggles =>
-      toggles.foreach(addToCache) // shove them in the individual toggle cache
-      toggles.sortBy(_.toggle_name)
+    getFromToggleSvc(svcUrl) { js => unpackJsonResults(js).as[Seq[Toggle]] }.map {
+      case Some(toggles) =>
+        toggles.foreach(addToCache) // shove them in the individual toggle cache
+        toggles.sortBy(_.toggle_name)
+      case _ => Seq.empty[Toggle]
     }
 
   private def getCachedToggles(): Future[Seq[Toggle]] = allTogglesCache("all") {
@@ -64,7 +71,9 @@ object TogglesClient extends IndividualToggleCache with AllTogglesCache with Con
   }
 
   // ************** Exposed Services ****************************
-  def getToggle(name: String): Future[Toggle] = getCachedToggle(name)
+  def getToggle(name: String): Future[Option[Toggle]] = getCachedToggle(name)
+
+  def getToggleState(name: String): Future[Option[Boolean]] = getCachedToggle(name).map(_.map(_.toggle_state))
 
   def getToggles(): Future[Seq[Toggle]] = getCachedToggles()
 

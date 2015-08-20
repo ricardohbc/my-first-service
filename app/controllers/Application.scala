@@ -137,7 +137,9 @@ object Application extends Controller {
   def toggles(name: Option[String]) = Action.async {
     implicit request =>
       withTimeout {
-        name.map(n => TogglesClient.getToggle(n).map(t => Seq(t))).getOrElse(TogglesClient.getToggles()).map(r => writeResponseGet(r))
+        name.map(n => TogglesClient.getToggle(n).map(t => Seq(t.toList).flatten))
+          .getOrElse(TogglesClient.getToggles())
+          .map(r => writeResponseGet(r))
       }
   }
 }

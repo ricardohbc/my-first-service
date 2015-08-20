@@ -18,12 +18,13 @@ class ToggleServiceSpec extends WordSpec with org.scalatest.Matchers {
 
   TogglesClient.addToCache(toggle1)
   TogglesClient.addToCache(toggle2)
+  TogglesClient.addToCache(toggle3)
 
   "Toggle service with spray cache" should {
     "return a toggle already in the cache" in {
       val toggleFuture = TogglesClient.getToggle("TEST_ONE")
       val toggle = Await.result(toggleFuture, 1.seconds)
-      toggle.toggle_state shouldBe false
+      toggle.get.toggle_state shouldBe false
     }
 
     "delete a single toggle" should {

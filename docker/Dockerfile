@@ -10,6 +10,6 @@ RUN chmod 755 /opt/hbc-microservice-template-0.1/bin/hbc-microservice-template
 # Play port to expose
 EXPOSE 9000
 
-ENV CONFIG_FILE application.conf
+#ENV CONFIG_FILE application.conf
 
 CMD nohup /opt/hbc-microservice-template-0.1/bin/hbc-microservice-template -Dhttp.port=9000 -Dpidfile.path=/dev/null -Dconfig.file=${CONFIG_FILE}

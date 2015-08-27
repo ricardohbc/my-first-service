@@ -30,10 +30,10 @@ class ControllerTimeoutSpec extends WordSpec
       intercept[TimeoutException](
         Await.result(
           timeout {
-            Thread.sleep(config getLong "controllers.timeout")
+            Thread.sleep(getIntProp("controllers.timeout") + 1000)
             Ok("Won't get here")
           },
-          5 seconds
+          10 seconds
         )
       )
     }
@@ -42,11 +42,11 @@ class ControllerTimeoutSpec extends WordSpec
         Await.result(
           withTimeout {
             Future {
-              Thread.sleep(config getLong "controllers.timeout")
+              Thread.sleep(getIntProp("controllers.timeout") + 1000)
               Ok("Won't get here")
             }
           },
-          5 seconds
+          10 seconds
         )
       )
     }

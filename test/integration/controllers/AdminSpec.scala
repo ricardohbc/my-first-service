@@ -5,6 +5,7 @@ import play.api.test._
 import play.api.Play
 import org.scalatest.{ Matchers, BeforeAndAfterAll, WordSpec }
 import play.api.test.FakeApplication
+import utils.TestGlobal
 import utils.TestUtils._
 
 class AdminSpec extends WordSpec
@@ -12,7 +13,7 @@ class AdminSpec extends WordSpec
     with BeforeAndAfterAll {
 
   override def beforeAll() = {
-    Play.start(FakeApplication())
+    Play.start(FakeApplication(withGlobal = Some(TestGlobal)))
   }
 
   override def afterAll() = {

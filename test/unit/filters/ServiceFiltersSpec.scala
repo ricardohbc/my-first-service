@@ -2,6 +2,7 @@ package unit.filters
 
 import _root_.helpers.ConfigHelper
 import play.api.mvc._
+import utils.TestGlobal
 import scala.concurrent._
 import play.api.mvc.Results._
 import play.api.test.FakeRequest
@@ -9,16 +10,12 @@ import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 import play.api.Play
 import play.api.test.Helpers._
 import play.api.http.HttpVerbs.GET
-import globals.GlobalServiceSettings
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import play.api.test.FakeApplication
-import scala.Some
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.json.Json
 import helpers.ControllerTimeoutLike._
-
-object TestGlobal extends GlobalServiceSettings
 
 class FiltersSpec
     extends WordSpec

@@ -2,6 +2,7 @@ package integration.controllers
 
 import play.api.test.Helpers._
 import play.api.test._
+import utils.TestGlobal
 import scala.concurrent.duration._
 import play.api.{ Logger, Play }
 import play.api.test.FakeApplication
@@ -15,7 +16,7 @@ class ApplicationSpec extends WordSpec
     with BeforeAndAfterAll {
 
   override def beforeAll() = {
-    Play.start(FakeApplication())
+    Play.start(FakeApplication(withGlobal = Some(TestGlobal)))
   }
 
   override def afterAll() = {

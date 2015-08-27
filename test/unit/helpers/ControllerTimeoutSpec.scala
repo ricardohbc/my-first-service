@@ -1,10 +1,10 @@
 package unit.helpers
 
+import utils.TestGlobal
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
-import helpers.{ ControllerPayload, ControllerTimeout }
+import helpers.{ ConfigHelper, ControllerPayload, ControllerTimeout }
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import play.api.Play
@@ -14,10 +14,11 @@ class ControllerTimeoutSpec extends WordSpec
     with Matchers
     with BeforeAndAfterAll
     with ControllerTimeout
-    with ControllerPayload {
+    with ControllerPayload
+    with ConfigHelper {
 
   override def beforeAll() = {
-    Play.start(FakeApplication())
+    Play.start(FakeApplication(withGlobal = Some(TestGlobal)))
   }
 
   override def afterAll() = {
@@ -29,10 +30,10 @@ class ControllerTimeoutSpec extends WordSpec
       intercept[TimeoutException](
         Await.result(
           timeout {
-            Thread.sleep(10000)
+            Thread.sleep(config getLong "controllers.timeout")
             Ok("Won't get here")
           },
-          10 seconds
+          5 seconds
         )
       )
     }
@@ -41,11 +42,11 @@ class ControllerTimeoutSpec extends WordSpec
         Await.result(
           withTimeout {
             Future {
-              Thread.sleep(10000)
+              Thread.sleep(config getLong "controllers.timeout")
               Ok("Won't get here")
             }
           },
-          10 seconds
+          5 seconds
         )
       )
     }

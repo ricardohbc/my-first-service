@@ -12,7 +12,7 @@ import helpers.AdminHelper._
 object Admin extends Controller {
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
-    GET /service/admin/ping
+    GET /hbc-microservice-template/admin/ping
 
     DESCRIPTION
       Basic health check
@@ -30,7 +30,7 @@ object Admin extends Controller {
   }
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
-    GET /service/admin/jvmstats
+    GET /hbc-microservice-template/admin/jvmstats
 
     DESCRIPTION
       JVM statistics for the service

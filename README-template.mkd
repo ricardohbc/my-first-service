@@ -1,0 +1,38 @@
+# hbc-microservice-template
+
+## Prequisites
+[Prerequisite Setup](https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#prerequisite-setup)  
+
+## Commands
+- To create a new box with containers running
+
+     ```
+      sbt build-zip
+      
+      vagrant up
+      ```
+  - To run clean, test, and deploy your latest code
+
+     ```
+      sbt pre-commit
+      ```
+  - Sbt commands:
+     - build-zip: Compiles, tests, and publishes a zip file with the new code.
+     - pre-commit: Compiles, tests, zips code, and then refreshes docker container.
+
+## Routes
+
+[list all routes that this service supports]
+
+| Method | Route | Class | Description
+| ------ | ----- | ----- | -----------
+| GET | /hbc-microservice-template | controllers.Application.index | Index Page
+| PUT | /hbc-microservice-template/logLevel/$level | controllers.Application.changeLogLevel | Change Log Level
+| GET | /hbc-microservice-template/logLevel/$level | controllers.Application.changeLogLevel | Change Log Level (Convenient Method)
+| GET | /hbc-microservice-template/admin/ping | controllers.Admin.ping | Ping Service
+| GET | /hbc-microservice-template/admin/jvmstats | controllers.Admin.jvmstats | Display current JVM Stats
+
+
+# Architecture
+
+[describe how this service interacts with other external systems]

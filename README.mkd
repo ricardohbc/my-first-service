@@ -1,38 +1,179 @@
-# service
+HBC Microservice Template
+=================================
 
-## Prequisites
-[Prerequisite Setup](https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#prerequisite-setup)  
+This Scala Play app template aims to be used as the base template used by the developer community at HBC Digital.
 
-## Commands
-- To create a new box with containers running
+Feel free to run the steps below in order to bootstrap your brand new microservice.
 
-     ```
-      sbt build-zip
+[Steps to Create a New Microservice](#steps-to-create-a-new-microservice)  
+[Microservice Naming Scheme](#microservice-naming-scheme)  
+[Features Supported](#features-supported)  
+[Additional Information](#additional-information)  
+
+## Steps to Create a New Microservice
+- Clone this project:
       
-      vagrant up
+      ```sh
+      git clone https://github.com/saksdirect/hbc-microservice-template.git
       ```
-  - To run clean, test, and deploy your latest code
 
-     ```
-      sbt pre-commit
+- Create an empty Git repository without the README.
+
+- Run the 'setup.sh' as a source script inside this repo (works in Mac OSX only at the moment):
+      
+      ```sh
+      cd hbc-microservice-template
+      . setup.sh
       ```
-  - Sbt commands:
-     - build-zip: Compiles, tests, and publishes a zip file with the new code.
-     - pre-commit: Compiles, tests, zips code, and then refreshes docker container.
 
-## Routes
+- Give the new microservice a name. The script will perform a search & replace to change all "hbc-microservice-template" string instances to the name you have provided (please conform to the naming scheme described below):
 
-[list all routes that this service supports]
+      ```sh
+      Please enter service name:
+      lookahead-service
+      ```
 
-| Method | Route | Class | Description
-| ------ | ----- | ----- | -----------
-| GET | /service | controllers.Application.index | Index Page
-| PUT | /service/logLevel/$level | controllers.Application.changeLogLevel | Change Log Level
-| GET | /service/logLevel/$level | controllers.Application.changeLogLevel | Change Log Level (Convenient Method)
-| GET | /service/admin/ping | controllers.Admin.ping | Ping Service
-| GET | /service/admin/jvmstats | controllers.Admin.jvmstats | Display current JVM Stats
+- If you ran this script as a source script, it will change the current directory for you automatically. Otherwise, change it manually as it has been renamed:
+
+      ```sh
+      cd .
+      ```
+
+## Microservice Naming Scheme  
+- Only use lower case letters.
+- All words should be separated by dashes.
+- Name should be short, and clearly describes what the service is used for.
+- All microservices should have a suffix of "-service", so we can easily search for and distinguish all microservices in github.
+- Examples of good service names:
+      - find-in-store-serivce
+      - store-pickup-service
+      - endeca-service
+      - lookahead-service
+
+## Features supported  
+[Get Started with Vagrant/Docker](https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#first-time-setup)
+
+- Docker image (TBD - Still needs to be tested)
+  - Readme, Dockerfile, and scripts can be found under docker directory
+
+- Vagrant
+  - Vagrantfile is in root of project
+  - Puppet provisioning is in puppet directory
+
+- Logging
+  - Based on embedded Play logging support (Logback)
+  - [Logging](https://www.playframework.com/documentation/2.3.x/SettingsLogger)
+  - Change logging settings by modifying file 'conf/logger.xml'
+  - Logs are at 'logs/hbc-microservice-template.log'
+  - You can change the log level at runtime by hitting the endpoint:
+    - /hbc-microservice-template/logLevel/DEBUG (possible values = ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)
+
+- Metrics (TBD - Still needs to be thoroughly tested)
+  - Based on [metrics](https://github.com/saksdirect/metrics) project 
+  - Turned into a scala trait, StatsDClient, and associated classes
+  - Embedded with the template
+  - Provides Counters, Gauges and Metrics
+
+- Health check page
+    Health check pages are under the endpoint path **/admin/[???]**
+
+    These are the supported endpoint:
+
+ - Ping
+    When called the endpoit **/admin/ping** the response should **pong**
+    
+ - JVM stats
+    When called the endpoint **/admin/jvmstats** the response should be a JSON payload with the JVM stats as showed below:
+    
+    ```sh
+{
+  "jvm_num_cpus" : 4.0,
+  "jvm_current_mem_Code Cache_max" : 50331648,
+  "jvm_post_gc_PS Old Gen_max" : 7.1565312E+8,
+  "jvm_post_gc_PS Eden Space_used" : 0.0,
+  "jvm_fd_limit" : 10240.0,
+  "jvm_current_mem_PS Survivor Space_used" : 45259984,
+  "jvm_thread_count" : 40.0,
+  "jvm_post_gc_PS Perm Gen_used" : 106023416,
+  "jvm_classes_total_unloaded" : 14152.0,
+  "jvm_current_mem_PS Eden Space_max" : 239599616,
+  "jvm_current_mem_PS Old Gen_max" : 7.1565312E+8,
+  "jvm_nonheap_max" : 5.8720256E+8,
+  "jvm_buffer_direct_count" : 19.0,
+  "jvm_buffer_mapped_used" : 0.0,
+  "jvm_buffer_direct_max" : 627712.0,
+  "jvm_current_mem_PS Old Gen_used" : 197647536,
+  "jvm_classes_current_loaded" : 22564.0,
+  "jvm_start_time" : 1432235806864,
+  "jvm_current_mem_Code Cache_used" : 1.839776E+7,
+  "jvm_buffer_mapped_count" : 0.0,
+  "jvm_post_gc_PS Survivor Space_max" : 45613056,
+  "jvm_buffer_direct_used" : 627712.0,
+  "jvm_thread_peak_count" : 42.0,
+  "jvm_current_mem_used" : 527369496,
+  "jvm_post_gc_PS Eden Space_max" : 239599616,
+  "jvm_post_gc_used" : 276579328,
+  "jvm_current_mem_PS Perm Gen_used" : 134804432,
+  "jvm_uptime" : 70355031,
+  "jvm_heap_committed" : 495976448,
+  "jvm_compilation_time_msec" : 96308.0,
+  "jvm_current_mem_PS Eden Space_used" : 131259784,
+  "jvm_classes_total_loaded" : 36716.0,
+  "jvm_current_mem_PS Survivor Space_max" : 45613056,
+  "jvm_buffer_mapped_max" : 0.0,
+  "jvm_thread_daemon_count" : 9.0,
+  "jvm_heap_max" : 954728448,
+  "jvm_post_gc_PS Old Gen_used" : 125295928,
+  "jvm_fd_count" : 354.0,
+  "jvm_post_gc_PS Perm Gen_max" : 536870912,
+  "jvm_heap_used" : 374167304,
+  "jvm_post_gc_PS Survivor Space_used" : 45259984,
+  "jvm_nonheap_used" : 153191056,
+  "jvm_current_mem_PS Perm Gen_max" : 536870912,
+  "jvm_nonheap_committed" : 238354432
+}
+    ```
+ 
+- Template patching/versioning
+  - Version stored in conf/application.conf
+  - Version property is template-version
+  - Corresponding Git head commit hash is stored in property: template-commit-hash
+  - To create patch and update version:
+    - Run ./create_patch.sh
+    - Follow instructions to set version and included commits
+    - conf/application.conf will automatically be updated
+    - New tag and conf/application.conf will be pushed to master
+    - To apply patch:
+      - https://github.com/saksdirect/How-to-Start/blob/master/git/creating-patches.mkd#how-to-apply-the-patch 
+  - You can also manually change the version and/or head commit in conf/application.conf yourself
+
+- HTTP fail over (TBD)
+
+- Timeout handling
+  - Controller timeout handled by mixing in helpers/ControllerTimeout trait
+  - Wrap your async controller body like:
+    - timeout(errorHandler: => T) {BODY}
+
+- Time requests and calls within
+  - calls to each endpoint are timed OOTB. Tag is controller.action
+  - If you want to time more fine-grained sections of code, you can mix in the StatsDClient trait, use it like:
+    - time("mytag", request) {code} if you want the tag to be prefixed with controller.action 
+    - or just time("mytag") {code} if you don't want to controller/action tagging 
+
+- IDE support
+
+- OOTB provision of basic metrics (count and timing for each endpoint), a default (configurable) timeout for all endpoints and some standardized catching of show-stopper exceptions and providing a standard error response.
 
 
-# Architecture
+Navigate to the root project directory and call sbt
 
-[describe how this service interacts with other external systems]
+ - Intellij
+   When you are on sbt console, call **gen-idea**
+  
+ - Eclipse
+   When you are on sbt console, call **eclipse**
+
+All project dependencies will be downloaded and the configuration files will be created
+
+## Additional Information  
+Resource: https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#additional-information

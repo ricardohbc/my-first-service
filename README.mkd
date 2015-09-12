@@ -164,6 +164,9 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 
 - OOTB provision of basic metrics (count and timing for each endpoint), a default (configurable) timeout for all endpoints and some standardized catching of show-stopper exceptions and providing a standard error response.
 
+#### Configuration
+  - Configuration is handled via Play's built in configuration file, conf/application.conf for development
+  - Any configuration settings you add to application.conf should also be added to SERVICE_NAME-application.conf with Puppet variables where appropriate in place of values so they can be configured for other environments.
 
 Navigate to the root project directory and call sbt
 

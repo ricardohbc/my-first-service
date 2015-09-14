@@ -53,14 +53,14 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 ## Features supported  
 [Get Started with Vagrant/Docker](https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#first-time-setup)
 
-- Docker image (TBD - Still needs to be tested)
+- Docker image
   - Readme, Dockerfile, and scripts can be found under docker directory
 
 - Vagrant
   - Vagrantfile is in root of project
   - Puppet provisioning is in puppet directory
 
-- Logging
+#### Logging
   - Based on embedded Play logging support (Logback)
   - [Logging](https://www.playframework.com/documentation/2.3.x/SettingsLogger)
   - Change logging settings by modifying file 'conf/logger.xml'
@@ -68,7 +68,7 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
   - You can change the log level at runtime by hitting the endpoint:
     - /hbc-microservice-template/logLevel/DEBUG (possible values = ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)
 
-- Metrics (TBD - Still needs to be thoroughly tested)
+- Metrics
   - Based on [metrics](https://github.com/saksdirect/metrics) project 
   - Turned into a scala trait, StatsDClient, and associated classes
   - Embedded with the template
@@ -164,7 +164,29 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 
 - OOTB provision of basic metrics (count and timing for each endpoint), a default (configurable) timeout for all endpoints and some standardized catching of show-stopper exceptions and providing a standard error response.
 
+#### Configuration
+  - Configuration is handled via Play's built in configuration file, conf/application.conf for development
+  - Any configuration settings you add to application.conf should also be added to SERVICE_NAME-application.conf with Puppet variables where appropriate in place of values so they can be configured for other environments.
 
+#### Testing
+  - Tests for the services are in the test directory
+  - To run them you can use IntelliJ. Right click on the test class in the Project window or in the code of the class itself in the right window and click run
+  - To debug in IntelliJ you can right click as above but choose debug. You can set breakpoints throughout the code that will pause execution flow
+  - You can run individual tests but right click inside the code of the test
+  - You can also run the tests in SBT by either starting sbt and running the "test" task or running "sbt test" from the command line
+  - You can run a single test in SBT by using the testOnly task and passing the name (including package) of the test class
+
+#### External Libraries
+  - External libraries can be added to your project via sbt in several ways
+  - Plugins for sbt are added in project/plugins.sbt
+  - Library dependencies are added in:
+    - project/CommonDependencies.scala - only in the hbc-microservice-template and only for dependencies that are shared across all (or most) services
+    - project/ServiceDependencies.scala - for dependencies that arre service specific
+  - Play documentation on adding dependencies can be found here:
+    - http://www.scala-sbt.org/0.13/docs/Library-Management.html 
+
+#### Getting Started
+    
 Navigate to the root project directory and call sbt
 
  - Intellij

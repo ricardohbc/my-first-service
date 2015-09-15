@@ -37,6 +37,9 @@ elif [ "$1" == "run" ]; then
         git remote add origin $REPO_URL
         git config master.remote origin
         git config master.merge refs/heads/master
+        
+        echo "Cleaning previously-compiled files..."
+        sbt clean        
 
         echo "Removing setup.sh, create-patch.sh, and README.mkd (these are related to the template, not the new service)"
         rm -f setup.sh
@@ -48,9 +51,6 @@ elif [ "$1" == "run" ]; then
 
         echo "Replacing all instances of 'hbc-microservice-template' with '$SERVICE_NAME'"
         LC_ALL=C find . -path ./.git -prune -o -type f -exec sed -i '' -E "s/hbc-microservice-template/$SERVICE_NAME/g" {} \; > /dev/null
-
-        echo "Cleaning previously-compiled files..."
-        sbt clean
 
         git commit -a -m "Setup new service"
         git push -u origin master

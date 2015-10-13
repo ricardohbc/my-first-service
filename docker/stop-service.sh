@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-echo "Stopping the sendorderemail-service ..."
-docker stop sendorderemail-service; docker rm sendorderemail-service
+echo "Stopping the hbc-microservice-template ..."
+docker stop hbc-microservice-template; docker rm hbc-microservice-template
 echo "... done."

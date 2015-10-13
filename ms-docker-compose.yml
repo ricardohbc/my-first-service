@@ -1,6 +1,7 @@
 hbcmicroservicetemplate:
   image: sd1pgo01lx.saksdirect.com/hbc-microservice-template:<version>
   container_name: hbcmicroservicename
+  hostname: <hostname>
   restart: always
   ports:
     - "9000:9000"

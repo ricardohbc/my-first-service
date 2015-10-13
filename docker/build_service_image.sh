@@ -19,4 +19,3 @@ echo "Removing ZIP..."
 rm hbc-microservice-template-0.1.zip
 
 echo "Completed building image: $tag"
-

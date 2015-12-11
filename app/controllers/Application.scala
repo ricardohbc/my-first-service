@@ -1,6 +1,7 @@
 package controllers
 
 import play.api._
+import play.api.i18n.Messages
 import play.api.mvc._
 
 import webservices.toggles.TogglesClient
@@ -44,7 +45,13 @@ object Application extends Controller {
   def index = Action.async {
     implicit request =>
       timeout {
-        val response = "hbc-microservice-template is up and running!"
+        val title = Messages("title")
+        val link = Messages("link")
+        val comment = Messages("comment", "Dennis")
+        val color = Messages("color")
+
+        val messages = s"title=$title, link=$link, comment=$comment, color=$color"
+        val response = s"hbc-microservice-template is up and running! messages: $messages"
         writeResponseGet(response)
       }
   }

@@ -60,6 +60,25 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
   - Vagrantfile is in root of project
   - Puppet provisioning is in puppet directory
 
+## Messages
+
+- We are using a custom Messages Plugin, which is based on the default Scala Play Messages Plugin: [ScalaI18N](https://playframework.com/documentation/2.3.x/ScalaI18N)
+- All messages should go into the conf/messages folder.
+- If banner-specific messages are required, it should go into conf/messages/<banner_name> folder.
+- We determine which banner we are using by the "hbc_banner" JVM parameter.
+- For example, say we have the following structure:
+
+   conf/messages/messages.en:
+      title=hbc
+   conf/messages/saks/messages.en:
+      title=Saks
+   conf/messages/off5th/messages.en:
+      title=Saks Off 5th
+      
+   - Messages("title") would return "hbc" if no banner is configured.
+   - If we started the application with -Dhbc_banner=saks, we will get "Saks".
+   - If we started the application with -Dhbc_banner=off5th, we will get "Saks Off 5th".
+
 #### Logging
   - Based on embedded Play logging support (Logback)
   - [Logging](https://www.playframework.com/documentation/2.3.x/SettingsLogger)
@@ -189,8 +208,11 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
     
 Navigate to the root project directory and call sbt
 
- - Intellij
+ - Intellij (v12 and earlier)
    When you are on sbt console, call **gen-idea**
+   
+- Intellij (v13 and newer)
+   In IntelliJ: Click on File > New > Project from existing source > Select Root of Repo and click OK > SBT > Make sure "Use Auto-Import" is checked > Finish  
   
  - Eclipse
    When you are on sbt console, call **eclipse**

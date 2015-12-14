@@ -61,23 +61,23 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
   - Puppet provisioning is in puppet directory
 
 ## Messages
-
 - We are using a custom Messages Plugin, which is based on the default Scala Play Messages Plugin: [ScalaI18N](https://playframework.com/documentation/2.3.x/ScalaI18N)
-- All messages should go into the conf/messages folder.
+- All global messages should go into the conf/messages folder.
 - If banner-specific messages are required, it should go into conf/messages/<banner_name> folder.
-- We determine which banner we are using by the "hbc_banner" JVM parameter.
+- We determine which banner we are using by the "hbc.banner" property in application.conf.
 - For example, say we have the following structure:
 
    conf/messages/messages.en:
-      title=hbc
+      title=HBC
    conf/messages/saks/messages.en:
       title=Saks
    conf/messages/off5th/messages.en:
       title=Saks Off 5th
       
-   - Messages("title") would return "hbc" if no banner is configured.
-   - If we started the application with -Dhbc_banner=saks, we will get "Saks".
-   - If we started the application with -Dhbc_banner=off5th, we will get "Saks Off 5th".
+   - Messages("title") would return "HBC" if no banner is configured.
+   - If hbc.banner="saks", we will get "Saks".
+   - If hbc.banner="off5th", we will get "Saks Off 5th".
+   - If hbc.banner="lat", we will get "HBC" because there is no "lat" folder, and will fall back to the global messages.en.
 
 #### Logging
   - Based on embedded Play logging support (Logback)

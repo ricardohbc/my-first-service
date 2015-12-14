@@ -11,14 +11,11 @@ import scala.collection.JavaConverters._
 class HBCMessagesPlugin(app: Application) extends DefaultMessagesPlugin(app) {
 
   val GLOBAL_MESSAGES_PATH = "messages"
-  val BANNER_JVM_PARAM = "hbc_banner"
+  val BANNER_CONF = "hbc.banner"
 
   override def enabled = true
 
-  private lazy val hbcBannerName = System.getProperty(BANNER_JVM_PARAM) match {
-    case null   => None
-    case banner => Some(banner)
-  }
+  private lazy val hbcBannerName = app.configuration.getString(BANNER_CONF)
 
   private lazy val bannerMessagesPath = hbcBannerName.map { str => joinPaths(Some(GLOBAL_MESSAGES_PATH), str) }
 

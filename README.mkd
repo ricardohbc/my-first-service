@@ -67,13 +67,15 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
 - We determine which banner we are using by the "hbc.banner" property in application.conf.
 - For example, say we have the following structure:
 
+```
    conf/messages/messages.en:
       title=HBC
    conf/messages/saks/messages.en:
       title=Saks
    conf/messages/off5th/messages.en:
       title=Saks Off 5th
-      
+```
+
    - Messages("title") would return "HBC" if no banner is configured.
    - If hbc.banner="saks", we will get "Saks".
    - If hbc.banner="off5th", we will get "Saks Off 5th".

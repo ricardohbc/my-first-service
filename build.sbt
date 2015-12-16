@@ -8,6 +8,8 @@ name := """hbc-microservice-template"""
 
 version := "0.1"
 
+envVars := Map("HBC_BANNER" -> "someBanner")
+
 val defaultSettings: Seq[Setting[_]] = Seq(
       scalaVersion  := "2.11.6",
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature","-Ywarn-unused-import"),

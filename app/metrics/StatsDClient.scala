@@ -90,7 +90,7 @@ object StatsDClient extends ConfigHelper {
     val ret = f
     timeTaken(start, ret).map { tm =>
       timing(tag, tm)
-      Logger.info(s"$tag took $tm")
+      Logger.debug(s"$tag took $tm")
     }
     ret
   }

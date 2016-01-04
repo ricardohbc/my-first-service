@@ -26,3 +26,4 @@ projectFilesBackUp
 *.zip
 .*~
 *.log
+/bin/

@@ -11,7 +11,7 @@ import play.api.mvc.Result
 import play.api.libs.json.JsResultException
 
 import scala.concurrent._
-import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.libs.concurrent.Execution.Implicits._
 
 trait ControllerPayload extends Controller {
 

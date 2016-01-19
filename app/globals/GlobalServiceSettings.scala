@@ -2,7 +2,7 @@ package globals
 
 import filters.ServiceFilters
 import play.api.GlobalSettings
-import helpers.{ ControllerPayload, ConfigHelper }
+import helpers.{ControllerPayload, ConfigHelper}
 import scala.concurrent._
 import play.api.mvc._
 

@@ -1,8 +1,8 @@
 package helpers
 
-import play.api.libs.json.{ Json, JsValue }
+import play.api.libs.json.{Json, JsValue}
 import scala.collection.mutable
-import java.lang.management.{ BufferPoolMXBean, ManagementFactory }
+import java.lang.management.{BufferPoolMXBean, ManagementFactory}
 
 object AdminHelper {
   def extractJvmStats(): JsValue = {

@@ -5,7 +5,7 @@ import java.net.URL
 import helpers.ConfigHelper
 import play.api.Application
 import play.api.i18n.Messages.UrlMessageSource
-import play.api.i18n.{ Messages, DefaultMessagesPlugin }
+import play.api.i18n.{Messages, DefaultMessagesPlugin}
 import play.utils.Resources
 import scala.collection.JavaConverters._
 

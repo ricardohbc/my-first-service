@@ -2,7 +2,7 @@ package helpers
 
 import constants.Constants._
 import models._
-
+import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._
 import play.api.libs.json.JsSuccess
@@ -132,20 +132,27 @@ trait ControllerPayload extends Controller {
 
   val findResponseStatus: PartialFunction[Throwable, (Status, ApiErrorModel)] = {
     case e: NoSuchElementException =>
+      Logger.error("Yikes! An error has occurred: ", e)
       (NotFound, ApiErrorModel.fromExceptionAndMessage(
         "hbcStatus '" + e.getMessage + "' does not exist.", e
       ))
     case e: VerifyError =>
+      Logger.error("Yikes! An error has occurred: ", e)
       (PreconditionFailed, ApiErrorModel.fromException(e))
     case e: ClassCastException =>
+      Logger.error("Yikes! An error has occurred: ", e)
       (UnsupportedMediaType, ApiErrorModel.fromException(e))
     case e: IllegalArgumentException =>
+      Logger.error("Yikes! An error has occurred: ", e)
       (BadRequest, ApiErrorModel.fromException(e))
     case e: JsResultException =>
+      Logger.error("Yikes! An error has occurred: ", e)
       (BadRequest, ApiErrorModel.fromException(e))
     case e: TimeoutException =>
+      Logger.error("Yikes! An error has occurred: ", e)
       (ServiceUnavailable, ApiErrorModel.fromException(e))
     case NonFatal(e) =>
+      Logger.error("Yikes! An error has occurred: ", e)
       (InternalServerError, ApiErrorModel.fromExceptionAndMessage(
         "Yikes! An error has occurred: " + e.getMessage, e
       ))

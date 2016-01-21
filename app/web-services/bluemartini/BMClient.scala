@@ -1,7 +1,7 @@
 package webservices.bluemartini
 
 import com.s5a.hornetq_client.protocol.Request.JSONResponse
-import models.{ ApiErrorModel, FailureResponse, SuccessfulResponse, ResponseData }
+import models.{ApiErrorModel, FailureResponse, SuccessfulResponse, ResponseData}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

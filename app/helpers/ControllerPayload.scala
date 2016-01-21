@@ -130,29 +130,22 @@ trait ControllerPayload extends Controller {
   private def getRequestBodyAsJson(implicit request: Request[AnyContent]): JsValue =
     request.body.asJson.fold(throw new IllegalArgumentException("no json found"))(x => x)
 
-  val findResponseStatus: PartialFunction[Throwable, (Status, ApiErrorModel)] = {
+  def findResponseStatus(implicit request: RequestHeader): PartialFunction[Throwable, (Status, ApiErrorModel)] = {
     case e: NoSuchElementException =>
-      Logger.error("Yikes! An error has occurred: ", e)
       (NotFound, ApiErrorModel.fromExceptionAndMessage(
         "hbcStatus '" + e.getMessage + "' does not exist.", e
       ))
     case e: VerifyError =>
-      Logger.error("Yikes! An error has occurred: ", e)
       (PreconditionFailed, ApiErrorModel.fromException(e))
     case e: ClassCastException =>
-      Logger.error("Yikes! An error has occurred: ", e)
       (UnsupportedMediaType, ApiErrorModel.fromException(e))
     case e: IllegalArgumentException =>
-      Logger.error("Yikes! An error has occurred: ", e)
       (BadRequest, ApiErrorModel.fromException(e))
     case e: JsResultException =>
-      Logger.error("Yikes! An error has occurred: ", e)
       (BadRequest, ApiErrorModel.fromException(e))
     case e: TimeoutException =>
-      Logger.error("Yikes! An error has occurred: ", e)
       (ServiceUnavailable, ApiErrorModel.fromException(e))
     case NonFatal(e) =>
-      Logger.error("Yikes! An error has occurred: ", e)
       (InternalServerError, ApiErrorModel.fromExceptionAndMessage(
         "Yikes! An error has occurred: " + e.getMessage, e
       ))
@@ -166,12 +159,14 @@ trait ControllerPayload extends Controller {
       )
   }
 
+  def defaultExceptionHandler(req: RequestHeader): PartialFunction[Throwable, Result] =
+    findResponseStatus(req) andThen handlerForRequest(req).tupled
+
+  // I don't think these don't really belong here, some generally utilities/conveniences trait would be better
   def getJsessionId(implicit request: Request[AnyContent]): Option[String] = request.cookies.get(JSESSIONID).map(_.value)
 
   def getUserName(implicit request: Request[AnyContent]): Option[String] = request.cookies.get(USERNAME).map(_.value)
 
-  def defaultExceptionHandler(req: RequestHeader): PartialFunction[Throwable, Result] =
-    findResponseStatus andThen handlerForRequest(req).tupled
 }
 
 object ControllerPayloadLike extends ControllerPayload

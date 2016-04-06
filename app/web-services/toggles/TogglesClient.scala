@@ -38,11 +38,19 @@ object TogglesClient extends IndividualToggleCache with AllTogglesCache with Con
       Logger.info("response status: " + response.status)
       Logger.info("body: " + response.body)
 
-      if (response.status == 200)
-        Some(handler(response.json))
-      else if (response.status == 404)
+      if (response.status == 200) {
+        try {
+          Some(handler(response.json))
+        } catch {
+          case e: Exception => {
+            Logger.error(s"Error while parsing toggle-service response (toggle doesn't exist?): '${reqUrl}', defaulting toggle state to false: ", e)
+            None
+          }
+        }
+      } else if (response.status == 404) {
+        Logger.error(s"HTTP 404 status received from toggle-service: '${reqUrl}', defaulting toggle state to false.")
         None
-      else {
+      } else {
         val msg = "toggle web request failed with: " + response.body
         Logger.info(msg)
         throw new Exception(msg)

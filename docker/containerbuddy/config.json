@@ -1,0 +1,22 @@
+{
+"consul": "{{ .CONSUL_HOST }}",
+"onStart": "/opt/containerbuddy/ms-start.sh",
+"preStop": "/opt/containerbuddy/ms-stop.sh",
+  "services": [
+    {
+      "name": "micro-service",
+      "port": XXXX,
+      "interfaces": ["eth0"],
+      "health": [
+        "/usr/bin/curl",
+        "--fail",
+        "-s",
+        "--output",
+        "/dev/null",
+        "http://0.0.0.0:XXXX/v1/micro-service"
+      ],
+      "poll": 10,
+      "ttl": 30
+    }
+  ]
+}

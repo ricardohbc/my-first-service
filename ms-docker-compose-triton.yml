@@ -1,0 +1,12 @@
+microservicetemplate:
+  image: sd1pgo01lx.saksdirect.com/microservice-template:<version>
+  restart: always
+  ports:
+    - "XXXX:XXXX"
+  environment:
+    - JAVA_OPTS=-Xms1g -Xmx1g {{key "newrelic"}} 
+    - CONSUL_HOST={{key "consul_host"}}
+    - ENV={{key "env"}}
+  labels:
+    - "com.joyent.package=<triton_package>"
+  command: /opt/containerbuddy/containerbuddy -config file:///opt/containerbuddy/config.json  /opt/microservice-0.1/bin/microservice -Dhttp.port=XXXX -Dpidfile.path=/dev/null -Dconfig.file=/opt/microservice-0.1/conf/microservice-application.conf

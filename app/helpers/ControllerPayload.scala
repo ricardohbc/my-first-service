@@ -1,17 +1,13 @@
 package helpers
 
-import constants.Constants._
 import models._
-import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._
+import scala.concurrent._
 import play.api.libs.json.JsSuccess
 import scala.util.control.NonFatal
 import play.api.mvc.Result
 import play.api.libs.json.JsResultException
-
-import scala.concurrent._
-import play.api.libs.concurrent.Execution.Implicits._
 
 trait ControllerPayload extends Controller {
 
@@ -19,67 +15,49 @@ trait ControllerPayload extends Controller {
   //      RESPONSE      //
   ////////////////////////
 
-  def writeResponseStore[T: Format](result: T)(implicit request: Request[_]): Result =
-    writeResponseSuccess(result, Created)
+  def writeResponseStore[T: Format](result: T, versionURI: String)(implicit request: Request[_]): Result =
+    writeResponseSuccess(result, Created, versionURI)
 
-  def writeResponseStores[T: Format](results: Seq[T])(implicit request: Request[_]): Result =
-    writeResponses(results, Created)
+  def writeResponseStores[T: Format](results: Seq[T], versionURI: String)(implicit request: Request[_]): Result =
+    writeResponses(results, Created, versionURI)
 
-  def writeResponseGet[T: Format](response: T, errors: Seq[ApiErrorModel] = Seq())(implicit request: Request[_]): Result =
-    writeResponseSuccess(response, Ok, errors)
+  def writeResponseGet[T: Format](response: T, versionURI: String, errors: Seq[ApiErrorModel] = Seq())(implicit request: Request[_]): Result =
+    writeResponseSuccess(response, Ok, versionURI, errors)
 
-  def writeResponseUpdate[T: Format](result: T)(implicit request: Request[_]): Result =
-    writeResponseSuccess(result, Ok)
+  def writeResponseUpdate[T: Format](result: T, versionURI: String)(implicit request: Request[_]): Result =
+    writeResponseSuccess(result, Ok, versionURI)
 
-  def writeResponseUpdates[T: Format](results: Seq[T])(implicit request: Request[_]): Result =
-    writeResponses(results, Ok)
+  def writeResponseUpdates[T: Format](results: Seq[T], versionURI: String)(implicit request: Request[_]): Result =
+    writeResponses(results, Ok, versionURI)
 
-  def writeResponseRemove[T: Format](result: T)(implicit request: Request[_]): Result =
-    writeResponseSuccess(result, Ok)
+  def writeResponseRemove[T: Format](result: T, versionURI: String)(implicit request: Request[_]): Result =
+    writeResponseSuccess(result, Ok, versionURI)
 
-  def writeResponseSuccess[T: Format](result: T, status: Status, errors: Seq[ApiErrorModel] = Seq())(implicit request: RequestHeader): Result =
-    writeResponse(status, constructResponseModel(result, errors))
+  def writeResponseSuccess[T: Format](result: T, status: Status, versionURI: String, errors: Seq[ApiErrorModel] = Seq())(implicit request: RequestHeader): Result =
+    writeResponse(status, constructResponseModel(result, versionURI, errors))
 
-  def writeResponseError(errors: Seq[ApiErrorModel], status: Status)(implicit request: RequestHeader): Result =
-    formatResponse(constructErrorResponseModel(errors), status)
+  def writeResponseError(errors: Seq[ApiErrorModel], status: Status, versionURI: String)(implicit request: RequestHeader): Result =
+    formatResponse(constructErrorResponseModel(errors, versionURI), status)
 
   def writeResponse(responseStatus: Status, body: ApiModel): Result =
     responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
 
-  def writeResponseData[T](responseData: Future[ResponseData], validate: (JsValue) => JsResult[T], processBody: T => T = identity _)(implicit request: Request[_], typeFormat: Format[T]): Future[Result] = {
-    responseData.map {
-      case SuccessfulResponse(body, cookie) =>
-        validate(body) match {
-          case JsSuccess(c, _) => writeResponseGet(processBody(c)).withCookies(cookie: _*)
-          case JsError(e)      => writeResponseError(Seq(ApiErrorModel("Failed to validate JSON", "JSON error")), Status(500))
-        }
-      case FailureResponse(errors, code) => writeResponseError(errors, Status(code))
-    }
-  }
-
-  def writeResponseData(responseData: Future[ResponseData])(implicit request: Request[_]): Future[Result] = {
-    responseData.map {
-      case SuccessfulResponse(body, cookie) =>
-        writeResponseGet(body).withCookies(cookie: _*)
-      case FailureResponse(errors, code) => writeResponseError(errors, Status(code))
-    }
-  }
-
   def constructResultModel[T: Format](result: T): ApiResultModel = ApiResultModel(Json.toJson(result))
 
   def constructResponseModel[T: Format](
-    result: T,
-    errs:   Seq[ApiErrorModel] = Seq()
+    result:     T,
+    versionURI: String,
+    errs:       Seq[ApiErrorModel] = Seq()
   )(implicit request: RequestHeader): ApiModel =
     ApiModel.apply(
-      ApiRequestModel.fromReq(request),
+      ApiRequestModel.fromReq(request, versionURI),
       constructResultModel(result),
       errs
     )
 
-  def constructErrorResponseModel(errs: Seq[ApiErrorModel])(implicit request: RequestHeader): ApiModel =
+  def constructErrorResponseModel(errs: Seq[ApiErrorModel], versionURI: String)(implicit request: RequestHeader): ApiModel =
     ApiModel.apply(
-      ApiRequestModel.fromReq(request),
+      ApiRequestModel.fromReq(request, versionURI),
       EmptyApiResultModel,
       errs
     )
@@ -88,10 +66,11 @@ trait ControllerPayload extends Controller {
     response.apply(Json.prettyPrint(Json.toJson(responseModel))).as(JSON)
 
   private def writeResponses[T: Format](
-    results: Seq[T],
-    status:  Status
+    results:    Seq[T],
+    status:     Status,
+    versionURI: String
   )(implicit request: Request[_]): Result =
-    formatResponse(constructResponseModel(results), status)
+    formatResponse(constructResponseModel(results, versionURI), status)
 
   ////////////////////////
   //     GET ITEMS      //
@@ -151,22 +130,16 @@ trait ControllerPayload extends Controller {
       ))
   }
 
-  def handlerForRequest(implicit req: RequestHeader): (Status, ApiErrorModel) => Result = {
+  def handlerForRequest(versionURI: String)(implicit req: RequestHeader): (Status, ApiErrorModel) => Result = {
     (status, err) =>
       writeResponse(
         status,
-        constructErrorResponseModel(Seq(err))
+        constructErrorResponseModel(Seq(err), versionURI)
       )
   }
 
-  def defaultExceptionHandler(req: RequestHeader): PartialFunction[Throwable, Result] =
-    findResponseStatus(req) andThen handlerForRequest(req).tupled
-
-  // I don't think these don't really belong here, some generally utilities/conveniences trait would be better
-  def getJsessionId(implicit request: Request[AnyContent]): Option[String] = request.cookies.get(JSESSIONID).map(_.value)
-
-  def getUserName(implicit request: Request[AnyContent]): Option[String] = request.cookies.get(USERNAME).map(_.value)
-
+  def defaultExceptionHandler(versionURI: String)(implicit req: RequestHeader): PartialFunction[Throwable, Result] =
+    findResponseStatus andThen handlerForRequest(versionURI)(req).tupled
 }
 
 object ControllerPayloadLike extends ControllerPayload

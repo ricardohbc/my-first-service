@@ -1,4 +1,4 @@
-<!-- Overrides conf/logger.xml to just log at debug level and to stdout when tests are executed -->
+<!-- Overrides conf/logback.xml to just log at debug level and to stdout when tests are executed -->
 <configuration>
 
     <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel" />
@@ -22,4 +22,3 @@
     </root>
 
 </configuration>
-

@@ -1,61 +1,52 @@
 package integration.controllers
 
-import play.api.test.Helpers._
+import org.scalatest.{Matchers, WordSpec}
 import play.api.test._
-import utils.TestGlobal
+import play.api.Logger
+import play.api.test.Helpers._
 import scala.concurrent.duration._
-import play.api.{ Logger, Play }
-import play.api.test.FakeApplication
-import org.scalatest.{ Matchers, BeforeAndAfterAll, WordSpec }
 import scala.concurrent.Await
 import scala.language.postfixOps
-import utils.TestUtils._
 
-class ApplicationSpec extends WordSpec
-    with Matchers
-    with BeforeAndAfterAll {
+class ApplicationSpec extends WordSpec with Matchers {
 
-  override def beforeAll() = {
-    Play.start(FakeApplication(withGlobal = Some(TestGlobal)))
-  }
-
-  override def afterAll() = {
-    Play.stop()
-  }
+  import utils.TestUtils._
 
   "Application Controller" should {
-    "send 404 on a bad request" in {
-      route(FakeRequest(GET, "/boom")) shouldBe None
+    "send 404 on a bad request" in withPlay() {
+      val result = route(application(), FakeRequest(GET, "/boom")).get
+      status(result) shouldBe NOT_FOUND
     }
 
-    "render the index page" in {
-      val index = route(FakeRequest(GET, versionCtx + "/hbc-microservice-template")).get
+    "render the index page" in withPlay() {
+      val index = route(application(), FakeRequest(GET, versionCtx + "/hbc-microservice-template")).get
 
       status(index) shouldBe OK
       contentType(index).get == "application/json" shouldBe true
       (contentAsJson(index) \ "response" \ "results").as[String] == "hbc-microservice-template is up and running!" shouldBe true
     }
 
-    "get Swagger spec" in {
-      val index = route(FakeRequest(GET, versionCtx + "/api-docs")).get
+    "get Swagger spec" in withPlay() {
+      val index = route(application(), FakeRequest(GET, versionCtx + "/api-docs")).get
 
       status(index) shouldBe OK
       contentType(index).get == "application/json" shouldBe true
       (contentAsJson(index) \ "swagger").as[String] == "2.0" shouldBe true
     }
 
-    "change the log Level" in {
-      val changeLog = route(FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/WARN")).get
+    "change the log Level" in withPlay() {
+      val changeLog = route(application(), FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/WARN")).get
       status(changeLog) shouldBe OK
       contentType(changeLog).get == "application/json" shouldBe true
       (contentAsJson(changeLog) \ "response" \ "results").as[String] == "Log level changed to WARN" shouldBe true
       Logger.isDebugEnabled shouldBe false
-      Await.result(route(FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/DEBUG")).get, 10 seconds)
+      Await.result(route(application(), FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/DEBUG")).get, 10 seconds)
       Logger.isDebugEnabled shouldBe true
     }
 
-    "ignore incorrect log Level" in {
-      route(FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/WARN2")) shouldBe None
+    "not process incorrect log Level" in withPlay() {
+      val result = route(application(), FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/WARN2")).get
+      status(result) shouldBe NOT_FOUND
     }
   }
 }

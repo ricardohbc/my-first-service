@@ -7,7 +7,6 @@ import constants.Constants
 import play.api.libs.json._
 import play.api.mvc.RequestHeader
 import play.api.Logger
-import helpers.ConfigHelper
 
 // results if we are successful
 case class ApiResultModel(results: JsValue)
@@ -52,14 +51,12 @@ object ApiErrorModel {
 // the request url
 case class ApiRequestModel(url: String, server_received_time: String, api_version: String, help: String)
 
-object ApiRequestModel
-    extends ConfigHelper {
+object ApiRequestModel {
   implicit val reqFormat = Json.format[ApiRequestModel]
 
-  def fromReq(request: RequestHeader): ApiRequestModel = {
+  def fromReq(request: RequestHeader, versionURI: String): ApiRequestModel = {
     val fullRequestUrl = if (request.secure) "https://" else "http://" + request.host + request.uri
     val df = new SimpleDateFormat(Constants.ZULU_DATE_FORMAT)
-    val versionURI = config.getString("application.context")
     val help = if (request.secure) "https://" else "http://" + request.host + versionURI + "/api-docs"
     new ApiRequestModel(
       fullRequestUrl,
@@ -92,8 +89,8 @@ object ApiModel {
     } yield result
 
   // maybe you just want to proxy the rest of the apiModel, but update the header
-  def withHeader(body: String)(implicit req: RequestHeader): ApiModel = {
-    val reqModel = ApiRequestModel.fromReq(req)
+  def withHeader(body: String, versionURI: String)(implicit req: RequestHeader): ApiModel = {
+    val reqModel = ApiRequestModel.fromReq(req, versionURI)
     fromBody(body)
       .fold(f => throw new Exception(s"unexpected failure parsing ApiModel\n${f.toString}"), _.copy(request = reqModel))
   }

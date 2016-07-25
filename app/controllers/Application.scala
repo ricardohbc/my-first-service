@@ -2,20 +2,27 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-
-import webservices.toggles.TogglesClient
+import webservices.toggles.TogglesClientLike
 import helpers.ControllerPayloadLike._
-import helpers.ControllerTimeoutLike._
+import javax.inject._
 
-import ch.qos.logback.classic.Level
-
+import no.samordnaopptak.json.J
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-object Application extends Controller {
+import scala.concurrent.Future
+import ch.qos.logback.classic.Level
+
+class Application @Inject() (
+    timeoutHelper:                   helpers.ControllerTimeout,
+    togglesClient:                   TogglesClientLike,
+    @Named("versionURI") versionURI: String
+) extends Controller {
+
+  import timeoutHelper._
 
   @no.samordnaopptak.apidoc.ApiDoc(doc =
     """
-    GET /hbc-microservice-template
+    GET /v1/hbc-microservice-template
 
     DESCRIPTION
       Check to see if hbc-microservice-template service is running
@@ -40,19 +47,19 @@ object Application extends Controller {
       request: Request
       response: ResponseResult
       errors: Array Error
-  """)
+    """)
   def index = Action.async {
     implicit request =>
       timeout {
         val response = "hbc-microservice-template is up and running!"
-        writeResponseGet(response)
+        writeResponseGet(response, versionURI)
       }
   }
 
   @no.samordnaopptak.apidoc.ApiDoc(doc =
 
     """
-    GET /hbc-microservice-template/logLevel/{level}
+    GET /v1/hbc-microservice-template/logLevel/{level}
 
     DESCRIPTION
       Change the log level of this service
@@ -63,13 +70,13 @@ object Application extends Controller {
     RESULT
       Response
 
-  """)
+    """)
   def changeLogLevelGet(levelString: String) = changeLogLevel(levelString)
 
   @no.samordnaopptak.apidoc.ApiDoc(doc =
 
     """
-    PUT /hbc-microservice-template/logLevel/{level}
+    PUT /v1/hbc-microservice-template/logLevel/{level}
 
     DESCRIPTION
       Change the log level of this service
@@ -80,7 +87,7 @@ object Application extends Controller {
     RESULT
       Response
 
-  """)
+    """)
   def changeLogLevel(levelString: String) = Action.async {
     implicit request =>
       timeout {
@@ -88,14 +95,14 @@ object Application extends Controller {
         val level = Level.toLevel(levelString)
         Logger.underlyingLogger.asInstanceOf[ch.qos.logback.classic.Logger].setLevel(level)
         val response = s"Log level changed to $level"
-        writeResponseGet(response)
+        writeResponseGet(response, versionURI)
       }
   }
 
   @no.samordnaopptak.apidoc.ApiDoc(doc =
 
     """
-    GET  /hbc-microservice-template/clear_toggles
+    GET /v1/hbc-microservice-template/clear_toggles
 
     DESCRIPTION
       Clear the toggles cache, if you pass a toggle name under ?name=toggle_name it will clear that toggle, otherwise clear everything
@@ -103,17 +110,17 @@ object Application extends Controller {
     RESULT
       String
 
-     """)
+    """)
   def clearToggles(name: Option[String]) = Action.async {
     implicit request =>
       timeout {
-        TogglesClient.clearCache(name)
-        writeResponseGet("done!")
+        togglesClient.clearCache(name)
+        writeResponseGet("done!", versionURI)
       }
   }
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
-    GET  /hbc-microservice-template/toggles
+    GET /v1/hbc-microservice-template/toggles
 
     DESCRIPTION
       See what toggles our service has, if you pass a toggle name under ?name=toggle_name it will fetch that toggle, otherwise fetch everything
@@ -133,13 +140,39 @@ object Application extends Controller {
       response: ToggleResult
       errors: Array Error
 
-     """) // This is useful for debugging, and perhaps pre-populating appropriate toggles ...
+                                         """) // This is useful for debugging, and perhaps pre-populating appropriate toggles ...
   def toggles(name: Option[String]) = Action.async {
     implicit request =>
       withTimeout {
-        name.map(n => TogglesClient.getToggle(n).map(t => Seq(t.toList).flatten))
-          .getOrElse(TogglesClient.getToggles())
-          .map(r => writeResponseGet(r))
+        name.map(n => togglesClient.getToggle(n).map(t => Seq(t.toList).flatten))
+          .getOrElse(togglesClient.getToggles())
+          .map(r => writeResponseGet(r, versionURI))
       }
+  }
+
+  val swaggerInfoObject = J.obj(
+    "info" -> J.obj(
+      "title" -> "Generated Swagger API",
+      "version" -> "1.0"
+    )
+  )
+
+  @no.samordnaopptak.apidoc.ApiDoc(doc = """
+    GET /v1/api-docs
+
+    DESCRIPTION
+      Get main swagger json documentation
+      You can add more detailed information here.
+                                         """)
+  def apiDoc = Action.async { implicit request =>
+    try {
+      val generatedSwaggerDocs = no.samordnaopptak.apidoc.ApiDocUtil.getSwaggerDocs("/")
+      val json = generatedSwaggerDocs ++ swaggerInfoObject
+      Future(Ok(json.asJsValue))
+    } catch {
+      case e: Exception =>
+        println(s"ERROR: $e")
+        throw e
+    }
   }
 }

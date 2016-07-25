@@ -1,3 +1,0 @@
-import globals.GlobalServiceSettings
-
-object Global extends GlobalServiceSettings

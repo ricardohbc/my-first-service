@@ -1,35 +1,35 @@
-package integration.controllers
+package scala.controllers
 
-import play.api.test.Helpers._
+import org.scalatest.{Matchers, BeforeAndAfterAll, WordSpec}
 import play.api.test._
+import play.api.test.Helpers._
 import play.api.Play
-import org.scalatest.{ Matchers, BeforeAndAfterAll, WordSpec }
-import play.api.test.FakeApplication
-import utils.TestGlobal
-import utils.TestUtils._
 
 class AdminSpec extends WordSpec
-    with Matchers
-    with BeforeAndAfterAll {
+    with Matchers with BeforeAndAfterAll {
+
+  import utils.TestUtils._
+
+  val app = application()
 
   override def beforeAll() = {
-    Play.start(FakeApplication(withGlobal = Some(TestGlobal)))
+    Play.start(app)
   }
 
   override def afterAll() = {
-    Play.stop()
+    Play.stop(app)
   }
 
   "Admin controller" should {
-    "show **pong** when /hbc-microservice-template/admin/ping endpoint is called" in {
-      val ping = route(FakeRequest(GET, versionCtx + "/hbc-microservice-template/admin/ping")).get
+    "return healthcheck status" in {
+      val ping = route(app, FakeRequest(GET, versionCtx + "/hbc-microservice-template/admin/ping")).get
 
       status(ping) shouldBe OK
-      contentAsString(ping).contains("pong") shouldBe true
+      (contentAsJson(ping) \ "response" \ "results").as[String] shouldBe "pong"
     }
 
     "show **JVM Stats** when /hbc-microservice-template/admin/jvmstats endpoint is called" in {
-      val jvmstats = route(FakeRequest(GET, versionCtx + "/hbc-microservice-template/admin/jvmstats")).get
+      val jvmstats = route(app, FakeRequest(GET, versionCtx + "/hbc-microservice-template/admin/jvmstats")).get
 
       status(jvmstats) shouldBe OK
       contentAsString(jvmstats).contains("jvm_num_cpus") shouldBe true

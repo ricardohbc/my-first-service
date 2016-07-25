@@ -3,7 +3,7 @@
 # ~~~~
 
 # Swagger api json doc page
-GET     /api-docs                               no.samordnaopptak.apidoc.controllers.ApiDocController.get
+GET     /api-docs                               controllers.Application.apiDoc
 
 # Index page
 GET     /hbc-microservice-template              controllers.Application.index

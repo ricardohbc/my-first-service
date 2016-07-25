@@ -32,28 +32,64 @@ import java.nio.channels.DatagramChannel
 import java.util.Random
 import akka.actor._
 import play.Logger
-import helpers.ConfigHelper
 import play.api.Play.current
 import play.api.mvc._
 import play.api.libs.concurrent.Akka
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
+import play.api.routing.Router.Tags
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import javax.inject.Inject
 
-object StatsDClient extends ConfigHelper {
+trait StatsDClientLike {
+  def timing(key: String, value: Long, sampleRate: Double = 1.0): Boolean
+  def timing(key: String, value: Long): Unit
+  def requestTag(requestHeader: RequestHeader): String = {
+    val controllerActionTag = for {
+      controller <- requestHeader.tags.get(Tags.RouteController)
+      action <- requestHeader.tags.get(Tags.RouteActionMethod)
+    } yield controller.replaceFirst("controllers.", "") + "." + action
+    controllerActionTag.getOrElse(requestHeader.path.replaceAll("/", "_"))
+  }
+  def time[A](tag: String, req: RequestHeader)(f: => A): A
+  def time[A](tag: String)(f: => A): A
+  def decrement(key: String, magnitude: Int = -1, sampleRate: Double = 1.0): Boolean
+  def decrement(key: String): Unit
+  def increment(key: String, magnitude: Int = 1, sampleRate: Double = 1.0): Boolean
+  def increment(key: String): Unit
+  def gauge(key: String, value: String = "1", sampleRate: Double = 1.0): Boolean
+  def set(key: String, value: Int, sampleRate: Double = 1.0): Boolean
+  def prefix: String
+}
 
-  val host = config.getString("statsd.server")
-  val port = config.getInt("statsd.port")
-  val server = config.getString("statsd.metric-host")
-  val namespace = config.getString("statsd.metric-namespace")
+object NoOpStatsDClient extends StatsDClientLike {
+  def timing(key: String, value: Long, sampleRate: Double = 1.0): Boolean = true
+  def timing(key: String, value: Long): Unit = ()
+  def time[A](tag: String, req: RequestHeader)(f: => A): A = f
+  def time[A](tag: String)(f: => A): A = f
+  def decrement(key: String, magnitude: Int = -1, sampleRate: Double = 1.0): Boolean = true
+  def decrement(key: String): Unit = ()
+  def increment(key: String, magnitude: Int = 1, sampleRate: Double = 1.0): Boolean = true
+  def increment(key: String): Unit = ()
+  def gauge(key: String, value: String = "1", sampleRate: Double = 1.0): Boolean = true
+  def set(key: String, value: Int, sampleRate: Double = 1.0): Boolean = true
+  val prefix = "noopClient"
+}
+
+class StatsDClient @Inject() (
+    host:      String,
+    port:      Int,
+    server:    String,
+    namespace: String
+) extends StatsDClientLike {
 
   val multiMetrics = true
   val packetBufferSize = 1024
-  val prefix = s"$server.$namespace."
+  val prefix = s"$host.$namespace."
 
   private val rand = new Random()
 
   // prefer use of play's actor system
-  private lazy val actorRef = Akka.system.actorOf(Props(new StatsDActor(host, port, multiMetrics, packetBufferSize, prefix)))
+  private lazy val actorRef = Akka.system.actorOf(Props(new StatsDActor(server, port, multiMetrics, packetBufferSize, prefix)))
 
   /**
    * Sends timing stats in milliseconds to StatsD
@@ -71,15 +107,6 @@ object StatsDClient extends ConfigHelper {
 
   def getTimeSince(start: Long): Long = System.currentTimeMillis - start
 
-  // prefix tags with controller.action
-  def requestTag(requestHeader: RequestHeader): String = {
-    val controllerActionTag = for {
-      controller <- requestHeader.tags.get(play.api.Routes.ROUTE_CONTROLLER)
-      action <- requestHeader.tags.get(play.api.Routes.ROUTE_ACTION_METHOD)
-    } yield controller.replaceFirst("controllers.", "") + "." + action
-    controllerActionTag.getOrElse(requestHeader.path.replaceAll("/", "_"))
-  }
-
   def time[A](tag: String, req: RequestHeader)(f: => A): A = {
     val fullTag = requestTag(req) + (if (tag == "") "" else "." + tag)
     time(fullTag)(f)
@@ -90,17 +117,21 @@ object StatsDClient extends ConfigHelper {
     val ret = f
     timeTaken(start, ret).map { tm =>
       timing(tag, tm)
-      Logger.debug(s"$tag took $tm")
+      Logger.info(s"$tag took $tm")
     }
     ret
   }
 
   // this is theoretically testable by itself
   def timeTaken[A](start: Long, body: A): Future[Long] = {
+    val timestamp = Promise[Long]()
+
     body match {
-      case x: Future[_] => x.map { _ => getTimeSince(start) }
-      case _            => Future.successful(getTimeSince(start))
+      case x: Future[_] => x.onComplete { case _ => timestamp.success(getTimeSince(start)) }
+      case _            => timestamp.success(getTimeSince(start))
     }
+
+    timestamp.future
   }
 
   /**
@@ -259,7 +290,7 @@ private class StatsDActor(
         return
       }
 
-      // send and reset the buffer 
+      // send and reset the buffer
       sendBuffer.flip()
       val nbSentBytes = channel.send(sendBuffer, address)
       sendBuffer.limit(sendBuffer.capacity())

@@ -13,7 +13,6 @@ import duration._
 object TestUtils {
   val configString = """
                        | application.secret="SECRET"
-                       | application.context=/v1
                        | logger.application=ERROR
                        |
                        | mock.simulate-order = false
@@ -35,7 +34,7 @@ object TestUtils {
 
   val configuration = new Configuration(config)
 
-  val versionCtx = configuration.getString("application.context").get
+  val versionCtx = "/v1"
 
   val defaultBindings: Seq[Binding[_]] = List[Binding[_]](
     bind[Duration].qualifiedWith("requestTimeout").toInstance(60.seconds),
@@ -45,7 +44,7 @@ object TestUtils {
     bind(classOf[helpers.ControllerTimeout]).toSelf,
     bind(classOf[metrics.StatsDClientLike]).toInstance(metrics.NoOpStatsDClient),
     bind(classOf[webservices.toggles.TogglesClientLike]).toInstance(webservices.toggles.TogglesClient()),
-    bind(classOf[String]).qualifiedWith("versionURI").toInstance(configuration.getString("application.context").get),
+    bind(classOf[String]).qualifiedWith("versionURI").toInstance(versionCtx),
     bind(classOf[filters.TimingFilter]).toSelf,
     bind(classOf[filters.IncrementFilter]).toSelf,
     bind(classOf[filters.ExceptionFilter]).toSelf

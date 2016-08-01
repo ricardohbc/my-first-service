@@ -11,7 +11,7 @@ class ConfigurationProvider(
   def configure() = {
     bind(classOf[String])
       .annotatedWith(Names.named("versionURI"))
-      .toInstance(configuration.getString("application.context").get)
+      .toInstance("/v1") //for backwards compatibility...for now
 
     bind(classOf[String])
       .annotatedWith(Names.named("banner"))

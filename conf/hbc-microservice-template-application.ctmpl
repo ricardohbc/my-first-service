@@ -18,8 +18,6 @@ application.langs="en"
 defaultmessagesplugin="disabled"
 hbc.banner={{key "banner"}}
 
-application.context=/v1
-
 # Another Execution Context
 microservice-template-context {
   fork-join-executor {

@@ -16,6 +16,8 @@ object CommonDependencies {
   val playWS = "com.typesafe.play" %% "play-ws" % playWSVersion
   val sprayCaching = "io.spray" %% "spray-caching" % sprayVersion
   val doppelauge = "com.github.sun-opsys" % "doppelauge" % doppelaugeVersion
+  val playSwagger = "com.iheart" %% "play-swagger" % "0.3.2-PLAY2.5"
+  val swaggerUi = "org.webjars" % "swagger-ui" % "2.1.4"
 
   val commonDependencies : Seq[ModuleID] =
     Seq(
@@ -23,6 +25,8 @@ object CommonDependencies {
       scalaTest,
       scalacheck,
       sprayCaching,
-      doppelauge
+      doppelauge,
+      playSwagger,
+      swaggerUi
     )
 }

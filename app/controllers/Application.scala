@@ -11,6 +11,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future
 import ch.qos.logback.classic.Level
+import com.iheart.playSwagger.SwaggerSpecGenerator
+import play.api.libs.json.JsObject
 
 class Application @Inject() (
     timeoutHelper:                   helpers.ControllerTimeout,
@@ -157,13 +159,13 @@ class Application @Inject() (
     )
   )
 
-  @no.samordnaopptak.apidoc.ApiDoc(doc = """
+  /*@no.samordnaopptak.apidoc.ApiDoc(doc = """
     GET /v1/api-docs
 
     DESCRIPTION
       Get main swagger json documentation
       You can add more detailed information here.
-                                         """)
+                                         """)*/
   def apiDoc = Action.async { implicit request =>
     try {
       val generatedSwaggerDocs = no.samordnaopptak.apidoc.ApiDocUtil.getSwaggerDocs("/")
@@ -175,4 +177,51 @@ class Application @Inject() (
         throw e
     }
   }
+
+  implicit val cl = getClass.getClassLoader
+  private lazy val generator = SwaggerSpecGenerator() //TODO: need to update this when new models are added
+
+  def specs = {
+    Action.async { _ =>
+      Future.fromTry(generator.generate())
+        .map { newSwagger =>
+
+          val keys = List("definitions", "paths")
+
+          val oldSwagger = no.samordnaopptak.apidoc.ApiDocUtil.getSwaggerDocs("/").asJsValue
+
+          val newSwaggerJsonKeyValMap = newSwagger.value
+          val oldSwaggerJsonKeyValMap = oldSwagger.value
+
+          val combinedPathDefs = for (key <- keys) yield {
+            (
+              key,
+              newSwaggerJsonKeyValMap.get(key).map(_.as[JsObject])
+              .foldLeft(oldSwaggerJsonKeyValMap.get(key).map(_.as[JsObject]).get)(_ ++ _)
+            )
+          }
+
+          val unorganizedResult = newSwagger ++ JsObject(combinedPathDefs)
+          val organizedKeys =
+            List(
+              "swagger",
+              "info",
+              "tags",
+              "consumes",
+              "produces",
+              "paths",
+              "definitions"
+            )
+
+          val organizedPairs = (for (key <- organizedKeys) yield {
+            unorganizedResult.value.get(key) map (value => (key, value))
+          }).flatten
+
+          Ok(JsObject(organizedPairs))
+        }
+    }
+  }
+
+  def renderSwaggerUi = Action(Redirect("/v1/api-docs/swagger-ui/index.html?url=/v1/api-docs"))
+
 }

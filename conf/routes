@@ -2,19 +2,4 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Swagger api json doc page
-GET     /api-docs                               controllers.Application.apiDoc
-
-# Index page
-GET     /hbc-microservice-template              controllers.Application.index
-
-# Change log level
-PUT     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevel(level: String)
-# Change log level convenience method
-GET     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevelGet(level: String)
-
-# Admin
-GET     /hbc-microservice-template/admin/ping                controllers.Admin.ping
-GET     /hbc-microservice-template/admin/jvmstats            controllers.Admin.jvmstats
-GET     /hbc-microservice-template/clear_toggles             controllers.Application.clearToggles(name: Option[String] ?= None)
-GET     /hbc-microservice-template/toggles                   controllers.Application.toggles(name: Option[String] ?= None)
+-> /v1 v1.Routes

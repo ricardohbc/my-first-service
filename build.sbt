@@ -18,9 +18,10 @@ val defaultSettings: Seq[Setting[_]] = Seq(
 
 lazy val root = (project in file("."))
     .settings(defaultSettings: _*)
+    .configs(Integration)
+    .settings(inConfig(Integration)(Defaults.testSettings): _*)
     .settings( libraryDependencies ++= serviceDependencies )
     .enablePlugins(PlayScala)
-//    .disablePlugins(PlayLogback)
 
 libraryDependencies ~= { _.map(_.exclude("org.slf4j", "slf4j-log4j12")) }
 //libraryDependencies ~= { _.map(_.exclude("ch.qos.logback", "logback-classic")) }
@@ -52,3 +53,12 @@ ScalariformKeys.preferences := FormattingPreferences()
   .setPreference( AlignParameters, true )
   .setPreference( AlignSingleLineCaseStatements, true )
   .setPreference( DoubleIndentClassDeclaration, true )
+
+//Integration test settings
+lazy val Integration = config("integration") extend (Test)
+scalaSource in Integration := baseDirectory.value / "test-integration"
+resourceDirectory in Integration := baseDirectory.value / "test-integration/resources"
+scalacOptions in Test ++= Seq("-Yrangepos")
+//task to run unit and integration tests
+lazy val testAll = TaskKey[Unit]("test-all", "Runs test and integrationTest:test")
+testAll <<= Seq(clean, compile in Compile, compile in Test, test in Test, test in Integration).dependOn

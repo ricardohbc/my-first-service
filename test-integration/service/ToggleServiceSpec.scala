@@ -3,6 +3,8 @@ package webservices.toggles
 
 import javax.inject.Inject
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import org.scalatest.WordSpec
 import models._
@@ -10,6 +12,7 @@ import models._
 import scala.concurrent._
 import scala.concurrent.duration._
 import play.api.libs.ws.WSClient
+import play.api.libs.ws.ahc.AhcWSClient
 
 object ToggleServiceSpec {
   val configString = """
@@ -28,11 +31,15 @@ object ToggleServiceSpec {
 }
 
 //@RunWith(classOf[JUnitRunner])
-class ToggleServiceSpec @Inject() (ws: WSClient) extends WordSpec with org.scalatest.Matchers {
+class ToggleServiceSpec extends WordSpec with org.scalatest.Matchers {
 
   val toggle1 = Toggle("TEST_ONE", false)
   val toggle2 = Toggle("TEST_TWO", true)
   val toggle3 = Toggle("TEST_THREE", true)
+
+  implicit val sys = ActorSystem("test-system")
+  implicit val mat = ActorMaterializer()
+  val ws: WSClient = AhcWSClient()
 
   val client = new TogglesClient(ToggleServiceSpec.testUrl, ws)
 

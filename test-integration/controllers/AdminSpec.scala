@@ -1,9 +1,9 @@
-package scala.controllers
+package controllers
 
-import org.scalatest.{Matchers, BeforeAndAfterAll, WordSpec}
-import play.api.test._
-import play.api.test.Helpers._
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import play.api.Play
+import play.api.test.Helpers._
+import play.api.test._
 
 class AdminSpec extends WordSpec
     with Matchers with BeforeAndAfterAll {

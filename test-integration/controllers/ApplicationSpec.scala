@@ -1,11 +1,12 @@
-package integration.controllers
+package controllers
 
 import org.scalatest.{Matchers, WordSpec}
-import play.api.test._
 import play.api.Logger
 import play.api.test.Helpers._
-import scala.concurrent.duration._
+import play.api.test._
+
 import scala.concurrent.Await
+import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class ApplicationSpec extends WordSpec with Matchers {

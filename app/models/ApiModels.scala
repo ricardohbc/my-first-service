@@ -49,19 +49,18 @@ object ApiErrorModel {
 }
 
 // the request url
-case class ApiRequestModel(url: String, server_received_time: String, api_version: String, help: String)
+case class ApiRequestModel(url: String, server_received_time: String, help: String)
 
 object ApiRequestModel {
   implicit val reqFormat = Json.format[ApiRequestModel]
 
-  def fromReq(request: RequestHeader, versionURI: String): ApiRequestModel = {
+  def fromReq(request: RequestHeader): ApiRequestModel = {
     val fullRequestUrl = if (request.secure) "https://" else "http://" + request.host + request.uri
     val df = new SimpleDateFormat(Constants.ZULU_DATE_FORMAT)
-    val help = if (request.secure) "https://" else "http://" + request.host + versionURI + "/api-docs"
-    new ApiRequestModel(
+    val help = if (request.secure) "https://" else "http://" + request.host + "/v1" + "/api-docs" //TODO: watch this
+    ApiRequestModel(
       fullRequestUrl,
       df.format(Calendar.getInstance.getTime),
-      versionURI.substring(1),
       help
     )
   }
@@ -89,8 +88,8 @@ object ApiModel {
     } yield result
 
   // maybe you just want to proxy the rest of the apiModel, but update the header
-  def withHeader(body: String, versionURI: String)(implicit req: RequestHeader): ApiModel = {
-    val reqModel = ApiRequestModel.fromReq(req, versionURI)
+  def withHeader(body: String)(implicit req: RequestHeader): ApiModel = {
+    val reqModel = ApiRequestModel.fromReq(req)
     fromBody(body)
       .fold(f => throw new Exception(s"unexpected failure parsing ApiModel\n${f.toString}"), _.copy(request = reqModel))
   }

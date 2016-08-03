@@ -18,17 +18,6 @@ application.langs="en"
 defaultmessagesplugin="disabled"
 hbc.banner={{key "banner"}}
 
-# Another Execution Context
-microservice-template-context {
-  fork-join-executor {
-    parallelism-factor = 5.0
-    parallelism-max = 50
-  }
-}
-
-# Controller Timeout
-controllers.timeout=10000
-
 # web services we need for most/all microservices
 webservices {
   toggles {
@@ -40,6 +29,8 @@ statsd {
 {{key "graphite"}}
  metric-namespace="micro-service"
 }
+
+include "default-template-config.conf"
 
 # Template Version
 template-version="v1.0.32"

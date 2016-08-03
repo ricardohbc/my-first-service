@@ -10,10 +10,6 @@ class ConfigurationProvider(
 ) extends AbstractModule {
   def configure() = {
     bind(classOf[String])
-      .annotatedWith(Names.named("versionURI"))
-      .toInstance("/v1") //for backwards compatibility...for now
-
-    bind(classOf[String])
       .annotatedWith(Names.named("banner"))
       .toInstance(configuration.getString("hbc.banner").get)
   }

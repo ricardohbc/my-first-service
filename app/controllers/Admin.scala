@@ -9,8 +9,7 @@ import helpers.AdminHelper._
 import helpers.ControllerPayload
 
 class Admin @Inject() (
-    timeoutHelper:                   helpers.ControllerTimeout,
-    @Named("versionURI") versionURI: String
+    timeoutHelper: helpers.ControllerTimeout
 ) extends ControllerPayload {
 
   import timeoutHelper._
@@ -29,7 +28,7 @@ class Admin @Inject() (
     implicit request =>
       timeout {
         Logger.debug("ping")
-        writeResponseGet("pong", versionURI)
+        writeResponseGet("pong")
       }
   }
 
@@ -100,7 +99,7 @@ class Admin @Inject() (
     implicit request =>
       timeout {
         Logger.debug("jvmstats")
-        writeResponseGet(Json.toJson(extractJvmStats()), versionURI)
+        writeResponseGet(Json.toJson(extractJvmStats()))
       }
   }
 }

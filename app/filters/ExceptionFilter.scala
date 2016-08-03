@@ -9,8 +9,8 @@ import play.api.mvc._
 
 import scala.concurrent._
 
-class ExceptionFilter @Inject() (@Named("versionURI") versionURI: String, val mat: Materializer) extends Filter {
+class ExceptionFilter @Inject() (val mat: Materializer) extends Filter {
   def apply(next: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] =
-    next(req) recover (helpers.ControllerPayloadLike.defaultExceptionHandler(versionURI)(req))
+    next(req) recover (helpers.ControllerPayloadLike.defaultExceptionHandler(req))
 }
 

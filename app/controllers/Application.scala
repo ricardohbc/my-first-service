@@ -15,9 +15,8 @@ import com.iheart.playSwagger.SwaggerSpecGenerator
 import play.api.libs.json.JsObject
 
 class Application @Inject() (
-    timeoutHelper:                   helpers.ControllerTimeout,
-    togglesClient:                   TogglesClientLike,
-    @Named("versionURI") versionURI: String
+    timeoutHelper: helpers.ControllerTimeout,
+    togglesClient: TogglesClientLike
 ) extends Controller {
 
   import timeoutHelper._
@@ -35,7 +34,6 @@ class Application @Inject() (
     Request: models.ApiRequestModel
       url: String
       server_received_time: String
-      api_version: String
       help: String
 
     ResponseResult: models.ApiResultModel
@@ -54,7 +52,7 @@ class Application @Inject() (
     implicit request =>
       timeout {
         val response = "hbc-microservice-template is up and running!"
-        writeResponseGet(response, versionURI)
+        writeResponseGet(response)
       }
   }
 
@@ -97,7 +95,7 @@ class Application @Inject() (
         val level = Level.toLevel(levelString)
         Logger.underlyingLogger.asInstanceOf[ch.qos.logback.classic.Logger].setLevel(level)
         val response = s"Log level changed to $level"
-        writeResponseGet(response, versionURI)
+        writeResponseGet(response)
       }
   }
 
@@ -117,7 +115,7 @@ class Application @Inject() (
     implicit request =>
       timeout {
         togglesClient.clearCache(name)
-        writeResponseGet("done!", versionURI)
+        writeResponseGet("done!")
       }
   }
 
@@ -148,7 +146,7 @@ class Application @Inject() (
       withTimeout {
         name.map(n => togglesClient.getToggle(n).map(t => Seq(t.toList).flatten))
           .getOrElse(togglesClient.getToggles())
-          .map(r => writeResponseGet(r, versionURI))
+          .map(r => writeResponseGet(r))
       }
   }
 

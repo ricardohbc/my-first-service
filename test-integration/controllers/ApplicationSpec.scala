@@ -11,7 +11,7 @@ import scala.language.postfixOps
 
 class ApplicationSpec extends WordSpec with Matchers {
 
-  import utils.TestUtils._
+  import utils.TestUtilsForUnitTests._
 
   "Application Controller" should {
     "send 404 on a bad request" in withPlay() {
@@ -20,7 +20,7 @@ class ApplicationSpec extends WordSpec with Matchers {
     }
 
     "render the index page" in withPlay() {
-      val index = route(application(), FakeRequest(GET, versionCtx + "/hbc-microservice-template")).get
+      val index = route(application(), FakeRequest(GET, "/v1/hbc-microservice-template")).get
 
       status(index) shouldBe OK
       contentType(index).get == "application/json" shouldBe true
@@ -28,7 +28,7 @@ class ApplicationSpec extends WordSpec with Matchers {
     }
 
     "get Swagger spec" in withPlay() {
-      val index = route(application(), FakeRequest(GET, versionCtx + "/api-docs")).get
+      val index = route(application(), FakeRequest(GET, "/v1/api-docs")).get
 
       status(index) shouldBe OK
       contentType(index).get == "application/json" shouldBe true
@@ -36,17 +36,17 @@ class ApplicationSpec extends WordSpec with Matchers {
     }
 
     "change the log Level" in withPlay() {
-      val changeLog = route(application(), FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/WARN")).get
+      val changeLog = route(application(), FakeRequest(GET, "/v1/hbc-microservice-template/logLevel/WARN")).get
       status(changeLog) shouldBe OK
       contentType(changeLog).get == "application/json" shouldBe true
       (contentAsJson(changeLog) \ "response" \ "results").as[String] == "Log level changed to WARN" shouldBe true
       Logger.isDebugEnabled shouldBe false
-      Await.result(route(application(), FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/DEBUG")).get, 10 seconds)
+      Await.result(route(application(), FakeRequest(GET, "/v1/hbc-microservice-template/logLevel/DEBUG")).get, 10 seconds)
       Logger.isDebugEnabled shouldBe true
     }
 
     "not process incorrect log Level" in withPlay() {
-      val result = route(application(), FakeRequest(GET, versionCtx + "/hbc-microservice-template/logLevel/WARN2")).get
+      val result = route(application(), FakeRequest(GET, "/v1/hbc-microservice-template/logLevel/WARN2")).get
       status(result) shouldBe NOT_FOUND
     }
   }

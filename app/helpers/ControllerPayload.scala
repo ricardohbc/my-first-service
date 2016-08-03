@@ -15,29 +15,29 @@ trait ControllerPayload extends Controller {
   //      RESPONSE      //
   ////////////////////////
 
-  def writeResponseStore[T: Format](result: T, versionURI: String)(implicit request: Request[_]): Result =
-    writeResponseSuccess(result, Created, versionURI)
+  def writeResponseStore[T: Format](result: T)(implicit request: Request[_]): Result =
+    writeResponseSuccess(result, Created)
 
-  def writeResponseStores[T: Format](results: Seq[T], versionURI: String)(implicit request: Request[_]): Result =
-    writeResponses(results, Created, versionURI)
+  def writeResponseStores[T: Format](results: Seq[T])(implicit request: Request[_]): Result =
+    writeResponses(results, Created)
 
-  def writeResponseGet[T: Format](response: T, versionURI: String, errors: Seq[ApiErrorModel] = Seq())(implicit request: Request[_]): Result =
-    writeResponseSuccess(response, Ok, versionURI, errors)
+  def writeResponseGet[T: Format](response: T, errors: Seq[ApiErrorModel] = Seq())(implicit request: Request[_]): Result =
+    writeResponseSuccess(response, Ok, errors)
 
-  def writeResponseUpdate[T: Format](result: T, versionURI: String)(implicit request: Request[_]): Result =
-    writeResponseSuccess(result, Ok, versionURI)
+  def writeResponseUpdate[T: Format](result: T)(implicit request: Request[_]): Result =
+    writeResponseSuccess(result, Ok)
 
-  def writeResponseUpdates[T: Format](results: Seq[T], versionURI: String)(implicit request: Request[_]): Result =
-    writeResponses(results, Ok, versionURI)
+  def writeResponseUpdates[T: Format](results: Seq[T])(implicit request: Request[_]): Result =
+    writeResponses(results, Ok)
 
-  def writeResponseRemove[T: Format](result: T, versionURI: String)(implicit request: Request[_]): Result =
-    writeResponseSuccess(result, Ok, versionURI)
+  def writeResponseRemove[T: Format](result: T)(implicit request: Request[_]): Result =
+    writeResponseSuccess(result, Ok)
 
-  def writeResponseSuccess[T: Format](result: T, status: Status, versionURI: String, errors: Seq[ApiErrorModel] = Seq())(implicit request: RequestHeader): Result =
-    writeResponse(status, constructResponseModel(result, versionURI, errors))
+  def writeResponseSuccess[T: Format](result: T, status: Status, errors: Seq[ApiErrorModel] = Seq())(implicit request: RequestHeader): Result =
+    writeResponse(status, constructResponseModel(result, errors))
 
-  def writeResponseError(errors: Seq[ApiErrorModel], status: Status, versionURI: String)(implicit request: RequestHeader): Result =
-    formatResponse(constructErrorResponseModel(errors, versionURI), status)
+  def writeResponseError(errors: Seq[ApiErrorModel], status: Status)(implicit request: RequestHeader): Result =
+    formatResponse(constructErrorResponseModel(errors), status)
 
   def writeResponse(responseStatus: Status, body: ApiModel): Result =
     responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
@@ -45,19 +45,18 @@ trait ControllerPayload extends Controller {
   def constructResultModel[T: Format](result: T): ApiResultModel = ApiResultModel(Json.toJson(result))
 
   def constructResponseModel[T: Format](
-    result:     T,
-    versionURI: String,
-    errs:       Seq[ApiErrorModel] = Seq()
+    result: T,
+    errs:   Seq[ApiErrorModel] = Seq()
   )(implicit request: RequestHeader): ApiModel =
     ApiModel.apply(
-      ApiRequestModel.fromReq(request, versionURI),
+      ApiRequestModel.fromReq(request),
       constructResultModel(result),
       errs
     )
 
-  def constructErrorResponseModel(errs: Seq[ApiErrorModel], versionURI: String)(implicit request: RequestHeader): ApiModel =
+  def constructErrorResponseModel(errs: Seq[ApiErrorModel])(implicit request: RequestHeader): ApiModel =
     ApiModel.apply(
-      ApiRequestModel.fromReq(request, versionURI),
+      ApiRequestModel.fromReq(request),
       EmptyApiResultModel,
       errs
     )
@@ -66,11 +65,10 @@ trait ControllerPayload extends Controller {
     response.apply(Json.prettyPrint(Json.toJson(responseModel))).as(JSON)
 
   private def writeResponses[T: Format](
-    results:    Seq[T],
-    status:     Status,
-    versionURI: String
+    results: Seq[T],
+    status:  Status
   )(implicit request: Request[_]): Result =
-    formatResponse(constructResponseModel(results, versionURI), status)
+    formatResponse(constructResponseModel(results), status)
 
   ////////////////////////
   //     GET ITEMS      //
@@ -130,16 +128,16 @@ trait ControllerPayload extends Controller {
       ))
   }
 
-  def handlerForRequest(versionURI: String)(implicit req: RequestHeader): (Status, ApiErrorModel) => Result = {
+  def handlerForRequest(implicit req: RequestHeader): (Status, ApiErrorModel) => Result = {
     (status, err) =>
       writeResponse(
         status,
-        constructErrorResponseModel(Seq(err), versionURI)
+        constructErrorResponseModel(Seq(err))
       )
   }
 
-  def defaultExceptionHandler(versionURI: String)(implicit req: RequestHeader): PartialFunction[Throwable, Result] =
-    findResponseStatus andThen handlerForRequest(versionURI)(req).tupled
+  def defaultExceptionHandler(implicit req: RequestHeader): PartialFunction[Throwable, Result] =
+    findResponseStatus andThen handlerForRequest(req).tupled
 }
 
 object ControllerPayloadLike extends ControllerPayload

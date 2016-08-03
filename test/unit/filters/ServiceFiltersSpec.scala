@@ -12,9 +12,8 @@ import play.api.test.Helpers._
 import com.typesafe.config.ConfigFactory
 
 class CrashyAdmin @Inject() (
-    timeoutHelper:                   helpers.ControllerTimeout,
-    @Named("versionURI") versionURI: String
-) extends controllers.Admin(timeoutHelper, versionURI) {
+    timeoutHelper: helpers.ControllerTimeout
+) extends controllers.Admin(timeoutHelper) {
 
   override def ping = Action.async {
     implicit request =>
@@ -23,9 +22,8 @@ class CrashyAdmin @Inject() (
 }
 
 class SlowAdmin @Inject() (
-    timeoutHelper:                   helpers.ControllerTimeout,
-    @Named("versionURI") versionURI: String
-) extends controllers.Admin(timeoutHelper, versionURI) {
+    timeoutHelper: helpers.ControllerTimeout
+) extends controllers.Admin(timeoutHelper) {
 
   import timeoutHelper._
 
@@ -33,7 +31,7 @@ class SlowAdmin @Inject() (
     implicit request =>
       timeout {
         Thread.sleep(5000)
-        writeResponseGet("pong", versionURI)
+        writeResponseGet("pong")
       }
   }
 }
@@ -44,7 +42,7 @@ object FiltersSpec {
       | controllers.timeout=50
     """.stripMargin
 
-  val config = ConfigFactory.parseString(configString).withFallback(utils.TestUtils.config)
+  val config = ConfigFactory.parseString(configString).withFallback(utils.TestUtilsForUnitTests.config)
 
   val configuration = new Configuration(config)
 }
@@ -53,19 +51,19 @@ class FiltersSpec
     extends WordSpec
     with Matchers {
 
-  import utils.TestUtils._
+  import utils.TestUtilsForUnitTests._
 
   val crashyBindings = defaultBindings ++ Seq(bind[controllers.Admin].to[CrashyAdmin])
   val slowBindings = defaultBindings ++ Seq(bind[controllers.Admin].to[SlowAdmin])
 
   "ServiceFilters" should {
     "handle exception when it's thrown by controller" in withPlay(application(bindings = crashyBindings)) {
-      val ping = route(FakeRequest(GET, versionCtx + "/hbc-microservice-template/admin/ping")).get
+      val ping = route(FakeRequest(GET, "/v1/hbc-microservice-template/admin/ping")).get
       ((contentAsJson(ping) \ "errors")(0) \ "error").as[String] == "NullPointerException" shouldBe true
     }
 
     "return TimeoutException after configured time" in withPlay(application(config = FiltersSpec.configuration, bindings = slowBindings)) {
-      val ping = route(FakeRequest(GET, versionCtx + "/hbc-microservice-template/admin/ping")).get
+      val ping = route(FakeRequest(GET, "/v1/hbc-microservice-template/admin/ping")).get
       ((contentAsJson(ping) \ "errors")(0) \ "error").as[String] == "TimeoutException" shouldBe true
       status(ping) shouldBe 503
     }

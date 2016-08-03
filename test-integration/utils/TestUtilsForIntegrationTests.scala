@@ -10,7 +10,7 @@ import play.api.{Application, Configuration, Play}
 import scala.concurrent._
 import duration._
 
-object TestUtils {
+object TestUtilsForIntegrationTests {
   val configString = """
                        | application.secret="SECRET"
                        | logger.application=ERROR
@@ -34,8 +34,6 @@ object TestUtils {
 
   val configuration = new Configuration(config)
 
-  val versionCtx = "/v1"
-
   val defaultBindings: Seq[Binding[_]] = List[Binding[_]](
     bind[Duration].qualifiedWith("requestTimeout").toInstance(60.seconds),
     bind[String].qualifiedWith("bf-address").toInstance(configuration.getString("bf-address").get),
@@ -44,7 +42,6 @@ object TestUtils {
     bind(classOf[helpers.ControllerTimeout]).toSelf,
     bind(classOf[metrics.StatsDClientLike]).toInstance(metrics.NoOpStatsDClient),
     bind(classOf[webservices.toggles.TogglesClientLike]).toInstance(webservices.toggles.TogglesClient()),
-    bind(classOf[String]).qualifiedWith("versionURI").toInstance(versionCtx),
     bind(classOf[filters.TimingFilter]).toSelf,
     bind(classOf[filters.IncrementFilter]).toSelf,
     bind(classOf[filters.ExceptionFilter]).toSelf

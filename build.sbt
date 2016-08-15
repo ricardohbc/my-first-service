@@ -26,10 +26,18 @@ lazy val root = (project in file("."))
 libraryDependencies ~= { _.map(_.exclude("org.slf4j", "slf4j-log4j12")) }
 //libraryDependencies ~= { _.map(_.exclude("ch.qos.logback", "logback-classic")) }
 
-resolvers ++= Seq("Saks Artifactory - Ext Release Local" at "http://repo.saksdirect.com:8081/artifactory/ext-release-local",
-	"Saks Artifactory - Libs Release Local" at "http://repo.saksdirect.com:8081/artifactory/libs-release-local",
-	"Saks Artifactory - Libs Release" at "http://repo.saksdirect.com:8081/artifactory/libs-release"
-	)
+resolvers ++= {
+  val internal = Seq("Saks Artifactory - Ext Release Local" at "http://repo.saksdirect.com:8081/artifactory/ext-release-local",
+    "Saks Artifactory - Libs Release Local" at "http://repo.saksdirect.com:8081/artifactory/libs-release-local",
+    "Saks Artifactory - Libs Release" at "http://repo.saksdirect.com:8081/artifactory/libs-release"
+  )
+
+  val external = Seq(Resolver.jcenterRepo,
+    "jitpack" at "https://jitpack.io"
+  )
+
+  internal ++ external
+}
 		   
 lazy val buildAll = TaskKey[Unit]("build-all", "Compiles and runs all tests")
 lazy val buildZip = TaskKey[Unit]("build-zip","Compiles, tests, and publishes a zip file with the new code.")

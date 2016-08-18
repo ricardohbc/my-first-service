@@ -12,14 +12,13 @@ class HBCMessagesPlugin @Inject() (env: Environment, config: Configuration, lang
 
   override def isDefinedAt(key: String)(implicit lang: Lang): Boolean = true
 
-  private lazy val bannerMessagesPath = joinPaths(Some(hbcMessagesPath), banner)
-
-  private def joinPaths(first: Option[String], second: String) = first match {
-    case Some(first) => new java.io.File(first, second).getPath
-    case None        => second
-  }
+  private def joinPaths(first: Option[String], second: String) = first.map { f =>
+    new java.io.File(f, second).getPath
+  }.getOrElse(second)
 
   override def loadMessages(file: String): Map[String, String] = {
+    val bannerMessagesPath = joinPaths(Some(hbcMessagesPath), banner)
+
     val globalMessages: List[URL] = env.resource(joinPaths(Some(hbcMessagesPath), file)).toList
     val bannerMessages: List[URL] = env.resource(joinPaths(Some(bannerMessagesPath), file)).toList
 

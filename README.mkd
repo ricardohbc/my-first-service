@@ -61,8 +61,9 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
   - Puppet provisioning is in puppet directory
 
 ## Messages
-- We are using a custom Messages Plugin, which is based on the default Scala Play Messages Plugin: [ScalaI18N](https://playframework.com/documentation/2.3.x/ScalaI18N)
-- All global messages should go into the conf/messages folder.
+- We are using a custom Messages API, which is an extension on top of the default Scala Play Messages API: [ScalaI18N](https://playframework.com/documentation/2.5.x/ScalaI18N)
+- This supports all features of the default Messages API. We just added another layer to it to support banner-specific messages.
+- All global messages should go into the conf/messages folder. (e.g. conf/messages/messages.en)
 - If banner-specific messages are required, it should go into conf/messages/<banner_name> folder.
 - We determine which banner we are using by the "hbc.banner" property in application.conf.
 - For example, say we have the following structure:
@@ -76,7 +77,7 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
       title=Saks Off 5th
 ```
 
-   - Messages("title") would return "HBC" if no banner is configured.
+   - To get the title in your code, you would just need to inject MessagesApi into your class, and call it like this: messagesApi("title")
    - If hbc.banner="saks", we will get "Saks".
    - If hbc.banner="off5th", we will get "Saks Off 5th".
    - If hbc.banner="lat", we will get "HBC" because there is no "lat" folder, and will fall back to the global messages.en.

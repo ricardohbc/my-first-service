@@ -1,0 +1,18 @@
+hbcmicroservicetemplate:
+  image: sd1pgo01lx.saksdirect.com/hbc-microservice-template:<version>
+  container_name: hbcmicroservicename
+  hostname: <hostname>
+  restart: always
+  ports:
+    - "9000:9000"
+  volumes:
+    - /saksservices/config:/opt/hbc-microservice-template-0.1/conf/custom
+    - /saksservices/applogs/aem/hbc-microservice:/opt/hbc-microservice-template-0.1/logs
+  labels:
+    io.rancher.container.network: 'true'
+  env_file:
+    - ./ms.env
+  log_driver: syslog
+  log_opt:
+    syslog-address: <logstash_url>
+    syslog-tag: <banner>-<env>-<service>

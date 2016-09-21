@@ -25,7 +25,7 @@ object ApiErrorModel {
   implicit val errFormat = Json.format[ApiErrorModel]
 
   def logException(ex: Throwable)(implicit request: RequestHeader): Unit = {
-    Logger.error(s"Error in request to: ${request.uri}\n", ex)
+    Logger.error(s"Error in request to: ${request.uri}", ex)
   }
 
   //because java is hilariously unhelpful

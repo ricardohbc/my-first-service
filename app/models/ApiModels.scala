@@ -28,24 +28,16 @@ object ApiErrorModel {
     Logger.error(s"Error in request to: ${request.uri}", ex)
   }
 
-  //because java is hilariously unhelpful
-  def createStackTrace(ex: Throwable): String = {
-    val sw = new java.io.StringWriter()
-    val pw = new java.io.PrintWriter(sw)
-    ex.printStackTrace(pw)
-    sw.toString()
-  }
-
   // it would be nicer if these were apply methods, but that f's up the implicit conversion
   // we could move the implicits somewhere else.  I tried but didn't care enough.  I wouldn't object if anyone wants to look into it!
   def fromException(ex: Throwable)(implicit request: RequestHeader) = {
     logException(ex)
-    new ApiErrorModel(s"Error requesting ${request.uri}\n${createStackTrace(ex)}", ex.getClass.getSimpleName)
+    new ApiErrorModel(s"Error requesting ${request.uri}", ex.getClass.getSimpleName)
   }
 
   def fromExceptionAndMessage(message: String, ex: Throwable)(implicit request: RequestHeader) = {
     logException(ex)
-    new ApiErrorModel(message + s" Error requesting ${request.uri}\n${createStackTrace(ex)}", ex.getClass.getSimpleName)
+    new ApiErrorModel(message + s" Error requesting ${request.uri}", ex.getClass.getSimpleName)
   }
 }
 

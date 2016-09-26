@@ -1,17 +1,13 @@
 package helpers
 
-import constants.Constants._
 import models._
-import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._
+import scala.concurrent._
 import play.api.libs.json.JsSuccess
 import scala.util.control.NonFatal
 import play.api.mvc.Result
 import play.api.libs.json.JsResultException
-
-import scala.concurrent._
-import play.api.libs.concurrent.Execution.Implicits._
 
 trait ControllerPayload extends Controller {
 
@@ -45,25 +41,6 @@ trait ControllerPayload extends Controller {
 
   def writeResponse(responseStatus: Status, body: ApiModel): Result =
     responseStatus.apply(Json.prettyPrint(Json.toJson(body))).as(JSON)
-
-  def writeResponseData[T](responseData: Future[ResponseData], validate: (JsValue) => JsResult[T], processBody: T => T = identity _)(implicit request: Request[_], typeFormat: Format[T]): Future[Result] = {
-    responseData.map {
-      case SuccessfulResponse(body, cookie) =>
-        validate(body) match {
-          case JsSuccess(c, _) => writeResponseGet(processBody(c)).withCookies(cookie: _*)
-          case JsError(e)      => writeResponseError(Seq(ApiErrorModel("Failed to validate JSON", "JSON error")), Status(500))
-        }
-      case FailureResponse(errors, code) => writeResponseError(errors, Status(code))
-    }
-  }
-
-  def writeResponseData(responseData: Future[ResponseData])(implicit request: Request[_]): Future[Result] = {
-    responseData.map {
-      case SuccessfulResponse(body, cookie) =>
-        writeResponseGet(body).withCookies(cookie: _*)
-      case FailureResponse(errors, code) => writeResponseError(errors, Status(code))
-    }
-  }
 
   def constructResultModel[T: Format](result: T): ApiResultModel = ApiResultModel(Json.toJson(result))
 
@@ -159,14 +136,8 @@ trait ControllerPayload extends Controller {
       )
   }
 
-  def defaultExceptionHandler(req: RequestHeader): PartialFunction[Throwable, Result] =
-    findResponseStatus(req) andThen handlerForRequest(req).tupled
-
-  // I don't think these don't really belong here, some generally utilities/conveniences trait would be better
-  def getJsessionId(implicit request: Request[AnyContent]): Option[String] = request.cookies.get(JSESSIONID).map(_.value)
-
-  def getUserName(implicit request: Request[AnyContent]): Option[String] = request.cookies.get(USERNAME).map(_.value)
-
+  def defaultExceptionHandler(implicit req: RequestHeader): PartialFunction[Throwable, Result] =
+    findResponseStatus andThen handlerForRequest(req).tupled
 }
 
 object ControllerPayloadLike extends ControllerPayload

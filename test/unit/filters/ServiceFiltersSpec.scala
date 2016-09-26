@@ -1,67 +1,71 @@
 package unit.filters
 
-import _root_.helpers.ConfigHelper
-import play.api.mvc._
-import utils.TestGlobal
-import scala.concurrent._
-import play.api.mvc.Results._
-import play.api.test.FakeRequest
-import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
-import play.api.Play
-import play.api.test.Helpers._
+import javax.inject._
+import play.api.inject.bind
+import org.scalatest.{Matchers, WordSpec}
+import play.api._
 import play.api.http.HttpVerbs.GET
-import scala.concurrent.duration._
-import scala.language.postfixOps
-import play.api.test.FakeApplication
-import play.api.libs.iteratee.Iteratee
-import play.api.libs.json.Json
-import helpers.ControllerTimeoutLike._
+import play.api.mvc._
+import play.api.Configuration
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
+import com.typesafe.config.ConfigFactory
+
+class CrashyAdmin @Inject() (
+    timeoutHelper: helpers.ControllerTimeout
+) extends controllers.Admin(timeoutHelper) {
+
+  override def ping = Action.async {
+    implicit request =>
+      throw new NullPointerException("Test!")
+  }
+}
+
+class SlowAdmin @Inject() (
+    timeoutHelper: helpers.ControllerTimeout
+) extends controllers.Admin(timeoutHelper) {
+
+  import timeoutHelper._
+
+  override def ping = Action.async {
+    implicit request =>
+      timeout {
+        Thread.sleep(5000)
+        writeResponseGet("pong")
+      }
+  }
+}
+
+object FiltersSpec {
+  val configString =
+    """
+      | controllers.timeout=50
+    """.stripMargin
+
+  val config = ConfigFactory.parseString(configString).withFallback(utils.TestUtilsForUnitTests.config)
+
+  val configuration = new Configuration(config)
+}
 
 class FiltersSpec
     extends WordSpec
-    with Matchers
-    with BeforeAndAfterAll
-    with ConfigHelper {
+    with Matchers {
 
-  val actionTimeout = config getInt "controllers.timeout"
+  import utils.TestUtilsForUnitTests._
 
-  val testRouter: PartialFunction[(String, String), Handler] = {
-    case (GET, "/slowRequest") =>
-      Action.async {
-        implicit request =>
-          timeout {
-            Thread.sleep(actionTimeout * 3)
-            Ok("Should never get here")
-          }
-      }
-    case (GET, "/errorRequest") =>
-      Action {
-        throw new NullPointerException("Bad code!")
-        Ok("Should never get here")
-      }
-  }
-
-  override def beforeAll() = {
-    Play.start(FakeApplication(withGlobal = Some(TestGlobal), withRoutes = testRouter))
-  }
-
-  override def afterAll() = {
-    Play.stop()
-  }
+  val crashyBindings = defaultBindings ++ Seq(bind[controllers.Admin].to[CrashyAdmin])
+  val slowBindings = defaultBindings ++ Seq(bind[controllers.Admin].to[SlowAdmin])
 
   "ServiceFilters" should {
-
-    "return TimeoutException after configured time" in {
-      val result: Result = Await.result(route(FakeRequest(GET, "/slowRequest")).get, (actionTimeout * 2) millis)
-      val bytesContent = Await.result(result.body |>>> Iteratee.consume[Array[Byte]](), Duration.Inf)
-      val contentAsJson = Json.parse(new String(bytesContent))
-      result.header.status shouldBe 503
-      ((contentAsJson \ "errors")(0) \ "error").as[String] == "TimeoutException" shouldBe true
+    "handle exception when it's thrown by controller" in withPlay(application(bindings = crashyBindings)) {
+      val ping = route(FakeRequest(GET, "/v1/hbc-microservice-template/admin/ping")).get
+      ((contentAsJson(ping) \ "errors")(0) \ "error").as[String] == "NullPointerException" shouldBe true
     }
 
-    "handle exception when it's thrown by controller" in {
-      val result = route(FakeRequest(GET, "/errorRequest")).get
-      ((contentAsJson(result) \ "errors")(0) \ "error").as[String] == "NullPointerException" shouldBe true
+    "return TimeoutException after configured time" in withPlay(application(config = FiltersSpec.configuration, bindings = slowBindings)) {
+      val ping = route(FakeRequest(GET, "/v1/hbc-microservice-template/admin/ping")).get
+      ((contentAsJson(ping) \ "errors")(0) \ "error").as[String] == "TimeoutException" shouldBe true
+      status(ping) shouldBe 503
     }
   }
 }

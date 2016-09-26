@@ -10,26 +10,8 @@
 # See http://www.playframework.com/documentation/latest/ApplicationSecret for more details.
 application.secret="v7]yr6Mj^04k5]C_Eo`/YGHViwD<v9hfTcFWU1Dv_klxa=D;_R/B5@xm;XQGpBXR"
 
-# The application languages
-# ~~~~~
-application.langs="en"
-
 # Used for banner-specific messages. See hbc-microservice-template's readme for details.
-defaultmessagesplugin="disabled"
 hbc.banner={{key "banner"}}
-
-application.context=/v1
-
-# Another Execution Context
-microservice-template-context {
-  fork-join-executor {
-    parallelism-factor = 5.0
-    parallelism-max = 50
-  }
-}
-
-# Controller Timeout
-controllers.timeout=10000
 
 # web services we need for most/all microservices
 webservices {
@@ -42,6 +24,8 @@ statsd {
 {{key "graphite"}}
  metric-namespace="micro-service"
 }
+
+include "default-template-config.conf"
 
 # Template Version
 template-version="v1.0.32"

@@ -1,0 +1,66 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Swagger api json doc page
+
+###
+#   tags:
+#     - V1
+###
+GET     /api-docs                               controllers.Application.specs
+
+### NoDocs ###
+GET     /api-docs/swagger-ui/*file        controllers.Assets.at(path:String="/public/lib/swagger-ui", file:String)
+#example for above -> http://localhost:9000/v1/api-docs/swagger-ui/index.html?url=/v1/api-docs
+### NoDocs ###
+GET     /swagger-ui                           controllers.Application.renderSwaggerUi
+#convenience end point that simply redirects to the above route
+
+###
+#   tags:
+#     - V1
+#   summary:
+#     Check to see if hbc-microservice-template service is running
+#     THIS IS AN EXAMPLE SWAGGER DOCUMENTATION
+#   responses:
+#     200:
+#        description: success
+#        schema:
+#          required:
+#            - 'request'
+#            - 'response'
+#            - 'errors'
+#          properties:
+#            request:
+#              $ref: '#/definitions/Request'
+#            response:
+#              required:
+#                - 'results'
+#              properties:
+#                results:
+#                  type: 'string'
+#            errors:
+#              type: 'array'
+#              items:
+#                $ref: '#/definitions/Error'
+###
+GET     /hbc-microservice-template              controllers.Application.index
+
+# Change log level
+### NoDocs ###
+PUT     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevel(level: String)
+
+# Change log level convenience method
+### NoDocs ###
+GET     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevelGet(level: String)
+
+# Admin
+### NoDocs ###
+GET     /hbc-microservice-template/admin/ping                controllers.Admin.ping
+### NoDocs ###
+GET     /hbc-microservice-template/admin/jvmstats            controllers.Admin.jvmstats
+### NoDocs ###
+GET     /hbc-microservice-template/clear_toggles             controllers.Application.clearToggles(name: Option[String] ?= None)
+### NoDocs ###
+GET     /hbc-microservice-template/toggles                   controllers.Application.toggles(name: Option[String] ?= None)

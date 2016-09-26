@@ -1,18 +1,21 @@
 package controllers
 
-import play.api._
+import javax.inject._
 
+import play.api._
 import play.api.mvc._
 import play.api.libs.json._
-
-import helpers.ControllerPayloadLike._
-import helpers.ControllerTimeoutLike._
 import helpers.AdminHelper._
+import helpers.ControllerPayload
 
-object Admin extends Controller {
+class Admin @Inject() (
+    timeoutHelper: helpers.ControllerTimeout
+) extends ControllerPayload {
+
+  import timeoutHelper._
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
-    GET /hbc-microservice-template/admin/ping
+    GET /v1/hbc-microservice-template/admin/ping
 
     DESCRIPTION
       Basic health check
@@ -20,7 +23,7 @@ object Admin extends Controller {
     RESULT
       Response
 
-  """)
+                                         """)
   def ping = Action.async {
     implicit request =>
       timeout {
@@ -30,7 +33,7 @@ object Admin extends Controller {
   }
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
-    GET /hbc-microservice-template/admin/jvmstats
+    GET /v1/hbc-microservice-template/admin/jvmstats
 
     DESCRIPTION
       JVM statistics for the service

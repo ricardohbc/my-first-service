@@ -1,15 +1,17 @@
 package webservices.toggles
 
-import helpers.ConfigHelper
 import play.api.Logger
 import play.api.libs.json._
-import play.api.Play.current
 import play.api.libs.ws._
+
 import scala.concurrent._
 import scala.concurrent.duration._
 import spray.caching._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models._
+import javax.inject.{Inject, Named}
+
+import com.google.inject.ImplementedBy
 
 // no idea about ttl just yet. Do they change much? The service is pretty snappy so could be less aggressive with the cache if useful
 // the dev toggle server returns about 260 toggles total right now
@@ -23,34 +25,46 @@ trait AllTogglesCache {
   def addToAllTogglesCache(key: String, toggles: Seq[Toggle]) = allTogglesCache(key, () => Future.successful(toggles))
 }
 
-object TogglesClient extends IndividualToggleCache with AllTogglesCache with ConfigHelper {
+@ImplementedBy(classOf[TogglesClient])
+trait TogglesClientLike extends IndividualToggleCache with AllTogglesCache {
+  def getToggle(name: String): Future[Option[Toggle]]
+  def getToggleState(name: String): Future[Option[Boolean]]
+  def getToggles(): Future[Seq[Toggle]]
+  def clearCache(name: Option[String]): Unit
+}
 
-  private val svcUrl = config.getString("webservices.toggles.url")
+object TogglesClient {
+  def apply(
+    gt:  String => Future[Option[Toggle]]  = _ => Future.successful(None),
+    gts: String => Future[Option[Boolean]] = _ => Future.successful(None),
+    gtS: () => Future[Seq[Toggle]]         = () => Future.successful(Seq.empty[Toggle]),
+    cc:  Option[String] => Unit            = _ => ()
+  ): TogglesClientLike = new TogglesClientLike {
+    def getToggle(name: String): Future[Option[Toggle]] = gt(name)
+    def getToggleState(name: String): Future[Option[Boolean]] = gts(name)
+    def getToggles(): Future[Seq[Toggle]] = gtS()
+    def clearCache(name: Option[String]): Unit = cc(name)
+  }
+}
+
+class TogglesClient @Inject() (@Named("togglesUrl") svcUrl: String, ws: WSClient) extends TogglesClientLike {
 
   // no idea about ttl just yet. Do they change much? The service is pretty snappy so could be less aggressive with the cache if useful
   // the dev toggle server returns about 260 toggles total right now
   //private val toggleCache: Cache[Toggle] = LruCache(maxCapacity = 500, initialCapacity = 275, timeToLive = Duration(24, "hours"))
   //private val allTogglesCache: Cache[Seq[Toggle]] = LruCache(maxCapacity = 1, initialCapacity = 1, timeToLive = Duration(24, "hours"))
-  val unpackJsonResults: JsValue => JsValue = (json) => (json \ "response" \ "results")
+  val unpackJsonResults: JsValue => JsValue = (json) => (json \ "response" \ "results").get
 
   private def getFromToggleSvc[T](reqUrl: String)(handler: JsValue => T): Future[Option[T]] =
-    WS.url(reqUrl).get().map { response =>
+    ws.url(reqUrl).get().map { response =>
       Logger.info("response status: " + response.status)
       Logger.info("body: " + response.body)
 
-      if (response.status == 200) {
-        try {
-          Some(handler(response.json))
-        } catch {
-          case e: Exception => {
-            Logger.error(s"Error while parsing toggle-service response (toggle doesn't exist?): '${reqUrl}', defaulting toggle state to false: ", e)
-            None
-          }
-        }
-      } else if (response.status == 404) {
-        Logger.error(s"HTTP 404 status received from toggle-service: '${reqUrl}', defaulting toggle state to false.")
+      if (response.status == 200)
+        Some(handler(response.json))
+      else if (response.status == 404)
         None
-      } else {
+      else {
         val msg = "toggle web request failed with: " + response.body
         Logger.info(msg)
         throw new Exception(msg)
@@ -89,4 +103,3 @@ object TogglesClient extends IndividualToggleCache with AllTogglesCache with Con
     name.fold(clearBothCaches)(k => toggleCache.remove(k))
 
 }
-

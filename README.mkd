@@ -32,6 +32,13 @@ Feel free to run the steps below in order to bootstrap your brand new microservi
       Please enter service name:
       lookahead-service
       ```
+ 
+- Provide the repo url for the new microservice (retrieved from github or whereever the repo was created)
+
+      ```sh
+      Please enter url of new service repo: 
+      https://github.com/saksdirect/lookahead-service.git
+      ```
 
 - If you ran this script as a source script, it will change the current directory for you automatically. Otherwise, change it manually as it has been renamed:
 

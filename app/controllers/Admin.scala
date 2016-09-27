@@ -8,6 +8,7 @@ import play.api.libs.json._
 import helpers.AdminHelper._
 import helpers.ControllerPayload
 
+@Singleton
 class Admin @Inject() (
     timeoutHelper: helpers.ControllerTimeout
 ) extends ControllerPayload {

@@ -14,6 +14,7 @@ import ch.qos.logback.classic.Level
 import com.iheart.playSwagger.SwaggerSpecGenerator
 import play.api.libs.json.JsObject
 
+@Singleton
 class Application @Inject() (
     timeoutHelper: helpers.ControllerTimeout,
     togglesClient: TogglesClientLike

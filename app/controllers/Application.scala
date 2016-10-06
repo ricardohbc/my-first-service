@@ -10,8 +10,9 @@ import no.samordnaopptak.json.J
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future
-import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.{Level, LoggerContext}
 import com.iheart.playSwagger.SwaggerSpecGenerator
+import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 @Singleton
@@ -93,8 +94,14 @@ class Application @Inject() (
     implicit request =>
       timeout {
         Logger.debug("hbc-microservice-template change log level called")
+
         val level = Level.toLevel(levelString)
-        Logger.underlyingLogger.asInstanceOf[ch.qos.logback.classic.Logger].setLevel(level)
+        val loggerCtx = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
+
+        loggerCtx.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).setLevel(level)
+        loggerCtx.getLogger("application").setLevel(level)
+        loggerCtx.getLogger("play").setLevel(level)
+
         val response = s"Log level changed to $level"
         writeResponseGet(response)
       }

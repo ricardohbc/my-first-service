@@ -54,7 +54,7 @@ class ToggleServiceSpec extends WordSpec with org.scalatest.Matchers {
       toggle.get.toggle_state shouldBe false
     }
 
-    "delete a single toggle" should {
+    "delete a single toggle" in {
       val initialSize = client.toggleCache.size
       client.clearCache(Some("TEST_TWO"))
       client.toggleCache.size shouldBe (initialSize - 1)

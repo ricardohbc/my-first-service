@@ -20,6 +20,11 @@ webservices {
   }
 }
 
+akka {
+  loglevel="INFO"
+  loggers = ["akka.event.slf4j.Slf4jLogger"]
+}
+
 statsd {
 {{key "graphite"}}
  metric-namespace="micro-service"

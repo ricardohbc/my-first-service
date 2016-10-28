@@ -15,4 +15,4 @@ RUN chmod 775 /opt/containerbuddy/*
 # Play port to expose
 EXPOSE 9000
 
-CMD nohup /opt/microservice-template-0.1/bin/microservice-template -Dhttp.port=9000 -Dpidfile.path=/dev/null -Dconfig.file=${CONFIG_FILE}
+CMD nohup /opt/microservice-template-0.1/bin/microservice-template -Dhttp.port=9000 -Dpidfile.path=/dev/null -Dconfig.file=${CONFIG_FILE} -Dlogger.file=conf/docker-logback.xml

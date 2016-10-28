@@ -1,6 +1,6 @@
 <configuration>
 
-    <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
+    <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel" />
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${application.home}/logs/hbc-microservice-template.log</file>
@@ -14,9 +14,17 @@
     </appender>
 
     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <charset>UTF-8</charset>
-            <Pattern>%date{ISO8601} hbc-microservice-template - [%X][%level] - from %logger in %thread : %message%n%xException%n</Pattern>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <logLevel/>
+                <stackTrace/>
+                <mdc/>
+                <arguments/>
+            </providers>
         </encoder>
     </appender>
 

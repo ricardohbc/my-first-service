@@ -24,6 +24,11 @@
                 <stackTrace/>
                 <mdc/>
                 <arguments/>
+                <pattern>
+                    <pattern>
+                        { "service": "hbc-microservice-template" }
+                    </pattern>
+                </pattern>
             </providers>
         </encoder>
     </appender>

@@ -16,7 +16,7 @@ class Admin @Inject() (
   import timeoutHelper._
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
-    GET /v1/hbc-microservice-template/admin/ping
+    GET /v1/my-first-service/admin/ping
 
     DESCRIPTION
       Basic health check
@@ -34,7 +34,7 @@ class Admin @Inject() (
   }
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
-    GET /v1/hbc-microservice-template/admin/jvmstats
+    GET /v1/my-first-service/admin/jvmstats
 
     DESCRIPTION
       JVM statistics for the service

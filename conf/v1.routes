@@ -21,7 +21,7 @@ GET     /swagger-ui                           controllers.Application.renderSwag
 #   tags:
 #     - V1
 #   summary:
-#     Check to see if hbc-microservice-template service is running
+#     Check to see if my-first-service service is running
 #     THIS IS AN EXAMPLE SWAGGER DOCUMENTATION
 #   responses:
 #     200:
@@ -45,22 +45,22 @@ GET     /swagger-ui                           controllers.Application.renderSwag
 #              items:
 #                $ref: '#/definitions/Error'
 ###
-GET     /hbc-microservice-template              controllers.Application.index
+GET     /my-first-service              controllers.Application.index
 
 # Change log level
 ### NoDocs ###
-PUT     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevel(level: String)
+PUT     /my-first-service/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevel(level: String)
 
 # Change log level convenience method
 ### NoDocs ###
-GET     /hbc-microservice-template/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevelGet(level: String)
+GET     /my-first-service/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevelGet(level: String)
 
 # Admin
 ### NoDocs ###
-GET     /hbc-microservice-template/admin/ping                controllers.Admin.ping
+GET     /my-first-service/admin/ping                controllers.Admin.ping
 ### NoDocs ###
-GET     /hbc-microservice-template/admin/jvmstats            controllers.Admin.jvmstats
+GET     /my-first-service/admin/jvmstats            controllers.Admin.jvmstats
 ### NoDocs ###
-GET     /hbc-microservice-template/clear_toggles             controllers.Application.clearToggles(name: Option[String] ?= None)
+GET     /my-first-service/clear_toggles             controllers.Application.clearToggles(name: Option[String] ?= None)
 ### NoDocs ###
-GET     /hbc-microservice-template/toggles                   controllers.Application.toggles(name: Option[String] ?= None)
+GET     /my-first-service/toggles                   controllers.Application.toggles(name: Option[String] ?= None)

@@ -1,13 +1,13 @@
 hbcmicroservicetemplate:
-  image: sd1pgo01lx.saksdirect.com/hbc-microservice-template:<version>
+  image: sd1pgo01lx.saksdirect.com/my-first-service:<version>
   container_name: hbcmicroservicename
   hostname: <hostname>
   restart: always
   ports:
     - "9000:9000"
   volumes:
-    - /saksservices/config:/opt/hbc-microservice-template-0.1/conf/custom
-    - /saksservices/applogs/aem/hbc-microservice:/opt/hbc-microservice-template-0.1/logs
+    - /saksservices/config:/opt/my-first-service-0.1/conf/custom
+    - /saksservices/applogs/aem/hbc-microservice:/opt/my-first-service-0.1/logs
   labels:
     io.rancher.container.network: 'true'
   env_file:

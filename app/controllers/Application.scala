@@ -25,10 +25,10 @@ class Application @Inject() (
 
   @no.samordnaopptak.apidoc.ApiDoc(doc =
     """
-    GET /v1/hbc-microservice-template
+    GET /v1/my-first-service
 
     DESCRIPTION
-      Check to see if hbc-microservice-template service is running
+      Check to see if my-first-service service is running
 
     RESULT
       Response
@@ -53,7 +53,7 @@ class Application @Inject() (
   def index = Action.async {
     implicit request =>
       timeout {
-        val response = "hbc-microservice-template is up and running!"
+        val response = "my-first-service is up and running!"
         writeResponseGet(response)
       }
   }
@@ -61,7 +61,7 @@ class Application @Inject() (
   @no.samordnaopptak.apidoc.ApiDoc(doc =
 
     """
-    GET /v1/hbc-microservice-template/logLevel/{level}
+    GET /v1/my-first-service/logLevel/{level}
 
     DESCRIPTION
       Change the log level of this service
@@ -78,7 +78,7 @@ class Application @Inject() (
   @no.samordnaopptak.apidoc.ApiDoc(doc =
 
     """
-    PUT /v1/hbc-microservice-template/logLevel/{level}
+    PUT /v1/my-first-service/logLevel/{level}
 
     DESCRIPTION
       Change the log level of this service
@@ -93,7 +93,7 @@ class Application @Inject() (
   def changeLogLevel(levelString: String) = Action.async {
     implicit request =>
       timeout {
-        Logger.debug("hbc-microservice-template change log level called")
+        Logger.debug("my-first-service change log level called")
 
         val level = Level.toLevel(levelString)
         val loggerCtx = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
@@ -110,7 +110,7 @@ class Application @Inject() (
   @no.samordnaopptak.apidoc.ApiDoc(doc =
 
     """
-    GET /v1/hbc-microservice-template/clear_toggles
+    GET /v1/my-first-service/clear_toggles
 
     DESCRIPTION
       Clear the toggles cache, if you pass a toggle name under ?name=toggle_name it will clear that toggle, otherwise clear everything
@@ -128,7 +128,7 @@ class Application @Inject() (
   }
 
   @no.samordnaopptak.apidoc.ApiDoc(doc = """
-    GET /v1/hbc-microservice-template/toggles
+    GET /v1/my-first-service/toggles
 
     DESCRIPTION
       See what toggles our service has, if you pass a toggle name under ?name=toggle_name it will fetch that toggle, otherwise fetch everything

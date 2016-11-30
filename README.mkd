@@ -1,233 +1,38 @@
-HBC Microservice Template
-=================================
+# my-first-service
 
-This Scala Play app template aims to be used as the base template used by the developer community at HBC Digital.
+## Prequisites
+[Prerequisite Setup](https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#prerequisite-setup)  
 
-Feel free to run the steps below in order to bootstrap your brand new microservice.
+## Commands
+- To create a new box with containers running
 
-[Steps to Create a New Microservice](#steps-to-create-a-new-microservice)  
-[Microservice Naming Scheme](#microservice-naming-scheme)  
-[Features Supported](#features-supported)  
-[Additional Information](#additional-information)  
-
-## Steps to Create a New Microservice
-- Clone this project:
+     ```
+      sbt build-zip
       
-      ```sh
-      git clone https://github.com/saksdirect/hbc-microservice-template.git
+      vagrant up
       ```
+  - To run clean, test, and deploy your latest code
 
-- Create an empty Git repository without the README.
-
-- Run the 'setup.sh' as a source script inside this repo (works in Mac OSX only at the moment):
-      
-      ```sh
-      cd hbc-microservice-template
-      . setup.sh
+     ```
+      sbt pre-commit
       ```
+  - Sbt commands:
+     - build-zip: Compiles, tests, and publishes a zip file with the new code.
+     - pre-commit: Compiles, tests, zips code, and then refreshes docker container.
 
-- Give the new microservice a name. The script will perform a search & replace to change all "hbc-microservice-template" string instances to the name you have provided (please conform to the naming scheme described below):
+## Routes
 
-      ```sh
-      Please enter service name:
-      lookahead-service
-      ```
- 
-- Provide the repo url for the new microservice (retrieved from github or whereever the repo was created)
+[list all routes that this service supports]
 
-      ```sh
-      Please enter url of new service repo: 
-      https://github.com/saksdirect/lookahead-service.git
-      ```
+| Method | Route | Class | Description
+| ------ | ----- | ----- | -----------
+| GET | /my-first-service | controllers.Application.index | Index Page
+| PUT | /my-first-service/logLevel/$level | controllers.Application.changeLogLevel | Change Log Level
+| GET | /my-first-service/logLevel/$level | controllers.Application.changeLogLevel | Change Log Level (Convenient Method)
+| GET | /my-first-service/admin/ping | controllers.Admin.ping | Ping Service
+| GET | /my-first-service/admin/jvmstats | controllers.Admin.jvmstats | Display current JVM Stats
 
-- If you ran this script as a source script, it will change the current directory for you automatically. Otherwise, change it manually as it has been renamed:
 
-      ```sh
-      cd .
-      ```
+# Architecture
 
-## Microservice Naming Scheme  
-- Only use lower case letters.
-- All words should be separated by dashes.
-- Name should be short, and clearly describes what the service is used for.
-- All microservices should have a suffix of "-service", so we can easily search for and distinguish all microservices in github.
-- Examples of good service names:
-      - find-in-store-serivce
-      - store-pickup-service
-      - endeca-service
-      - lookahead-service
-
-## Features supported  
-[Get Started with Vagrant/Docker](https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#first-time-setup)
-
-- Docker image
-  - Readme, Dockerfile, and scripts can be found under docker directory
-
-- Vagrant
-  - Vagrantfile is in root of project
-  - Puppet provisioning is in puppet directory
-
-## Messages
-- We are using a custom Messages API, which is an extension on top of the default Scala Play Messages API: [ScalaI18N](https://playframework.com/documentation/2.5.x/ScalaI18N)
-- This supports all features of the default Messages API. We just added another layer to it to support banner-specific messages.
-- All global messages should go into the conf/messages folder. (e.g. conf/messages/messages.en)
-- If banner-specific messages are required, it should go into conf/messages/<banner_name> folder.
-- We determine which banner we are using by the "hbc.banner" property in application.conf.
-- For example, say we have the following structure:
-
-```
-   conf/messages/messages.en:
-      title=HBC
-   conf/messages/saks/messages.en:
-      title=Saks
-   conf/messages/off5th/messages.en:
-      title=Saks Off 5th
-```
-
-   - To get the title in your code, you would just need to inject MessagesApi into your class, and call it like this: messagesApi("title")
-   - If hbc.banner="saks", we will get "Saks".
-   - If hbc.banner="off5th", we will get "Saks Off 5th".
-   - If hbc.banner="lat", we will get "HBC" because there is no "lat" folder, and will fall back to the global messages.en.
-
-#### Logging
-  - Based on embedded Play logging support (Logback)
-  - [Logging](https://www.playframework.com/documentation/2.3.x/SettingsLogger)
-  - Change logging settings by modifying file 'conf/logger.xml'
-  - Logs are at 'logs/hbc-microservice-template.log'
-  - You can change the log level at runtime by hitting the endpoint:
-    - /hbc-microservice-template/logLevel/DEBUG (possible values = ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)
-
-- Metrics
-  - Based on [metrics](https://github.com/saksdirect/metrics) project 
-  - Turned into a scala trait, StatsDClient, and associated classes
-  - Embedded with the template
-  - Provides Counters, Gauges and Metrics
-
-- Health check page
-    Health check pages are under the endpoint path **/admin/[???]**
-
-    These are the supported endpoint:
-
- - Ping
-    When called the endpoit **/admin/ping** the response should **pong**
-    
- - JVM stats
-    When called the endpoint **/admin/jvmstats** the response should be a JSON payload with the JVM stats as showed below:
-    
-    ```sh
-{
-  "jvm_num_cpus" : 4.0,
-  "jvm_current_mem_Code Cache_max" : 50331648,
-  "jvm_post_gc_PS Old Gen_max" : 7.1565312E+8,
-  "jvm_post_gc_PS Eden Space_used" : 0.0,
-  "jvm_fd_limit" : 10240.0,
-  "jvm_current_mem_PS Survivor Space_used" : 45259984,
-  "jvm_thread_count" : 40.0,
-  "jvm_post_gc_PS Perm Gen_used" : 106023416,
-  "jvm_classes_total_unloaded" : 14152.0,
-  "jvm_current_mem_PS Eden Space_max" : 239599616,
-  "jvm_current_mem_PS Old Gen_max" : 7.1565312E+8,
-  "jvm_nonheap_max" : 5.8720256E+8,
-  "jvm_buffer_direct_count" : 19.0,
-  "jvm_buffer_mapped_used" : 0.0,
-  "jvm_buffer_direct_max" : 627712.0,
-  "jvm_current_mem_PS Old Gen_used" : 197647536,
-  "jvm_classes_current_loaded" : 22564.0,
-  "jvm_start_time" : 1432235806864,
-  "jvm_current_mem_Code Cache_used" : 1.839776E+7,
-  "jvm_buffer_mapped_count" : 0.0,
-  "jvm_post_gc_PS Survivor Space_max" : 45613056,
-  "jvm_buffer_direct_used" : 627712.0,
-  "jvm_thread_peak_count" : 42.0,
-  "jvm_current_mem_used" : 527369496,
-  "jvm_post_gc_PS Eden Space_max" : 239599616,
-  "jvm_post_gc_used" : 276579328,
-  "jvm_current_mem_PS Perm Gen_used" : 134804432,
-  "jvm_uptime" : 70355031,
-  "jvm_heap_committed" : 495976448,
-  "jvm_compilation_time_msec" : 96308.0,
-  "jvm_current_mem_PS Eden Space_used" : 131259784,
-  "jvm_classes_total_loaded" : 36716.0,
-  "jvm_current_mem_PS Survivor Space_max" : 45613056,
-  "jvm_buffer_mapped_max" : 0.0,
-  "jvm_thread_daemon_count" : 9.0,
-  "jvm_heap_max" : 954728448,
-  "jvm_post_gc_PS Old Gen_used" : 125295928,
-  "jvm_fd_count" : 354.0,
-  "jvm_post_gc_PS Perm Gen_max" : 536870912,
-  "jvm_heap_used" : 374167304,
-  "jvm_post_gc_PS Survivor Space_used" : 45259984,
-  "jvm_nonheap_used" : 153191056,
-  "jvm_current_mem_PS Perm Gen_max" : 536870912,
-  "jvm_nonheap_committed" : 238354432
-}
-    ```
- 
-- Template patching/versioning
-  - Version stored in conf/application.conf
-  - Version property is template-version
-  - Corresponding Git head commit hash is stored in property: template-commit-hash
-  - To create patch and update version:
-    - Run ./create_patch.sh
-    - Follow instructions to set version and included commits
-    - conf/application.conf will automatically be updated
-    - New tag and conf/application.conf will be pushed to master
-    - To apply patch:
-      - https://github.com/saksdirect/How-to-Start/blob/master/git/creating-patches.mkd#how-to-apply-the-patch 
-  - You can also manually change the version and/or head commit in conf/application.conf yourself
-
-- HTTP fail over (TBD)
-
-- Timeout handling
-  - Controller timeout handled by mixing in helpers/ControllerTimeout trait
-  - Wrap your async controller body like:
-    - timeout(errorHandler: => T) {BODY}
-
-- Time requests and calls within
-  - calls to each endpoint are timed OOTB. Tag is controller.action
-  - If you want to time more fine-grained sections of code, you can mix in the StatsDClient trait, use it like:
-    - time("mytag", request) {code} if you want the tag to be prefixed with controller.action 
-    - or just time("mytag") {code} if you don't want to controller/action tagging 
-
-- IDE support
-
-- OOTB provision of basic metrics (count and timing for each endpoint), a default (configurable) timeout for all endpoints and some standardized catching of show-stopper exceptions and providing a standard error response.
-
-#### Configuration
-  - Configuration is handled via Play's built in configuration file, conf/application.conf for development
-  - Any configuration settings you add to application.conf should also be added to SERVICE_NAME-application.conf with Puppet variables where appropriate in place of values so they can be configured for other environments.
-
-#### Testing
-  - Tests for the services are in the test directory
-  - To run them you can use IntelliJ. Right click on the test class in the Project window or in the code of the class itself in the right window and click run
-  - To debug in IntelliJ you can right click as above but choose debug. You can set breakpoints throughout the code that will pause execution flow
-  - You can run individual tests but right click inside the code of the test
-  - You can also run the tests in SBT by either starting sbt and running the "test" task or running "sbt test" from the command line
-  - You can run a single test in SBT by using the testOnly task and passing the name (including package) of the test class
-
-#### External Libraries
-  - External libraries can be added to your project via sbt in several ways
-  - Plugins for sbt are added in project/plugins.sbt
-  - Library dependencies are added in:
-    - project/CommonDependencies.scala - only in the hbc-microservice-template and only for dependencies that are shared across all (or most) services
-    - project/ServiceDependencies.scala - for dependencies that arre service specific
-  - Play documentation on adding dependencies can be found here:
-    - http://www.scala-sbt.org/0.13/docs/Library-Management.html 
-
-#### Getting Started
-    
-Navigate to the root project directory and call sbt
-
- - Intellij (v12 and earlier)
-   When you are on sbt console, call **gen-idea**
-   
-- Intellij (v13 and newer)
-   In IntelliJ: Click on File > New > Project from existing source > Select Root of Repo and click OK > SBT > Make sure "Use Auto-Import" is checked > Finish  
-  
- - Eclipse
-   When you are on sbt console, call **eclipse**
-
-All project dependencies will be downloaded and the configuration files will be created
-
-## Additional Information  
-Resource: https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#additional-information
+[describe how this service interacts with other external systems]

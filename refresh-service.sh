@@ -1,6 +1,6 @@
 #!/bin/bash
 
-artifactName = hbc-microservice-template-0.1.zip
+artifactName = my-first-service-0.1.zip
 
 if ! [ -a target/universal/${artifactName} ]  ; then
 	echo "Building the service distribution ZIP from sources..."

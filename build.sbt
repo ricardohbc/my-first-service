@@ -3,7 +3,7 @@ import ServiceDependencies._
 import net.virtualvoid.sbt.graph.Plugin._
 import scalariform.formatter.preferences._
 
-name := """hbc-microservice-template"""
+name := """my-first-service"""
 
 version := "0.1"
 

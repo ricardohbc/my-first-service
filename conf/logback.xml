@@ -3,7 +3,7 @@
     <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${application.home}/logs/hbc-microservice-template.log</file>
+        <file>${application.home}/logs/my-first-service.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
@@ -16,7 +16,7 @@
     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <charset>UTF-8</charset>
-            <Pattern>%date{ISO8601} hbc-microservice-template - [%X][%level] - from %logger in %thread : %message%n%xException%n</Pattern>
+            <Pattern>%date{ISO8601} my-first-service - [%X][%level] - from %logger in %thread : %message%n%xException%n</Pattern>
         </encoder>
     </appender>
 

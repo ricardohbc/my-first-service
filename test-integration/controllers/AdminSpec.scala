@@ -22,14 +22,14 @@ class AdminSpec extends WordSpec
 
   "Admin controller" should {
     "return healthcheck status" in {
-      val ping = route(app, FakeRequest(GET, "/v1/hbc-microservice-template/admin/ping")).get
+      val ping = route(app, FakeRequest(GET, "/v1/my-first-service/admin/ping")).get
 
       status(ping) shouldBe OK
       (contentAsJson(ping) \ "response" \ "results").as[String] shouldBe "pong"
     }
 
-    "show **JVM Stats** when /hbc-microservice-template/admin/jvmstats endpoint is called" in {
-      val jvmstats = route(app, FakeRequest(GET, "/v1/hbc-microservice-template/admin/jvmstats")).get
+    "show **JVM Stats** when /my-first-service/admin/jvmstats endpoint is called" in {
+      val jvmstats = route(app, FakeRequest(GET, "/v1/my-first-service/admin/jvmstats")).get
 
       status(jvmstats) shouldBe OK
       contentAsString(jvmstats).contains("jvm_num_cpus") shouldBe true

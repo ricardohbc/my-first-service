@@ -58,12 +58,12 @@ class FiltersSpec
 
   "ServiceFilters" should {
     "handle exception when it's thrown by controller" in withPlay(application(bindings = crashyBindings)) {
-      val ping = route(FakeRequest(GET, "/v1/hbc-microservice-template/admin/ping")).get
+      val ping = route(FakeRequest(GET, "/v1/my-first-service/admin/ping")).get
       ((contentAsJson(ping) \ "errors")(0) \ "error").as[String] == "NullPointerException" shouldBe true
     }
 
     "return TimeoutException after configured time" in withPlay(application(config = FiltersSpec.configuration, bindings = slowBindings)) {
-      val ping = route(FakeRequest(GET, "/v1/hbc-microservice-template/admin/ping")).get
+      val ping = route(FakeRequest(GET, "/v1/my-first-service/admin/ping")).get
       ((contentAsJson(ping) \ "errors")(0) \ "error").as[String] == "TimeoutException" shouldBe true
       status(ping) shouldBe 503
     }
